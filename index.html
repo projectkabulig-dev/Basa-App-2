@@ -109,7 +109,11 @@
 
   /* ---------- pagbasa ---------- */
   .tracker{list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(3,1fr); gap:10px}
-  .tracker li{display:flex; align-items:center; gap:8px; background:#fff; border:3px solid var(--ink); border-radius:16px; padding:6px 10px; font-family:'Fredoka',sans-serif; font-weight:600; font-size:.98rem; min-width:0; opacity:.75}
+  .tracker li{background:#fff; border:3px solid var(--ink); border-radius:16px; font-family:'Fredoka',sans-serif; font-weight:600; font-size:.98rem; min-width:0; opacity:.8; transition:transform .1s}
+  .tracker li button{display:flex; align-items:center; gap:8px; width:100%; background:none; border:0; padding:6px 10px; font:inherit; color:inherit; cursor:pointer; border-radius:12px; min-width:0}
+  .tracker li.now button{cursor:default}
+  .tracker li:not(.now):hover{transform:translateY(-2px); opacity:1}
+  .hint{margin:-8px 0 0; text-align:center; font-weight:700; font-size:.9rem; color:var(--mute)}
   .tracker .n{flex:none; width:28px; height:28px; border-radius:50%; background:var(--sky); border:3px solid var(--ink); display:grid; place-items:center; font-size:.9rem; font-weight:700}
   .tracker .t{overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
   .tracker li.now{background:var(--sun); opacity:1; box-shadow:0 4px 0 var(--ink); transform:translateY(-2px)}
@@ -262,6 +266,7 @@
   <section id="screenPlay" hidden style="display:flex; flex-direction:column; gap:18px">
     <span class="sr" id="levelName"></span>
     <ol class="tracker" id="tracker" aria-label="Mga antas"></ol>
+    <p class="hint" id="levelHint"></p>
     <div class="progress"><div class="bar" aria-hidden="true"><i id="barFill"></i></div><div class="count" id="count"></div></div>
 
     <div class="card target-card">
@@ -427,6 +432,7 @@
       listening: 'Nakikinig ako… basahin mo na!', listeningLong: 'Nakikinig ako… pindutin ulit kapag tapos ka na.',
       thinking: 'Sandali lang…',
       getReady: 'Sandali… hintayin munang pumula ang mikropono.',
+      levelHint: 'Gusto mong lumipat? Pindutin ang bilang ng antas.',
       praise: ['Magaling!', 'Ang galing mo!', 'Mahusay!', 'Napakahusay!', 'Very good!', 'Wow, ang galing!', 'Bravo!', 'Ang linaw ng basa mo!', 'Husay naman!', 'Sobrang galing!', 'Excellent!', 'Ayos! Tama ka!', 'Ang galing-galing mo!', 'Ikaw na!', 'Good job!', 'Napakagaling mo!', 'Tama! Ang husay!', 'Well done!'],
       near: ['Halos tama! Isa pa!', 'Malapit na!', 'Konti na lang!', 'Ang lapit na! Subukan ulit!', 'Halos nakuha mo na!'],
       retry: ['Subukan mo ulit!', 'Kaya mo yan!', 'Ulitin natin!', 'Dahan-dahan lang, kaya mo!', 'Isa pa, kaya mo yan!', 'Huwag sumuko, subukan ulit!'],
@@ -455,6 +461,7 @@
       listening: 'I am listening… read it out loud!', listeningLong: 'I am listening… press again when you are done.',
       thinking: 'One moment…',
       getReady: 'One moment… wait for the mic to turn red.',
+      levelHint: 'Want to switch? Tap a level number.',
       praise: ['Very good!', 'Excellent!', 'Great job!', 'Awesome!', 'Well done!', 'Fantastic!', 'Perfect!', 'Amazing!', 'Wonderful!', 'You did it!', 'Super reading!', 'Brilliant!', 'Nice work!', 'That is correct!', 'Outstanding!', 'Way to go!', 'Magnificent!', 'Terrific!', 'You are a star!', 'Great reading!'],
       near: ['Almost there!', 'So close! One more time!', 'Nearly right! Try again!', 'You are close!', 'Almost! Try once more!'],
       retry: ['Try again!', 'You can do it!', 'Let us try once more!', 'Take your time. You can do it!', 'One more time!', 'Do not give up, try again!'],
@@ -491,7 +498,7 @@
     engine: store('bt_engine') === 'azure' ? 'azure' : 'web'
   });
 
-  const S = { lang: store('bt_lang') === 'en' ? 'en' : 'fil', learner: '', stars: 0, results: [], stop: null, wantMore: false, azureFailed: false, last: {} };
+  const S = { lang: store('bt_lang') === 'en' ? 'en' : 'fil', learner: '', stars: 0, results: [], stop: null, wantMore: false, azureFailed: false, last: {}, jump: null, curLevel: 0, doneLevels: new Set() };
   const tr = k => TR[S.lang][k];
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   function pickPhrase(kind) {
@@ -548,14 +555,23 @@
     const t = $('tracker'); t.innerHTML = '';
     LEVELS.forEach((l, i) => {
       const li = document.createElement('li');
+      const btn = document.createElement('button'); btn.type = 'button';
+      btn.setAttribute('aria-label', l.name[S.lang]);
+      btn.addEventListener('click', () => jumpTo(i));
       const n = document.createElement('span'); n.className = 'n'; n.textContent = String(i + 1);
       const s = document.createElement('span'); s.className = 't'; s.textContent = l.short[S.lang];
-      li.append(n, s); t.appendChild(li);
+      btn.append(n, s); li.appendChild(btn); t.appendChild(li);
     });
   }
   function setTracker(level) {
     const idx = LEVELS.indexOf(level);
-    [...$('tracker').children].forEach((li, i) => { li.className = i < idx ? 'done' : i === idx ? 'now' : ''; li.querySelector('.t').textContent = LEVELS[i].short[S.lang]; });
+    [...$('tracker').children].forEach((li, i) => {
+      li.className = i === idx ? 'now' : S.doneLevels.has(i) ? 'done' : '';
+      const btn = li.querySelector('button');
+      btn.setAttribute('aria-current', i === idx ? 'step' : 'false');
+      btn.setAttribute('aria-label', LEVELS[i].name[S.lang]);
+      li.querySelector('.t').textContent = LEVELS[i].short[S.lang];
+    });
   }
 
   /* ================= PAGHAHAMBING ================= */
@@ -788,7 +804,7 @@
     el.innerHTML = '';
     tokens(text).forEach(w => { const s = document.createElement('span'); s.className = 'w'; s.textContent = w; el.appendChild(s); });
     $('levelName').textContent = level.name[S.lang];
-    setTracker(level); mood('idle');
+    setTracker(level); S.curLevel = LEVELS.indexOf(level); S.curText = text; $('levelHint').textContent = tr('levelHint'); mood('idle');
     $('count').textContent = TR[S.lang].itemOf(level.unit[S.lang], pos, total);
     $('barFill').style.width = Math.round(((pos - 1) / total) * 100) + '%';
     $('result').hidden = true; $('nextBtn').hidden = true;
@@ -815,14 +831,26 @@
   /* ================= ISANG BABASAHIN ================= */
   let runId = 0;
   const ABORT = 'ABORT';
-  function chk(id) { if (id !== runId) throw new Error(ABORT); }
+  const JUMP = 'JUMP';
+  function chk(id) { if (id !== runId) throw new Error(ABORT); if (S.jump !== null) throw new Error(JUMP); }
   function abortRun() {
-    runId++; bannerSeq++;
+    runId++; bannerSeq++; S.jump = null;
     if (S.stop) S.stop();
     try { if ('speechSynthesis' in window) speechSynthesis.cancel(); } catch (e) {}
     if (micWaiter) { const w = micWaiter; micWaiter = null; w('abort'); }
     if (nextWaiter) { const w = nextWaiter; nextWaiter = null; w(); }
     $('banner').hidden = true;
+  }
+
+  // Lumipat sa ibang antas kahit hindi pa tapos ang kasalukuyan (pasulong o paatras).
+  function jumpTo(i) {
+    if ($('screenPlay').hidden || i === S.curLevel) return;
+    S.jump = i;
+    if (S.stop) S.stop();
+    try { if ('speechSynthesis' in window) speechSynthesis.cancel(); } catch (e) {}
+    if (micWaiter) { const w = micWaiter; micWaiter = null; w('jump'); }
+    if (nextWaiter) { const w = nextWaiter; nextWaiter = null; w(); }
+    bannerSeq++; $('banner').hidden = true;
   }
 
   async function playItem(level, text, pos, total, id) {
@@ -839,7 +867,7 @@
       // Huwag magsalita hanggang hindi pa pula ang mikropono: doon pa lang tunay na nakikinig ang engine.
       setMic('starting', ''); setStatus(tr('getReady'));
       const onReady = () => {
-        if (id !== runId) return;
+        if (id !== runId || S.jump !== null) return;
         setMic('listening', level.mode === 'long' ? tr('micStop') : '');
         setStatus(level.mode === 'long' ? tr('listeningLong') : tr('listening'));
       };
@@ -903,30 +931,38 @@
   }
 
   /* ================= BUONG SESSION ================= */
-  async function runSession() {
+  async function runLevel(level, id) {
+    const idx = LEVELS.indexOf(level);
+    await banner(level.name[S.lang], 1400); chk(id);
+    const N = CONFIG.session[level.key];
+    let round = 0, acc = 0;
+    while (true) {
+      round++;
+      const items = pick(level.key, N);
+      let got = 0;
+      for (let i = 0; i < items.length; i++) {
+        const res = await playItem(level, items[i], i + 1, items.length, id); chk(id);
+        got += res.score; S.results.push(res);
+        if (level.key === 'paragraphs') rememberMissed('words', res.missWords.slice(0, 4));
+        else if (res.score < 1) rememberMissed(level.key, [items[i]]);
+      }
+      acc = got / items.length;
+      if (!level.gate || acc >= CONFIG.gate || round >= 2) break;
+      await banner(tr('another'), 1500, true); chk(id);
+    }
+    S.doneLevels.add(idx);
+    if (level.gate) { await banner(tr('levelUp'), 1100, true); chk(id); }
+  }
+
+  async function runSession(startIdx) {
     const id = ++runId;
     try {
-      S.results = []; S.stars = 0; S.azureFailed = false; $('stars').textContent = '0';
+      S.results = []; S.stars = 0; S.azureFailed = false; S.jump = null; S.doneLevels = new Set(); $('stars').textContent = '0';
       show('screenPlay'); $('screenPlay').style.display = 'flex';
-      for (const level of LEVELS) {
-        await banner(level.name[S.lang], 1400); chk(id);
-        const N = CONFIG.session[level.key];
-        let round = 0, acc = 0;
-        while (true) {
-          round++;
-          const items = pick(level.key, N);
-          let got = 0;
-          for (let i = 0; i < items.length; i++) {
-            const res = await playItem(level, items[i], i + 1, items.length, id); chk(id);
-            got += res.score; S.results.push(res);
-            if (level.key === 'paragraphs') rememberMissed('words', res.missWords.slice(0, 4));
-            else if (res.score < 1) rememberMissed(level.key, [items[i]]);
-          }
-          acc = got / items.length;
-          if (!level.gate || acc >= CONFIG.gate || round >= 2) break;
-          await banner(tr('another'), 1500, true); chk(id);
-        }
-        if (level.gate) { await banner(tr('levelUp'), 1100, true); chk(id); }
+      let li = startIdx || 0;
+      while (li < LEVELS.length) {
+        try { await runLevel(LEVELS[li], id); li++; }
+        catch (e) { if (e.message === JUMP) { li = S.jump; S.jump = null; continue; } throw e; }
       }
       showEnd();
     } catch (e) { if (e.message === ABORT) return; throw e; }
@@ -951,6 +987,7 @@
     const line = (k, v) => { const d = document.createElement('div'); const a = document.createElement('span'); a.textContent = k; const b = document.createElement('b'); b.textContent = v; d.append(a, b); sum.appendChild(d); };
     LEVELS.forEach(l => {
       const s = st[l.key];
+      if (!s.n) { line(l.short[S.lang], '—'); return; }
       if (l.mode === 'long') line(l.short[S.lang], `${Math.round(s.acc * 100)}%` + (s.wcpm ? ` (${s.wcpm} ${tr('wpm')})` : ''));
       else line(l.short[S.lang], `${s.got % 1 ? s.got.toFixed(1) : s.got} / ${s.n}`);
     });
@@ -962,7 +999,8 @@
     else pr.textContent = tr('practiceNone');
 
     const buddy = $('buddy'); buddy.className = 'buddy wait';
-    const overall = LEVELS.reduce((a, l) => a + st[l.key].acc, 0) / LEVELS.length;
+    const visited = LEVELS.filter(l => st[l.key].n > 0);
+    const overall = visited.length ? visited.reduce((a, l) => a + st[l.key].acc, 0) / visited.length : 0;
     const localMsg = overall >= 0.8 ? tr('local').good : overall >= 0.5 ? tr('local').mid : tr('local').low;
     const c = cfg();
     if (c.url && c.code) {
@@ -989,7 +1027,7 @@
     if (micWaiter) { const w = micWaiter; micWaiter = null; w('skip'); }
   });
   $('nextBtn').addEventListener('click', () => { if (nextWaiter) { const w = nextWaiter; nextWaiter = null; w(); } });
-  $('listen').addEventListener('click', () => { const t = $('target').textContent; if (t) speak(t); });
+  $('listen').addEventListener('click', () => { if (S.curText) speak(S.curText); });
 
   function setLang(l) {
     S.lang = l; store('bt_lang', l);
@@ -1001,9 +1039,9 @@
   // Kapag nagpalit ng wika habang nagbabasa, magsisimula ng bagong session sa bagong wika.
   function switchLang(l) {
     if (l === S.lang) return;
-    const playing = !$('screenPlay').hidden;
+    const playing = !$('screenPlay').hidden, cur = S.curLevel || 0;
     setLang(l);
-    if (playing) { abortRun(); runSession(); }
+    if (playing) { abortRun(); runSession(cur); }
   }
   ['langFil', 'hLangFil'].forEach(i => $(i).addEventListener('click', () => switchLang('fil')));
   ['langEn', 'hLangEn'].forEach(i => $(i).addEventListener('click', () => switchLang('en')));
