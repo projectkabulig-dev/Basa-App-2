@@ -32,14 +32,14 @@
   .cloud.c2{top:150px; right:-30px; width:160px}
   .waves{position:absolute; left:0; bottom:0; width:100%; height:110px}
 
-  header{position:relative; z-index:2; width:100%; max-width:640px; padding:14px 16px 6px; display:flex; align-items:center; justify-content:space-between; gap:12px}
+  header{position:relative; z-index:2; width:100%; max-width:640px; padding:14px 14px 6px; display:flex; align-items:center; justify-content:space-between; gap:8px}
   .brand{font-family:'Fredoka',sans-serif; font-weight:700; font-size:1.35rem; color:var(--deep)}
-  .tools{display:flex; align-items:center; gap:10px}
-  .starcount{display:flex; align-items:center; gap:6px; background:var(--sun); border:3px solid var(--ink); border-radius:999px; padding:3px 14px 3px 10px; box-shadow:0 4px 0 var(--ink); font-family:'Fredoka',sans-serif; font-weight:700; font-size:1.2rem}
+  .tools{display:flex; align-items:center; gap:8px; margin-left:auto}
+  .starcount{display:flex; align-items:center; gap:6px; background:var(--sun); border:3px solid var(--ink); border-radius:999px; padding:2px 11px 2px 8px; box-shadow:0 4px 0 var(--ink); font-family:'Fredoka',sans-serif; font-weight:700; font-size:1.1rem}
   .starcount svg{width:24px; height:24px}
-  .iconbtn{width:46px; height:46px; border-radius:50%; background:#fff; border:3px solid var(--ink); box-shadow:0 4px 0 var(--ink); display:grid; place-items:center; padding:0}
+  .iconbtn{width:40px; height:40px; border-radius:50%; background:#fff; border:3px solid var(--ink); box-shadow:0 4px 0 var(--ink); display:grid; place-items:center; padding:0}
   .iconbtn:active{transform:translateY(3px); box-shadow:0 1px 0 var(--ink)}
-  .iconbtn svg{width:24px; height:24px}
+  .iconbtn svg{width:22px; height:22px}
 
   main{position:relative; z-index:1; width:100%; max-width:640px; padding:6px 16px 130px; display:flex; flex-direction:column; gap:18px}
 
@@ -144,7 +144,7 @@
   .mic:active{transform:translateY(6px); box-shadow:0 2px 0 var(--ink)}
   .mic svg{width:64px; height:64px}
   .micarea[data-state="listening"] .mic{background:var(--coral); color:#fff}
-  .micarea[data-state="thinking"] .mic{background:#D7E6EE; cursor:progress}
+  .micarea[data-state="thinking"] .mic,.micarea[data-state="starting"] .mic{background:#D7E6EE; cursor:progress}
   .ring{position:absolute; inset:12px; border-radius:50%; border:5px solid var(--coral); opacity:0; z-index:1}
   .micarea[data-state="listening"] .ring{animation:pulse 1.2s ease-out infinite}
   .micarea[data-state="listening"] .ring.r2{animation-delay:.6s}
@@ -196,6 +196,12 @@
   .dlg .actions{display:flex; justify-content:flex-end; gap:10px; flex-wrap:wrap}
   footer{color:var(--ink); font-size:.85rem; font-weight:700; text-align:center; padding:10px 14px; background:rgba(255,255,255,.92); border:3px solid var(--ink); border-radius:18px}
 
+  .hdrlang{display:inline-flex; background:#fff; border:3px solid var(--ink); border-radius:999px; padding:3px; gap:3px; box-shadow:0 4px 0 var(--ink)}
+  .hdrlang button{border:0; background:transparent; font-family:'Fredoka',sans-serif; font-weight:700; font-size:.85rem; padding:4px 9px; border-radius:999px}
+  .hdrlang button[aria-pressed="true"]{background:var(--sun)}
+  .iconbtn .slash{display:none} .iconbtn[data-on="false"] .slash{display:block}
+  header{flex-wrap:wrap}
+
   @media (prefers-reduced-motion:reduce){ *,*::before,*::after{animation:none !important; transition:none !important} .micarea[data-state="listening"] .ring{opacity:.5; transform:scale(1.15)} }
 </style>
 </head>
@@ -211,12 +217,18 @@
 </div>
 
 <header>
-  <div class="brand">Basa Tayo!</div>
+  <div class="hdrlang" id="hdrLang" role="group" aria-label="Wika ng babasahin" hidden>
+    <button type="button" id="hLangFil" aria-pressed="true">Filipino</button>
+    <button type="button" id="hLangEn" aria-pressed="false">English</button>
+  </div>
   <div class="tools">
     <div class="starcount" aria-label="Mga bituin">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3 6.1 20.6l1.3-6.6L2.5 9.4l6.6-.8z" fill="#fff" stroke="#1F2A44" stroke-width="2" stroke-linejoin="round"/></svg>
       <span id="stars">0</span>
     </div>
+    <button class="iconbtn" id="voiceBtn" type="button" data-on="true" aria-pressed="true" aria-label="Boses ni Basa Buddy">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#1F2A44" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z" fill="#FFD23F"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/><path class="slash" d="M3 3l18 18" stroke="#E5484D" stroke-width="3"/></svg>
+    </button>
     <button class="iconbtn" id="openSettings" type="button" aria-label="Settings">
       <svg viewBox="0 0 24 24" fill="none" stroke="#1F2A44" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
     </button>
@@ -324,6 +336,14 @@
       </select>
       <small>Kapag pumalya ang Azure, awtomatikong babalik sa Web Speech.</small>
     </label>
+    <label>Boses ni Basa Buddy (papuri at paghikayat)
+      <select id="fVoice">
+        <option value="on">Naka-on</option>
+        <option value="off">Naka-off</option>
+      </select>
+      <small id="voiceInfo"></small>
+    </label>
+    <div><button class="btn small" type="button" id="testVoice">Subukan ang boses</button></div>
     <label>Apps Script URL (opsyonal)
       <input id="fUrl" type="url" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off">
       <small>Para sa talaan ng guro at mensahe ni Claude. Walang laman = gagana pa rin ang app.</small>
@@ -406,7 +426,10 @@
       micIdle: 'Pindutin para magsimula', micStop: 'Pindutin kapag tapos ka na',
       listening: 'Nakikinig ako… basahin mo na!', listeningLong: 'Nakikinig ako… pindutin ulit kapag tapos ka na.',
       thinking: 'Sandali lang…',
-      praise: ['Ang galing mo!', 'Wow, ang husay ng basa mo!', 'Sige pa, kaya mo yan!', 'Ang linaw ng basa mo!'],
+      getReady: 'Sandali… hintayin munang pumula ang mikropono.',
+      praise: ['Magaling!', 'Ang galing mo!', 'Mahusay!', 'Napakahusay!', 'Very good!', 'Wow, ang galing!', 'Bravo!', 'Ang linaw ng basa mo!', 'Husay naman!', 'Sobrang galing!', 'Excellent!', 'Ayos! Tama ka!', 'Ang galing-galing mo!', 'Ikaw na!', 'Good job!', 'Napakagaling mo!', 'Tama! Ang husay!', 'Well done!'],
+      near: ['Halos tama! Isa pa!', 'Malapit na!', 'Konti na lang!', 'Ang lapit na! Subukan ulit!', 'Halos nakuha mo na!'],
+      retry: ['Subukan mo ulit!', 'Kaya mo yan!', 'Ulitin natin!', 'Dahan-dahan lang, kaya mo!', 'Isa pa, kaya mo yan!', 'Huwag sumuko, subukan ulit!'],
       tama: 'Tama! Magaling!', halos: 'Halos tama!', ulit: 'Subukan ulit',
       again: 'Subukan ulit! Pakinggan muna kung gusto mo.',
       correct: 'Ito ang tamang basa. Pakinggan mo.',
@@ -431,7 +454,10 @@
       micIdle: 'Press to start', micStop: 'Press when you are done',
       listening: 'I am listening… read it out loud!', listeningLong: 'I am listening… press again when you are done.',
       thinking: 'One moment…',
-      praise: ['You are awesome!', 'Wow, great reading!', 'Keep going, you can do it!', 'So clear and loud!'],
+      getReady: 'One moment… wait for the mic to turn red.',
+      praise: ['Very good!', 'Excellent!', 'Great job!', 'Awesome!', 'Well done!', 'Fantastic!', 'Perfect!', 'Amazing!', 'Wonderful!', 'You did it!', 'Super reading!', 'Brilliant!', 'Nice work!', 'That is correct!', 'Outstanding!', 'Way to go!', 'Magnificent!', 'Terrific!', 'You are a star!', 'Great reading!'],
+      near: ['Almost there!', 'So close! One more time!', 'Nearly right! Try again!', 'You are close!', 'Almost! Try once more!'],
+      retry: ['Try again!', 'You can do it!', 'Let us try once more!', 'Take your time. You can do it!', 'One more time!', 'Do not give up, try again!'],
       tama: 'Correct! Great job!', halos: 'Almost!', ulit: 'Try again',
       again: 'Try again! Listen first if you like.',
       correct: 'Here is the right way to read it. Listen.',
@@ -465,9 +491,14 @@
     engine: store('bt_engine') === 'azure' ? 'azure' : 'web'
   });
 
-  const S = { lang: store('bt_lang') === 'en' ? 'en' : 'fil', learner: '', stars: 0, results: [], stop: null, wantMore: false, azureFailed: false };
+  const S = { lang: store('bt_lang') === 'en' ? 'en' : 'fil', learner: '', stars: 0, results: [], stop: null, wantMore: false, azureFailed: false, last: {} };
   const tr = k => TR[S.lang][k];
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  function pickPhrase(kind) {
+    const list = TR[S.lang][kind], key = S.lang + kind; let i;
+    do { i = Math.floor(Math.random() * list.length); } while (list.length > 1 && i === S.last[key]);
+    S.last[key] = i; return list[i];
+  }
 
   /* ================= SI BASA BUDDY ================= */
   const MASCOT_SVG = `
@@ -613,18 +644,23 @@
   }
 
   /* ================= MIKROPONO ================= */
-  function webSpeech(locale, continuous) {
+  function webSpeech(locale, continuous, onReady) {
     return new Promise((resolve, reject) => {
       if (!SR) { reject(new Error(tr('unsupported'))); return; }
       const rec = new SR();
       rec.lang = locale; rec.interimResults = true; rec.maxAlternatives = 3; rec.continuous = !!continuous;
       let text = '', prefix = '', alts = [], t0 = 0, t1 = 0, done = false;
+      let readyCalled = false;
+      const ready = () => { if (!readyCalled && !done) { readyCalled = true; if (onReady) onReady(); } };
       const finish = () => {
         if (done) return; done = true; S.stop = null; S.wantMore = false;
         const secs = t0 ? Math.max(5, (t1 - t0) / 1000 + 1.5) : 0;
         resolve({ text: text.trim(), alts, seconds: secs });
       };
+      rec.onaudiostart = ready;
+      rec.onstart = () => setTimeout(ready, 900);
       rec.onresult = e => {
+        ready();
         const now = Date.now(); if (!t0) t0 = now; t1 = now;
         const parts = []; for (let i = 0; i < e.results.length; i++) parts.push(e.results[i][0].transcript);
         text = (prefix + ' ' + parts.join(' ')).trim();
@@ -677,40 +713,70 @@
     });
   }
 
-  async function listen(level, text) {
+  async function listen(level, text, onReady) {
     const c = cfg();
     const useAzure = c.engine === 'azure' && level.mode === 'once' && !S.azureFailed && c.url && c.code;
     if (useAzure) {
       const usePA = !!CONFIG.pronunciationScore[S.lang];
+      if (onReady) onReady();
       try { const r = await azureOnce(text, CONFIG.azureLocale[S.lang], usePA); r.engine = 'azure'; r.usePA = usePA; return r; }
       catch (e) { S.azureFailed = true; const err = new Error('azure'); err.fallback = true; throw err; }
     }
-    const r = await webSpeech(CONFIG.locale[S.lang], level.mode === 'long');
+    const r = await webSpeech(CONFIG.locale[S.lang], level.mode === 'long', onReady);
     r.engine = 'web'; r.usePA = false; r.pa = null;
     return r;
   }
 
-  function speak(text) {
+  /* ================= BOSES (text-to-speech) ================= */
+  let VOICES = [];
+  const loadVoices = () => { try { VOICES = speechSynthesis.getVoices() || []; } catch (e) { VOICES = []; } };
+  if ('speechSynthesis' in window) { loadVoices(); speechSynthesis.onvoiceschanged = loadVoices; }
+  const voiceOn = () => store('bt_voice') !== 'off';
+  function pickVoice() {
+    if (!VOICES.length) loadVoices();
+    const lg = v => (v.lang || '').toLowerCase().replace('_', '-');
+    if (S.lang === 'fil') return VOICES.find(v => /^(fil|tl)/.test(lg(v))) || null;
+    const want = CONFIG.locale.en.toLowerCase();
+    return VOICES.find(v => lg(v) === want) || VOICES.find(v => lg(v).startsWith('en')) || null;
+  }
+  function utter(text, o) {
+    o = o || {};
     return new Promise(res => {
       if (!('speechSynthesis' in window)) return res();
-      speechSynthesis.cancel();
+      try { speechSynthesis.cancel(); } catch (e) {}
       const u = new SpeechSynthesisUtterance(text);
-      u.lang = CONFIG.locale[S.lang]; u.rate = 0.8;
-      u.onend = () => res(); u.onerror = () => res();
-      speechSynthesis.speak(u);
-      setTimeout(res, 15000);
+      const v = pickVoice();
+      if (v) { u.voice = v; u.lang = v.lang; } else u.lang = CONFIG.locale[S.lang];
+      u.rate = o.rate || 0.85; u.pitch = o.pitch || 1;
+      let done = false; const fin = () => { if (!done) { done = true; res(); } };
+      u.onend = fin; u.onerror = fin;
+      try { speechSynthesis.speak(u); } catch (e) { return fin(); }
+      setTimeout(fin, 9000);
     });
+  }
+  const speak = t => utter(t, { rate: 0.8 });                                  // pagbasa ng tamang salita
+  const say = t => voiceOn() ? utter(t, { rate: 1, pitch: 1.2 }) : Promise.resolve(); // papuri ni Basa Buddy
+  function syncVoiceBtn() { const b = $('voiceBtn'); b.dataset.on = String(voiceOn()); b.setAttribute('aria-pressed', String(voiceOn())); }
+  function updateVoiceInfo() {
+    const v = pickVoice();
+    $('voiceInfo').textContent = v ? `Boses: ${v.name} (${v.lang})` : 'Walang nakitang boses para sa wikang ito; gagamitin ang default na boses ng device.';
   }
 
   /* ================= UI ================= */
-  const show = id => ['screenStart', 'screenPlay', 'screenEnd'].forEach(s => { $(s).hidden = (s !== id); });
+  const show = id => { ['screenStart', 'screenPlay', 'screenEnd'].forEach(s => { $(s).hidden = (s !== id); }); $('hdrLang').hidden = (id === 'screenStart'); };
   const setStatus = s => { $('status').textContent = s; };
   function setMic(state, label) {
-    const m = $('mic'); m.dataset.state = state; m.disabled = (state === 'thinking');
+    const m = $('mic'); m.dataset.state = state; m.disabled = (state === 'thinking' || state === 'starting');
     $('micArea').dataset.state = state; $('micLabel').textContent = label || '';
     if (state === 'listening') mood('listen'); else if (state === 'thinking') mood('think');
   }
-  async function banner(text, ms) { $('bannerText').textContent = text; $('banner').hidden = false; await sleep(ms || 1500); $('banner').hidden = true; }
+  let bannerSeq = 0;
+  async function banner(text, ms, spoken) {
+    const my = ++bannerSeq;
+    $('bannerText').textContent = text; $('banner').hidden = false;
+    await Promise.all([sleep(ms || 1500), spoken ? say(text) : Promise.resolve()]);
+    if (my === bannerSeq) $('banner').hidden = true;
+  }
 
   let micWaiter = null, nextWaiter = null;
   const waitMic = () => new Promise(res => { micWaiter = res; });
@@ -747,7 +813,19 @@
   }
 
   /* ================= ISANG BABASAHIN ================= */
-  async function playItem(level, text, pos, total) {
+  let runId = 0;
+  const ABORT = 'ABORT';
+  function chk(id) { if (id !== runId) throw new Error(ABORT); }
+  function abortRun() {
+    runId++; bannerSeq++;
+    if (S.stop) S.stop();
+    try { if ('speechSynthesis' in window) speechSynthesis.cancel(); } catch (e) {}
+    if (micWaiter) { const w = micWaiter; micWaiter = null; w('abort'); }
+    if (nextWaiter) { const w = nextWaiter; nextWaiter = null; w(); }
+    $('banner').hidden = true;
+  }
+
+  async function playItem(level, text, pos, total, id) {
     renderTarget(level, text, pos, total);
     const maxAttempts = level.mode === 'long' ? 1 : 2;
     let attempts = 0, errors = 0, empties = 0, best = null, skipped = false;
@@ -755,20 +833,27 @@
     while (attempts < maxAttempts && errors < 3 && empties < 3) {
       setMic('idle', tr('micIdle'));
       setStatus(level.mode === 'long' ? tr('pressLong') : tr('press'));
-      const act = await waitMic();
+      const act = await waitMic(); chk(id);
       if (act === 'skip') { skipped = true; break; }
 
-      setMic('listening', level.mode === 'long' ? tr('micStop') : '');
-      setStatus(level.mode === 'long' ? tr('listeningLong') : tr('listening'));
+      // Huwag magsalita hanggang hindi pa pula ang mikropono: doon pa lang tunay na nakikinig ang engine.
+      setMic('starting', ''); setStatus(tr('getReady'));
+      const onReady = () => {
+        if (id !== runId) return;
+        setMic('listening', level.mode === 'long' ? tr('micStop') : '');
+        setStatus(level.mode === 'long' ? tr('listeningLong') : tr('listening'));
+      };
       let r;
-      try { r = await listen(level, text); }
+      try { r = await listen(level, text, onReady); }
       catch (e) {
+        chk(id);
         setMic('idle', ''); mood('idle');
-        if (e.fallback) { setStatus(tr('azureOut')); await sleep(1200); continue; }
-        errors++; setStatus(tr('errorPrefix') + ' ' + e.message); await sleep(1800); continue;
+        if (e.fallback) { setStatus(tr('azureOut')); await sleep(1200); chk(id); continue; }
+        errors++; setStatus(tr('errorPrefix') + ' ' + e.message); await sleep(1800); chk(id); continue;
       }
+      chk(id);
       setMic('thinking', ''); setStatus(tr('thinking'));
-      if (!r.text.trim()) { empties++; setMic('idle', ''); mood('idle'); setStatus(tr('none')); await sleep(1500); continue; }
+      if (!r.text.trim()) { empties++; setMic('idle', ''); mood('idle'); setStatus(tr('none')); await sleep(1500); chk(id); continue; }
 
       attempts++;
       const ev = evalItem(level, text, r);
@@ -776,15 +861,23 @@
       const wcpm = (level.mode === 'long' && r.seconds) ? Math.round(ev.ok / (r.seconds / 60)) : null;
       if (!best || VALUE[verdict] >= VALUE[best.verdict]) best = { ev, verdict, r, wcpm };
       showResult(level, ev, verdict, r, wcpm);
-      setStatus(verdict === 'tama' ? TR[S.lang].praise[Math.floor(Math.random() * TR[S.lang].praise.length)] : '');
 
-      if (verdict === 'tama') { S.stars++; $('stars').textContent = S.stars; await sleep(level.mode === 'long' ? 600 : 1800); break; }
-      if (attempts < maxAttempts) { setMic('idle', ''); setStatus(tr('again')); await sleep(1500); mood('idle'); }
-      else if (level.mode !== 'long') { setStatus(tr('correct')); await speak(text); await sleep(500); }
+      if (verdict === 'tama') {
+        S.stars++; $('stars').textContent = S.stars;
+        const ph = pickPhrase('praise'); setStatus(ph);
+        await Promise.all([say(ph), sleep(level.mode === 'long' ? 700 : 1200)]); chk(id);
+        break;
+      }
+      const last = attempts >= maxAttempts;
+      const ph = pickPhrase(verdict === 'halos' ? 'near' : 'retry'); setStatus(ph);
+      await Promise.all([say(ph), sleep(1100)]); chk(id);
+      if (!last) { setMic('idle', ''); mood('idle'); }
+      else if (level.mode !== 'long') { setStatus(tr('correct')); await speak(text); chk(id); await sleep(500); chk(id); }
     }
 
+    chk(id);
     setMic('idle', '');
-    if (level.mode === 'long' && best) { $('nextBtn').hidden = false; setStatus(''); await waitNext(); $('nextBtn').hidden = true; }
+    if (level.mode === 'long' && best) { $('nextBtn').hidden = false; setStatus(''); await waitNext(); chk(id); $('nextBtn').hidden = true; }
 
     const verdict = best ? best.verdict : 'ulit';
     const res = {
@@ -811,29 +904,32 @@
 
   /* ================= BUONG SESSION ================= */
   async function runSession() {
-    S.results = []; S.stars = 0; S.azureFailed = false; $('stars').textContent = '0';
-    show('screenPlay'); $('screenPlay').style.display = 'flex';
-    for (const level of LEVELS) {
-      await banner(level.name[S.lang], 1400);
-      const N = CONFIG.session[level.key];
-      let round = 0, acc = 0;
-      while (true) {
-        round++;
-        const items = pick(level.key, N);
-        let got = 0;
-        for (let i = 0; i < items.length; i++) {
-          const res = await playItem(level, items[i], i + 1, items.length);
-          got += res.score; S.results.push(res);
-          if (level.key === 'paragraphs') rememberMissed('words', res.missWords.slice(0, 4));
-          else if (res.score < 1) rememberMissed(level.key, [items[i]]);
+    const id = ++runId;
+    try {
+      S.results = []; S.stars = 0; S.azureFailed = false; $('stars').textContent = '0';
+      show('screenPlay'); $('screenPlay').style.display = 'flex';
+      for (const level of LEVELS) {
+        await banner(level.name[S.lang], 1400); chk(id);
+        const N = CONFIG.session[level.key];
+        let round = 0, acc = 0;
+        while (true) {
+          round++;
+          const items = pick(level.key, N);
+          let got = 0;
+          for (let i = 0; i < items.length; i++) {
+            const res = await playItem(level, items[i], i + 1, items.length, id); chk(id);
+            got += res.score; S.results.push(res);
+            if (level.key === 'paragraphs') rememberMissed('words', res.missWords.slice(0, 4));
+            else if (res.score < 1) rememberMissed(level.key, [items[i]]);
+          }
+          acc = got / items.length;
+          if (!level.gate || acc >= CONFIG.gate || round >= 2) break;
+          await banner(tr('another'), 1500, true); chk(id);
         }
-        acc = got / items.length;
-        if (!level.gate || acc >= CONFIG.gate || round >= 2) break;
-        await banner(tr('another'), 1500);
+        if (level.gate) { await banner(tr('levelUp'), 1100, true); chk(id); }
       }
-      if (level.gate) { await banner(tr('levelUp'), 1100); }
-    }
-    showEnd();
+      showEnd();
+    } catch (e) { if (e.message === ABORT) return; throw e; }
   }
 
   function statsByLevel() {
@@ -850,6 +946,7 @@
     show('screenEnd'); $('screenPlay').style.display = 'none';
     mood('happy'); confetti();
     $('endTitle').textContent = tr('endTitle');
+    say(tr('endTitle') + ' ' + pickPhrase('praise'));
     const st = statsByLevel(); const sum = $('sum'); sum.innerHTML = '';
     const line = (k, v) => { const d = document.createElement('div'); const a = document.createElement('span'); a.textContent = k; const b = document.createElement('b'); b.textContent = v; d.append(a, b); sum.appendChild(d); };
     LEVELS.forEach(l => {
@@ -896,13 +993,24 @@
 
   function setLang(l) {
     S.lang = l; store('bt_lang', l);
-    $('langFil').setAttribute('aria-pressed', String(l === 'fil'));
-    $('langEn').setAttribute('aria-pressed', String(l === 'en'));
+    ['langFil', 'hLangFil'].forEach(i => $(i).setAttribute('aria-pressed', String(l === 'fil')));
+    ['langEn', 'hLangEn'].forEach(i => $(i).setAttribute('aria-pressed', String(l === 'en')));
     document.documentElement.lang = l === 'fil' ? 'fil' : 'en';
     buildTracker();
   }
-  $('langFil').addEventListener('click', () => setLang('fil'));
-  $('langEn').addEventListener('click', () => setLang('en'));
+  // Kapag nagpalit ng wika habang nagbabasa, magsisimula ng bagong session sa bagong wika.
+  function switchLang(l) {
+    if (l === S.lang) return;
+    const playing = !$('screenPlay').hidden;
+    setLang(l);
+    if (playing) { abortRun(); runSession(); }
+  }
+  ['langFil', 'hLangFil'].forEach(i => $(i).addEventListener('click', () => switchLang('fil')));
+  ['langEn', 'hLangEn'].forEach(i => $(i).addEventListener('click', () => switchLang('en')));
+  $('voiceBtn').addEventListener('click', () => {
+    store('bt_voice', voiceOn() ? 'off' : 'on'); syncVoiceBtn();
+    if (!voiceOn()) { try { speechSynthesis.cancel(); } catch (e) {} }
+  });
 
   function refreshStart() {
     const c = cfg();
@@ -921,16 +1029,19 @@
   const dlg = $('settings');
   $('openSettings').addEventListener('click', () => {
     const c = cfg(); $('fEngine').value = c.engine; $('fUrl').value = c.url; $('fCode').value = c.code;
+    $('fVoice').value = voiceOn() ? 'on' : 'off'; updateVoiceInfo();
     if (typeof dlg.showModal === 'function') dlg.showModal(); else dlg.setAttribute('open', '');
   });
   $('cancelSettings').addEventListener('click', () => dlg.close());
+  $('testVoice').addEventListener('click', () => { utter(pickPhrase('praise'), { rate: 1, pitch: 1.2 }); updateVoiceInfo(); });
   $('settingsForm').addEventListener('submit', () => {
-    store('bt_engine', $('fEngine').value); store('bt_url', $('fUrl').value.trim()); store('bt_code', $('fCode').value.trim());
+    store('bt_engine', $('fEngine').value); store('bt_voice', $('fVoice').value); syncVoiceBtn(); store('bt_url', $('fUrl').value.trim()); store('bt_code', $('fCode').value.trim());
     tokenCache = { token: null, region: null, exp: 0 }; refreshStart();
   });
 
   /* ================= SIMULA ================= */
   initMascots();
+  syncVoiceBtn(); $('hdrLang').hidden = true;
   $('screenPlay').style.display = 'none';
   setLang(S.lang);
   $('learner').value = store('bt_learner') || '';
