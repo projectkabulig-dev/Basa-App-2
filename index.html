@@ -1,184 +1,318 @@
 <!doctype html>
-<html lang="fil">
+<html lang="fil" translate="no">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="google" content="notranslate">
 <title>Basa Tayo!</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --ink:#0B2E3F; --sea:#0E6E8C; --foam:#E3F2EF; --marble:#F6F9FA;
-    --sun:#FFB703; --sun-deep:#E39A00; --leaf:#2E9E5B; --near:#D98200; --oops:#D64550;
-    --line:#C9DDE3; --mute:#4D6F7E;
+    --ink:#1F2A44; --sky:#CDEEFF; --sky2:#EAF8FF; --sea:#1B8FD6; --deep:#0F5E96;
+    --sun:#FFD23F; --sun-d:#E8A900; --coral:#FF6B6B; --coral-d:#D94A4A; --grape:#7B61FF;
+    --ok:#12A36B; --near:#E07B00; --miss:#E5484D; --paper:#fff; --mute:#4A5878;
   }
   *{box-sizing:border-box}
   html,body{margin:0}
-  body{font-family:'Nunito',system-ui,sans-serif; color:var(--ink); background:linear-gradient(180deg,var(--foam) 0%,var(--marble) 55%); min-height:100vh; display:flex; flex-direction:column; align-items:center}
-  header{width:100%; max-width:760px; padding:14px 18px; display:flex; align-items:center; justify-content:space-between; gap:12px}
-  .brand{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:1.6rem; color:var(--sea)}
-  .tools{display:flex; align-items:center; gap:10px}
-  .stars{font-weight:800; background:#fff; border:2px solid var(--line); border-radius:999px; padding:4px 12px; min-width:64px; text-align:center}
-  .stars b{color:var(--sun-deep)}
-  button{font:inherit; color:inherit; cursor:pointer}
-  button:focus-visible, textarea:focus-visible, input:focus-visible, select:focus-visible{outline:3px solid var(--sea); outline-offset:3px}
-  .ghost{background:#fff; border:2px solid var(--line); border-radius:12px; padding:8px 14px; font-weight:700}
-  .ghost:hover{border-color:var(--sea)}
-  .ghost[disabled]{opacity:.45; cursor:default}
-  .primary{background:var(--sea); color:#fff; border:0; border-radius:14px; padding:14px 30px; font-weight:800; font-size:1.15rem}
-  .primary:hover{background:#0B5C75}
+  body{
+    font-family:'Nunito',system-ui,sans-serif; color:var(--ink); min-height:100vh; min-height:100dvh;
+    background:linear-gradient(180deg,var(--sky) 0%,var(--sky2) 55%,#fff 100%);
+    display:flex; flex-direction:column; align-items:center; overflow-x:hidden;
+  }
   [hidden]{display:none !important}
+  button{font:inherit; color:inherit; cursor:pointer}
+  button:focus-visible,input:focus-visible,select:focus-visible{outline:4px solid var(--grape); outline-offset:3px}
 
-  main{width:100%; max-width:760px; padding:6px 18px 40px; display:flex; flex-direction:column; align-items:center; gap:18px}
-  .stage{width:100%; background:#fff; border:2px solid var(--line); border-radius:28px; padding:28px 20px 24px; text-align:center}
-  .langs{display:inline-flex; background:var(--marble); border:2px solid var(--line); border-radius:999px; padding:4px; gap:4px}
-  .langs button{border:0; background:transparent; padding:8px 22px; border-radius:999px; font-weight:800}
-  .langs button[aria-pressed="true"]{background:var(--sea); color:#fff}
+  /* ---------- tanawin: ulap at dagat ---------- */
+  .scene{position:fixed; inset:0; z-index:0; pointer-events:none}
+  .cloud{position:absolute; width:130px; opacity:.95}
+  .cloud.c1{top:70px; left:-20px}
+  .cloud.c2{top:150px; right:-30px; width:160px}
+  .waves{position:absolute; left:0; bottom:0; width:100%; height:110px}
 
-  .start h1{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:clamp(2rem,8vw,3rem); margin:0 0 6px; line-height:1.1}
-  .start p{margin:0 auto 16px; max-width:30em; color:var(--mute); line-height:1.5}
-  .field{display:flex; flex-direction:column; gap:6px; max-width:320px; margin:14px auto; text-align:left; font-weight:800}
-  .field input{font:inherit; padding:12px 14px; border:2px solid var(--line); border-radius:12px; width:100%; text-transform:uppercase}
-  .field small{font-weight:400; color:var(--mute)}
-  .warn{background:#FFF3D6; border:2px solid #F0D28A; color:#6B4A00; border-radius:12px; padding:10px 14px; margin:12px auto; max-width:34em; font-weight:700}
-  .note{color:var(--mute); font-size:.9rem; margin-top:12px}
+  header{position:relative; z-index:2; width:100%; max-width:640px; padding:14px 16px 6px; display:flex; align-items:center; justify-content:space-between; gap:12px}
+  .brand{font-family:'Fredoka',sans-serif; font-weight:700; font-size:1.35rem; color:var(--deep)}
+  .tools{display:flex; align-items:center; gap:10px}
+  .starcount{display:flex; align-items:center; gap:6px; background:var(--sun); border:3px solid var(--ink); border-radius:999px; padding:3px 14px 3px 10px; box-shadow:0 4px 0 var(--ink); font-family:'Fredoka',sans-serif; font-weight:700; font-size:1.2rem}
+  .starcount svg{width:24px; height:24px}
+  .iconbtn{width:46px; height:46px; border-radius:50%; background:#fff; border:3px solid var(--ink); box-shadow:0 4px 0 var(--ink); display:grid; place-items:center; padding:0}
+  .iconbtn:active{transform:translateY(3px); box-shadow:0 1px 0 var(--ink)}
+  .iconbtn svg{width:24px; height:24px}
 
-  .level{font-family:'Baloo 2',sans-serif; font-weight:800; color:var(--sea); font-size:1.15rem}
-  .bar{height:10px; background:var(--foam); border-radius:999px; overflow:hidden; margin:8px auto 4px; max-width:420px}
-  .bar i{display:block; height:100%; width:0; background:var(--leaf); transition:width .3s}
-  .count{font-weight:700; color:var(--mute); font-size:.95rem}
-  .target{font-family:'Baloo 2',sans-serif; font-weight:800; line-height:1.15; font-size:clamp(2.4rem,11vw,4.6rem); margin:14px 0 8px; display:flex; flex-wrap:wrap; justify-content:center; gap:.05em .35em; overflow-wrap:anywhere}
-  .target.sent{font-size:clamp(1.7rem,7vw,2.8rem)}
-  .target.para{display:block; text-align:left; font-family:'Nunito',sans-serif; font-weight:700; font-size:clamp(1.25rem,5vw,1.65rem); line-height:2}
-  .target .w{padding:0 .12em; border-radius:10px; transition:background-color .25s,color .25s}
-  .target.para .w{display:inline-block; margin:0 .12em}
-  .target .w.ok{background:var(--leaf); color:#fff}
+  main{position:relative; z-index:1; width:100%; max-width:640px; padding:6px 16px 130px; display:flex; flex-direction:column; gap:18px}
+
+  /* ---------- mga gamit ---------- */
+  .card{background:var(--paper); border:3px solid var(--ink); border-radius:28px; box-shadow:0 7px 0 var(--ink); padding:22px 18px}
+  .btn{font-family:'Fredoka',sans-serif; font-weight:700; font-size:1.2rem; border:3px solid var(--ink); border-radius:18px; padding:12px 26px; background:#fff; box-shadow:0 5px 0 var(--ink); transition:transform .08s, box-shadow .08s}
+  .btn:active{transform:translateY(4px); box-shadow:0 1px 0 var(--ink)}
+  .btn.sun{background:var(--sun)}
+  .btn.sea{background:var(--sea); color:#fff}
+  .btn.small{font-size:1rem; padding:8px 18px; box-shadow:0 4px 0 var(--ink)}
+  .btn[disabled]{opacity:.5; cursor:default}
+  .btn svg{width:20px; height:20px; vertical-align:-4px; margin-right:6px}
+  .row{display:flex; justify-content:center; gap:12px; flex-wrap:wrap}
+
+  /* ---------- si Basa Buddy ---------- */
+  .mascot{width:112px; height:120px; flex:none}
+  .mascot.big{width:170px; height:182px; margin:0 auto}
+  .mascot svg{width:100%; height:100%; overflow:visible; display:block}
+  .mascot .e-happy,.mascot .brows,.mascot .m-big,.mascot .m-o,.mascot .m-wavy{display:none}
+  .mascot[data-mood="happy"] .e-open,.mascot[data-mood="happy"] .m-smile{display:none}
+  .mascot[data-mood="happy"] .e-happy,.mascot[data-mood="happy"] .m-big{display:inline}
+  .mascot[data-mood="listen"] .m-smile{display:none}
+  .mascot[data-mood="listen"] .m-o{display:inline}
+  .mascot[data-mood="think"] .m-smile{display:none}
+  .mascot[data-mood="think"] .m-wavy{display:inline}
+  .mascot[data-mood="oops"] .m-smile{display:none}
+  .mascot[data-mood="oops"] .m-wavy,.mascot[data-mood="oops"] .brows{display:inline}
+  .mascot .pupil{transition:transform .2s}
+  .mascot[data-mood="think"] .pupil{transform:translate(3px,-4px)}
+  .mascot .arm{transition:transform .25s}
+  .mascot .arm-l{transform-origin:42px 118px}
+  .mascot .arm-r{transform-origin:168px 118px}
+  .mascot[data-mood="happy"] .arm-l{transform:rotate(75deg)}
+  .mascot[data-mood="happy"] .arm-r{transform:rotate(-75deg)}
+  .mascot[data-mood="ok"] .arm-r{transform:rotate(-60deg)}
+  .mascot[data-mood="idle"] svg{animation:bob 3.4s ease-in-out infinite}
+  .mascot[data-mood="listen"] svg{animation:lean .9s ease-in-out infinite}
+  .mascot[data-mood="happy"] svg{animation:hop .55s ease-out 3}
+  .mascot[data-mood="oops"] svg{transform:rotate(-5deg)}
+  @keyframes bob{0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)}}
+  @keyframes lean{0%,100%{transform:rotate(-2deg)} 50%{transform:rotate(3deg)}}
+  @keyframes hop{0%{transform:translateY(0)} 45%{transform:translateY(-18px)} 100%{transform:translateY(0)}}
+
+  .coach{display:flex; align-items:flex-end; gap:14px}
+  .bubble{position:relative; flex:1; min-height:60px; background:#fff; border:3px solid var(--ink); border-radius:22px; box-shadow:0 5px 0 var(--ink); padding:12px 16px; display:flex; align-items:center; font-weight:800; font-size:1.08rem; line-height:1.35}
+  .bubble::before{content:''; position:absolute; left:-12px; bottom:22px; width:20px; height:20px; background:#fff; border-left:3px solid var(--ink); border-bottom:3px solid var(--ink); transform:rotate(45deg)}
+  .bubble p{margin:0}
+  .bubble:has(#status:empty){visibility:hidden}
+
+  /* ---------- simula ---------- */
+  .start{text-align:center; display:flex; flex-direction:column; gap:20px}
+  .logo{font-family:'Fredoka',sans-serif; font-weight:700; font-size:clamp(3rem,15vw,4.8rem); margin:6px 0 0; line-height:1; letter-spacing:.02em; -webkit-text-stroke:3px var(--ink); paint-order:stroke fill; text-shadow:0 5px 0 var(--ink)}
+  .logo span{display:inline-block}
+  .logo span:nth-child(5n+1){color:var(--coral)} .logo span:nth-child(5n+2){color:var(--sun)} .logo span:nth-child(5n+3){color:#fff}
+  .logo span:nth-child(5n+4){color:#7FD8FF} .logo span:nth-child(5n+5){color:#6BE3A7}
+  .logo span:nth-child(odd){transform:translateY(-3px) rotate(-4deg)} .logo span:nth-child(even){transform:translateY(2px) rotate(3deg)}
+  .logo .sp{width:.3em}
+  .tagline{margin:10px auto 0; max-width:22em; font-weight:800; font-size:1.15rem; line-height:1.4}
+  .langs{display:grid; grid-template-columns:1fr 1fr; gap:12px; max-width:380px; margin:0 auto}
+  .langs button{font-family:'Fredoka',sans-serif; font-weight:700; font-size:1.25rem; padding:12px 8px; background:#fff; border:3px solid var(--ink); border-radius:18px; box-shadow:0 5px 0 var(--ink); transition:transform .08s, box-shadow .08s}
+  .langs button[aria-pressed="true"]{background:var(--sun); transform:translateY(3px); box-shadow:0 2px 0 var(--ink)}
+  .field{display:flex; flex-direction:column; gap:8px; max-width:380px; margin:18px auto 6px; text-align:left; font-family:'Fredoka',sans-serif; font-weight:600; font-size:1.15rem}
+  .field input{font-family:'Fredoka',sans-serif; font-weight:600; font-size:1.4rem; text-align:center; text-transform:uppercase; letter-spacing:.06em; padding:12px 14px; border:3px solid var(--ink); border-radius:18px; width:100%; background:var(--sky2)}
+  .field small{font-family:'Nunito',sans-serif; font-weight:700; font-size:.92rem; color:var(--mute)}
+  .warn{background:#FFF1C7; border:3px solid var(--ink); border-radius:16px; padding:10px 14px; margin:10px auto; max-width:380px; font-weight:800}
+  .note{margin:14px 0 0; color:var(--mute); font-size:.92rem; font-weight:700}
+
+  /* ---------- pagbasa ---------- */
+  .tracker{list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(3,1fr); gap:10px}
+  .tracker li{display:flex; align-items:center; gap:8px; background:#fff; border:3px solid var(--ink); border-radius:16px; padding:6px 10px; font-family:'Fredoka',sans-serif; font-weight:600; font-size:.98rem; min-width:0; opacity:.75}
+  .tracker .n{flex:none; width:28px; height:28px; border-radius:50%; background:var(--sky); border:3px solid var(--ink); display:grid; place-items:center; font-size:.9rem; font-weight:700}
+  .tracker .t{overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .tracker li.now{background:var(--sun); opacity:1; box-shadow:0 4px 0 var(--ink); transform:translateY(-2px)}
+  .tracker li.now .n{background:#fff}
+  .tracker li.done{background:#CFF3E2; opacity:1}
+  .tracker li.done .n{background:var(--ok); color:#fff; font-size:0}
+  .tracker li.done .n::after{content:'\2713'; font-size:1rem}
+  @media (max-width:520px){ .tracker{display:flex} .tracker li{flex:none} .tracker li.now{flex:1 1 auto} .tracker li:not(.now) .t{display:none} }
+
+  .progress{display:flex; align-items:center; gap:10px}
+  .bar{flex:1; height:16px; background:#fff; border:3px solid var(--ink); border-radius:999px; overflow:hidden}
+  .bar i{display:block; height:100%; width:0; background:repeating-linear-gradient(135deg,var(--ok) 0 10px,#25B97B 10px 20px); transition:width .35s}
+  .count{font-family:'Fredoka',sans-serif; font-weight:600; white-space:nowrap}
+
+  .target-card{text-align:center; padding:26px 16px 22px}
+  .target{font-family:'Fredoka',sans-serif; font-weight:600; line-height:1.1; font-size:clamp(3.2rem,17vw,6.2rem); margin:0 0 14px; display:flex; flex-wrap:wrap; justify-content:center; gap:.08em .3em; overflow-wrap:anywhere}
+  .target.sent{font-size:clamp(2rem,9vw,3.2rem); line-height:1.2}
+  .target.para{display:block; text-align:left; font-family:'Nunito',sans-serif; font-weight:800; font-size:clamp(1.3rem,5.4vw,1.7rem); line-height:2.1}
+  .target .w{padding:0 .14em; border-radius:14px; transition:background-color .25s,color .25s}
+  .target.para .w{display:inline-block; margin:0 .1em; padding:0 .2em}
+  .target .w.ok{background:var(--ok); color:#fff}
   .target .w.near{background:var(--near); color:#fff}
-  .target .w.miss{background:var(--oops); color:#fff}
+  .target .w.miss{background:var(--miss); color:#fff}
+  .target .w.ok::after{content:' \2713'; font-size:.45em; vertical-align:.55em}
+  .target .w.near::after{content:' ~'; font-size:.45em; vertical-align:.55em}
+  .target .w.miss::after{content:' \2717'; font-size:.45em; vertical-align:.55em}
+  .sr{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
 
-  .micwrap{position:relative; width:150px; height:150px; margin:14px auto 0; display:grid; place-items:center}
-  .mic{position:relative; z-index:2; width:124px; height:124px; border-radius:50%; border:0; background:var(--sun); color:var(--ink); display:grid; place-items:center; box-shadow:0 6px 0 var(--sun-deep); transition:transform .08s, box-shadow .08s, background-color .2s}
-  .mic:active{transform:translateY(4px); box-shadow:0 2px 0 var(--sun-deep)}
-  .mic svg{width:56px; height:56px}
-  .mic[data-state="listening"]{background:var(--oops); color:#fff; box-shadow:0 6px 0 #A82F39}
-  .mic[data-state="thinking"]{background:var(--line); box-shadow:0 6px 0 #A9C3CB; cursor:progress}
-  .ring{position:absolute; inset:10px; border-radius:50%; border:4px solid var(--oops); opacity:0; z-index:1}
-  .mic[data-state="listening"] ~ .ring{animation:pulse 1.2s ease-out infinite}
-  .mic[data-state="listening"] ~ .ring.r2{animation-delay:.6s}
-  @keyframes pulse{0%{transform:scale(.9); opacity:.8} 100%{transform:scale(1.35); opacity:0}}
-  @media (prefers-reduced-motion:reduce){ .mic[data-state="listening"] ~ .ring{animation:none; opacity:.5; transform:scale(1.15)} .verdict.pop{animation:none} .bar i{transition:none} }
-  .miclabel{font-weight:800; margin:6px 0 0; min-height:1.4em}
-  .status{min-height:1.5em; font-weight:700; color:var(--mute); margin:4px 0 0}
-  .row{display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-top:12px}
+  .micarea{display:flex; flex-direction:column; align-items:center; gap:4px}
+  .micwrap{position:relative; width:170px; height:170px; display:grid; place-items:center}
+  .mic{position:relative; z-index:2; width:136px; height:136px; border-radius:50%; background:var(--sun); color:var(--ink); border:4px solid var(--ink); box-shadow:0 8px 0 var(--ink); display:grid; place-items:center; padding:0; transition:transform .08s, box-shadow .08s, background-color .2s}
+  .mic:active{transform:translateY(6px); box-shadow:0 2px 0 var(--ink)}
+  .mic svg{width:64px; height:64px}
+  .micarea[data-state="listening"] .mic{background:var(--coral); color:#fff}
+  .micarea[data-state="thinking"] .mic{background:#D7E6EE; cursor:progress}
+  .ring{position:absolute; inset:12px; border-radius:50%; border:5px solid var(--coral); opacity:0; z-index:1}
+  .micarea[data-state="listening"] .ring{animation:pulse 1.2s ease-out infinite}
+  .micarea[data-state="listening"] .ring.r2{animation-delay:.6s}
+  @keyframes pulse{0%{transform:scale(.9); opacity:.9} 100%{transform:scale(1.4); opacity:0}}
+  .miclabel{margin:2px 0 0; min-height:1.5em; font-family:'Fredoka',sans-serif; font-weight:600; font-size:1.1rem}
+  .wave{display:flex; align-items:flex-end; gap:5px; height:26px; opacity:0}
+  .wave i{width:7px; height:8px; border-radius:4px; background:var(--coral); border:2px solid var(--ink)}
+  .micarea[data-state="listening"] .wave{opacity:1}
+  .micarea[data-state="listening"] .wave i{animation:eq .7s ease-in-out infinite}
+  .wave i:nth-child(2){animation-delay:.1s !important} .wave i:nth-child(3){animation-delay:.2s !important}
+  .wave i:nth-child(4){animation-delay:.3s !important} .wave i:nth-child(5){animation-delay:.15s !important}
+  @keyframes eq{0%,100%{height:8px} 50%{height:24px}}
 
-  .result{margin-top:16px; border-top:2px dashed var(--line); padding-top:14px}
-  .verdict{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:1.9rem; margin:0}
-  .verdict.tama{color:var(--leaf)} .verdict.halos{color:var(--near)} .verdict.ulit{color:var(--oops)}
-  .verdict.pop{animation:pop .35s ease-out}
-  @keyframes pop{0%{transform:scale(.8)} 60%{transform:scale(1.08)} 100%{transform:scale(1)}}
-  .heard{color:var(--mute); margin:6px 0 0; overflow-wrap:anywhere}
+  .result{text-align:center; margin:0 0 18px}
+  .verdict{display:inline-block; font-family:'Fredoka',sans-serif; font-weight:700; font-size:clamp(1.7rem,7vw,2.3rem); margin:0; padding:6px 24px; border:3px solid var(--ink); border-radius:20px; box-shadow:0 5px 0 var(--ink); transform:rotate(-2deg); color:#fff}
+  .verdict.tama{background:var(--ok)} .verdict.halos{background:var(--near)} .verdict.ulit{background:var(--miss)}
+  .verdict.pop{animation:pop .4s ease-out}
+  @keyframes pop{0%{transform:scale(.6) rotate(-8deg)} 60%{transform:scale(1.12) rotate(-2deg)} 100%{transform:scale(1) rotate(-2deg)}}
+  .heard{margin:14px 0 0; color:var(--mute); font-weight:700; overflow-wrap:anywhere}
   .heard q{font-weight:800; color:var(--ink)}
-  .pill{display:inline-block; margin:8px 4px 0; font-weight:800; background:var(--foam); border-radius:999px; padding:4px 14px}
+  .pill{display:inline-block; margin:10px 4px 0; font-family:'Fredoka',sans-serif; font-weight:600; background:var(--sun); border:3px solid var(--ink); border-radius:999px; padding:3px 16px}
 
-  .endtitle{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:2.2rem; margin:0}
-  .sum{display:grid; gap:10px; margin:16px auto; max-width:420px; text-align:left}
-  .sum div{display:flex; justify-content:space-between; gap:12px; background:var(--marble); border:2px solid var(--line); border-radius:14px; padding:10px 14px; font-weight:700}
-  .sum b{color:var(--sea)}
-  .practice{max-width:34em; margin:10px auto; color:var(--mute)}
+  /* ---------- tapos ---------- */
+  .end{text-align:center; display:flex; flex-direction:column; gap:18px}
+  .endtitle{font-family:'Fredoka',sans-serif; font-weight:700; font-size:clamp(1.9rem,8vw,2.6rem); margin:0; line-height:1.1}
+  .sum{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:12px}
+  .sum div{display:flex; flex-direction:column; align-items:center; gap:2px; background:var(--sky2); border:3px solid var(--ink); border-radius:18px; padding:10px 8px; font-family:'Fredoka',sans-serif; font-weight:600}
+  .sum div:nth-child(4n+1){background:#FFE9A3} .sum div:nth-child(4n+2){background:#CFF3E2} .sum div:nth-child(4n+3){background:#E3DBFF} .sum div:nth-child(4n+4){background:#FFD5D5}
+  .sum span{font-size:.95rem}
+  .sum b{font-size:1.6rem; color:var(--ink)}
+  .practice{margin:0; font-weight:700; color:var(--mute); line-height:1.5}
   .practice strong{color:var(--ink)}
-  .buddy{max-width:34em; margin:14px auto 0; font-size:1.1rem; line-height:1.5; min-height:1.5em}
-  .buddy.wait{color:#7A98A4}
+  .buddy{margin:0}
+  .buddy.wait{color:#6B7FA0}
 
-  .banner{position:fixed; inset:0; background:rgba(11,46,63,.78); display:grid; place-items:center; z-index:50; padding:20px}
-  .banner div{background:#fff; border-radius:24px; padding:28px 34px; text-align:center; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:clamp(1.6rem,6vw,2.4rem); max-width:520px}
+  .banner{position:fixed; inset:0; background:rgba(31,42,68,.7); display:grid; place-items:center; z-index:50; padding:20px}
+  .banner div{background:#fff; border:4px solid var(--ink); border-radius:28px; box-shadow:0 8px 0 var(--ink); padding:26px 34px; text-align:center; font-family:'Fredoka',sans-serif; font-weight:700; font-size:clamp(1.7rem,7vw,2.6rem); max-width:520px; animation:pop .4s ease-out}
+  #confetti{position:fixed; inset:0; pointer-events:none; z-index:60; overflow:hidden}
+  #confetti i{position:absolute; top:-16px; width:10px; height:14px; border-radius:3px; border:2px solid var(--ink); animation:fall 1.5s ease-in forwards}
+  @keyframes fall{to{transform:translate(var(--dx),105vh) rotate(var(--r))}}
 
-  dialog{border:0; border-radius:20px; padding:0; max-width:520px; width:calc(100% - 28px); box-shadow:0 20px 60px rgba(11,46,63,.35)}
-  dialog::backdrop{background:rgba(11,46,63,.55)}
+  dialog{border:4px solid var(--ink); border-radius:24px; padding:0; max-width:520px; width:calc(100% - 28px); box-shadow:0 8px 0 var(--ink)}
+  dialog::backdrop{background:rgba(31,42,68,.6)}
   .dlg{padding:22px; display:flex; flex-direction:column; gap:14px}
-  .dlg h2{margin:0; font-family:'Baloo 2',sans-serif; font-size:1.5rem}
-  .dlg label{display:flex; flex-direction:column; gap:6px; font-weight:800; font-size:.95rem}
-  .dlg small{font-weight:400; color:var(--mute)}
-  .dlg input,.dlg select{font:inherit; padding:10px 12px; border:2px solid var(--line); border-radius:12px; width:100%; background:#fff}
-  .dlg .actions{display:flex; justify-content:flex-end; gap:10px}
-  footer{max-width:760px; padding:0 18px 28px; color:var(--mute); font-size:.85rem; text-align:center}
+  .dlg h2{margin:0; font-family:'Fredoka',sans-serif; font-size:1.6rem}
+  .dlg label{display:flex; flex-direction:column; gap:6px; font-weight:800; font-size:.98rem}
+  .dlg small{font-weight:700; color:var(--mute)}
+  .dlg input,.dlg select{font:inherit; padding:10px 12px; border:3px solid var(--ink); border-radius:14px; width:100%; background:#fff}
+  .dlg .actions{display:flex; justify-content:flex-end; gap:10px; flex-wrap:wrap}
+  footer{color:var(--ink); font-size:.85rem; font-weight:700; text-align:center; padding:10px 14px; background:rgba(255,255,255,.92); border:3px solid var(--ink); border-radius:18px}
+
+  @media (prefers-reduced-motion:reduce){ *,*::before,*::after{animation:none !important; transition:none !important} .micarea[data-state="listening"] .ring{opacity:.5; transform:scale(1.15)} }
 </style>
 </head>
 <body>
+<div class="scene" aria-hidden="true">
+  <svg class="cloud c1" viewBox="0 0 120 50"><path d="M20 44a16 16 0 0 1 2-32 22 22 0 0 1 42-6 18 18 0 0 1 30 14 14 14 0 0 1 6 24z" fill="#fff"/></svg>
+  <svg class="cloud c2" viewBox="0 0 120 50"><path d="M20 44a16 16 0 0 1 2-32 22 22 0 0 1 42-6 18 18 0 0 1 30 14 14 14 0 0 1 6 24z" fill="#fff"/></svg>
+  <svg class="waves" viewBox="0 0 1440 160" preserveAspectRatio="none">
+    <path fill="#A9DEF7" d="M0 60C240 120 480 0 720 50S1200 120 1440 40V160H0Z"/>
+    <path fill="#62BDEE" d="M0 100C300 40 560 150 840 90S1260 40 1440 100V160H0Z"/>
+    <path fill="#1B8FD6" d="M0 132C260 92 520 172 800 127S1220 102 1440 137V160H0Z"/>
+  </svg>
+</div>
+
 <header>
   <div class="brand">Basa Tayo!</div>
   <div class="tools">
-    <div class="stars" aria-label="Mga bituin">★ <b id="stars">0</b></div>
-    <button class="ghost" id="openSettings" type="button">Settings</button>
+    <div class="starcount" aria-label="Mga bituin">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3 6.1 20.6l1.3-6.6L2.5 9.4l6.6-.8z" fill="#fff" stroke="#1F2A44" stroke-width="2" stroke-linejoin="round"/></svg>
+      <span id="stars">0</span>
+    </div>
+    <button class="iconbtn" id="openSettings" type="button" aria-label="Settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#1F2A44" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+    </button>
   </div>
 </header>
 
 <main>
   <!-- SIMULA -->
-  <section class="stage start" id="screenStart">
-    <h1>Basa Tayo!</h1>
-    <p>Magbasa nang malakas. Pakikinggan ka ng app at sasabihin kung tama ang basa mo. Tatlong antas: mga salita, mga pangungusap, at isang talata.</p>
-    <div class="langs" role="group" aria-label="Wika ng babasahin">
-      <button type="button" id="langFil" aria-pressed="true">Filipino</button>
-      <button type="button" id="langEn" aria-pressed="false">English</button>
+  <section class="start" id="screenStart">
+    <div>
+      <div class="mascot big" data-mood="idle"></div>
+      <h1 class="logo" aria-label="Basa Tayo!"><span>B</span><span>a</span><span>s</span><span>a</span><span class="sp"></span><span>T</span><span>a</span><span>y</span><span>o</span><span>!</span></h1>
+      <p class="tagline">Magbasa nang malakas, at sasabihin ni Basa Buddy kung tama ang basa mo!</p>
     </div>
-    <label class="field">Code mo
-      <input id="learner" type="text" maxlength="20" placeholder="hal. G2-A-014" autocomplete="off">
-      <small>Code o initials lang, hindi buong pangalan.</small>
-    </label>
-    <div class="warn" id="supportWarn" hidden>Hindi gumagana ang mikropono sa browser na ito. Gumamit ng Chrome o Edge.</div>
-    <button class="primary" id="begin" type="button">Simulan</button>
-    <p class="note" id="logNote"></p>
+    <div class="card">
+      <div class="langs" role="group" aria-label="Wika ng babasahin">
+        <button type="button" id="langFil" aria-pressed="true">Filipino</button>
+        <button type="button" id="langEn" aria-pressed="false">English</button>
+      </div>
+      <label class="field">Code mo
+        <input id="learner" type="text" maxlength="20" placeholder="G2-A-014" autocomplete="off">
+        <small>Code o initials lang, hindi buong pangalan.</small>
+      </label>
+      <div class="warn" id="supportWarn" hidden>Hindi gumagana ang mikropono sa browser na ito. Gumamit ng Chrome o Edge.</div>
+      <div class="row" style="margin-top:14px"><button class="btn sun" id="begin" type="button">Simulan</button></div>
+      <p class="note" id="logNote"></p>
+    </div>
   </section>
 
   <!-- PAGBASA -->
-  <section class="stage" id="screenPlay" hidden>
-    <div class="level" id="levelName"></div>
-    <div class="bar" aria-hidden="true"><i id="barFill"></i></div>
-    <div class="count" id="count"></div>
-    <div class="target" id="target" aria-label="Babasahin"></div>
-    <div class="row"><button class="ghost" id="listen" type="button">Pakinggan muna</button></div>
+  <section id="screenPlay" hidden style="display:flex; flex-direction:column; gap:18px">
+    <span class="sr" id="levelName"></span>
+    <ol class="tracker" id="tracker" aria-label="Mga antas"></ol>
+    <div class="progress"><div class="bar" aria-hidden="true"><i id="barFill"></i></div><div class="count" id="count"></div></div>
 
-    <div class="micwrap">
-      <button class="mic" id="mic" type="button" data-state="idle" aria-label="Mikropono">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <rect x="9" y="2" width="6" height="12" rx="3" fill="currentColor" stroke="none"></rect>
-          <path d="M5 11a7 7 0 0 0 14 0"></path><path d="M12 18v4"></path><path d="M8 22h8"></path>
-        </svg>
-      </button>
-      <span class="ring"></span><span class="ring r2"></span>
+    <div class="card target-card">
+      <div class="target" id="target" aria-label="Babasahin"></div>
+      <div class="result" id="result" hidden>
+        <p class="verdict" id="verdict"></p>
+        <p class="heard" id="heard"></p>
+        <div id="pills"></div>
+      </div>
+      <div class="row">
+        <button class="btn small" id="listen" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#1F2A44" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z" fill="#FFD23F"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg><span id="listenTxt">Pakinggan muna</span>
+        </button>
+      </div>
     </div>
-    <p class="miclabel" id="micLabel"></p>
-    <p class="status" id="status" role="status" aria-live="polite"></p>
 
-    <div class="result" id="result" hidden>
-      <p class="verdict" id="verdict"></p>
-      <p class="heard" id="heard"></p>
-      <div id="pills"></div>
+    <div class="coach">
+      <div class="mascot" data-mood="idle"></div>
+      <div class="bubble"><p id="status" role="status" aria-live="polite"></p></div>
+    </div>
+
+    <div class="micarea" id="micArea" data-state="idle">
+      <div class="micwrap">
+        <button class="mic" id="mic" type="button" data-state="idle" aria-label="Mikropono">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="9" y="2" width="6" height="12" rx="3" fill="currentColor" stroke="none"></rect>
+            <path d="M5 11a7 7 0 0 0 14 0"></path><path d="M12 18v4"></path><path d="M8 22h8"></path>
+          </svg>
+        </button>
+        <span class="ring"></span><span class="ring r2"></span>
+      </div>
+      <p class="miclabel" id="micLabel"></p>
+      <div class="wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
     </div>
 
     <div class="row">
-      <button class="primary" id="nextBtn" type="button" hidden>Susunod</button>
-      <button class="ghost" id="skip" type="button">Laktawan</button>
+      <button class="btn sea" id="nextBtn" type="button" hidden>Susunod</button>
+      <button class="btn small" id="skip" type="button">Laktawan</button>
     </div>
   </section>
 
   <!-- TAPOS -->
-  <section class="stage" id="screenEnd" hidden>
+  <section class="end" id="screenEnd" hidden>
     <h2 class="endtitle" id="endTitle"></h2>
-    <div class="sum" id="sum"></div>
-    <p class="practice" id="practice"></p>
-    <p class="buddy wait" id="buddy"></p>
+    <div class="coach">
+      <div class="mascot" data-mood="happy"></div>
+      <div class="bubble"><p class="buddy wait" id="buddy"></p></div>
+    </div>
+    <div class="card">
+      <div class="sum" id="sum"></div>
+      <p class="practice" id="practice" style="margin-top:16px"></p>
+    </div>
     <div class="row">
-      <button class="primary" id="again" type="button">Ulit na session</button>
-      <button class="ghost" id="newUser" type="button">Ibang user</button>
+      <button class="btn sun" id="again" type="button">Ulit na session</button>
+      <button class="btn" id="newUser" type="button">Ibang user</button>
     </div>
   </section>
+
+  <footer>Hindi sine-save ang boses. Ang transcript, resulta, at code lang ang nasa talaan ng guro (kung naka-konekta). Pang-praktis ito, hindi pamalit sa pormal na pagtatasa.</footer>
 </main>
 
-<footer>Hindi sine-save ang boses. Ang transcript, resulta, at code lang ang nasa talaan ng guro (kung naka-konekta). Pang-praktis ito, hindi pamalit sa pormal na pagtatasa.</footer>
-
 <div class="banner" id="banner" hidden><div id="bannerText"></div></div>
+<div id="confetti" aria-hidden="true"></div>
 
 <dialog id="settings">
   <form method="dialog" class="dlg" id="settingsForm">
@@ -198,8 +332,8 @@
       <input id="fCode" type="text" autocomplete="off">
     </label>
     <div class="actions">
-      <button class="ghost" type="button" id="cancelSettings">Kanselahin</button>
-      <button class="primary" value="save" id="saveSettings">I-save</button>
+      <button class="btn small" type="button" id="cancelSettings">Kanselahin</button>
+      <button class="btn small sea" value="save" id="saveSettings">I-save</button>
     </div>
   </form>
 </dialog>
@@ -211,7 +345,7 @@
 
   /* ================= PAGSASAAYOS ================= */
   const CONFIG = {
-    appsScriptUrl: 'https://script.google.com/macros/s/AKfycbx-DP8McrCYegjiR5yIjulkq3VJ2e6yMdaaqNqD1wcEVDdMDFpXKutHAbJouSwTWyUatQ/exec',                         // opsyonal: Web App URL para sa talaan ng guro
+    appsScriptUrl: '',                         // opsyonal: Web App URL para sa talaan ng guro
     locale:      { fil: 'fil-PH', en: 'en-US' }, // Web Speech. Subukan din ang 'en-PH' para sa English
     azureLocale: { fil: 'fil-PH', en: 'en-US' },
     pronunciationScore: { fil: false, en: true },  // Azure lamang. I-on sa Filipino matapos subukan
@@ -260,20 +394,21 @@
   };
 
   const LEVELS = [
-    { key: 'words',      mode: 'once', gate: true,  name: { fil: 'Antas 1: Mga Salita',      en: 'Level 1: Words' },     unit: { fil: 'Salita',     en: 'Word' } },
-    { key: 'sentences',  mode: 'once', gate: true,  name: { fil: 'Antas 2: Mga Pangungusap', en: 'Level 2: Sentences' }, unit: { fil: 'Pangungusap', en: 'Sentence' } },
-    { key: 'paragraphs', mode: 'long', gate: false, name: { fil: 'Antas 3: Talata',          en: 'Level 3: Paragraph' }, unit: { fil: 'Talata',      en: 'Paragraph' } }
+    { key: 'words',      mode: 'once', gate: true,  name: { fil: 'Antas 1: Mga Salita',      en: 'Level 1: Words' },     short: { fil: 'Salita',      en: 'Words' },     unit: { fil: 'Salita',      en: 'Word' } },
+    { key: 'sentences',  mode: 'once', gate: true,  name: { fil: 'Antas 2: Mga Pangungusap', en: 'Level 2: Sentences' }, short: { fil: 'Pangungusap', en: 'Sentences' }, unit: { fil: 'Pangungusap', en: 'Sentence' } },
+    { key: 'paragraphs', mode: 'long', gate: false, name: { fil: 'Antas 3: Talata',          en: 'Level 3: Paragraph' }, short: { fil: 'Talata',      en: 'Paragraph' }, unit: { fil: 'Talata',      en: 'Paragraph' } }
   ];
 
   const TR = {
     fil: {
-      press: 'Pindutin ang mikropono at basahin nang malakas.',
+      press: 'Pindutin ang mikropono at basahin nang malakas!',
       pressLong: 'Pindutin ang mikropono at basahin ang buong talata.',
       micIdle: 'Pindutin para magsimula', micStop: 'Pindutin kapag tapos ka na',
       listening: 'Nakikinig ako… basahin mo na!', listeningLong: 'Nakikinig ako… pindutin ulit kapag tapos ka na.',
       thinking: 'Sandali lang…',
+      praise: ['Ang galing mo!', 'Wow, ang husay ng basa mo!', 'Sige pa, kaya mo yan!', 'Ang linaw ng basa mo!'],
       tama: 'Tama! Magaling!', halos: 'Halos tama!', ulit: 'Subukan ulit',
-      again: 'Subukan ulit. Pakinggan muna kung gusto mo.',
+      again: 'Subukan ulit! Pakinggan muna kung gusto mo.',
       correct: 'Ito ang tamang basa. Pakinggan mo.',
       none: 'Walang narinig. Pindutin ang mikropono at magsalita.',
       heard: 'Narinig:', clarity: 'Linaw ng bigkas', words: 'Tamang salita', wcpm: 'Bilis (tantiya)', wpm: 'salita kada minuto',
@@ -285,19 +420,20 @@
       another: 'Isa pang set para sa antas na ito!', levelUp: 'Magaling! Susunod na antas.',
       endTitle: 'Tapos na! Magaling ka!', sumPara: 'Talata', accuracy: 'Tama',
       practiceHead: 'Uulitin natin sa susunod:', practiceNone: 'Wala kang kailangang ulitin ngayon.',
-      buddyWait: 'Sandali, may mensahe si Basa Buddy…',
+      buddyWait: 'Sandali, may sasabihin ako sa iyo…',
       noLog: 'Hindi naka-konekta sa talaan ng guro. Gagana pa rin ang app.', logOn: 'Naka-konekta sa talaan ng guro.',
       itemOf: (u, a, b) => `${u} ${a} / ${b}`,
       local: { good: 'Napakahusay ng basa mo ngayon!', mid: 'Mahusay! Konting praktis pa at mas gagaling ka.', low: 'Magaling na simula! Basahin ulit nang dahan-dahan bukas.' }
     },
     en: {
-      press: 'Press the mic and read out loud.',
+      press: 'Press the mic and read out loud!',
       pressLong: 'Press the mic and read the whole paragraph.',
       micIdle: 'Press to start', micStop: 'Press when you are done',
-      listening: 'Listening… read it out loud!', listeningLong: 'Listening… press again when you are done.',
+      listening: 'I am listening… read it out loud!', listeningLong: 'I am listening… press again when you are done.',
       thinking: 'One moment…',
+      praise: ['You are awesome!', 'Wow, great reading!', 'Keep going, you can do it!', 'So clear and loud!'],
       tama: 'Correct! Great job!', halos: 'Almost!', ulit: 'Try again',
-      again: 'Try again. Listen first if you like.',
+      again: 'Try again! Listen first if you like.',
       correct: 'Here is the right way to read it. Listen.',
       none: 'I heard nothing. Press the mic and speak.',
       heard: 'Heard:', clarity: 'Clarity', words: 'Words correct', wcpm: 'Speed (estimate)', wpm: 'words per minute',
@@ -309,7 +445,7 @@
       another: 'One more set for this level!', levelUp: 'Great! Next level.',
       endTitle: 'All done! Well done!', sumPara: 'Paragraph', accuracy: 'Correct',
       practiceHead: 'We will practice these next time:', practiceNone: 'Nothing to practice today.',
-      buddyWait: 'One moment, Basa Buddy has a message…',
+      buddyWait: 'One moment, I have something to tell you…',
       noLog: 'Not connected to the teacher log. The app still works.', logOn: 'Connected to the teacher log.',
       itemOf: (u, a, b) => `${u} ${a} of ${b}`,
       local: { good: 'You read very well today!', mid: 'Nice work! A little more practice and you will improve.', low: 'Good start! Read slowly again tomorrow.' }
@@ -332,6 +468,64 @@
   const S = { lang: store('bt_lang') === 'en' ? 'en' : 'fil', learner: '', stars: 0, results: [], stop: null, wantMore: false, azureFailed: false };
   const tr = k => TR[S.lang][k];
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  /* ================= SI BASA BUDDY ================= */
+  const MASCOT_SVG = `
+<svg viewBox="0 0 200 210" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Basa Buddy, ang kaibigan mong aklat">
+  <g stroke="#1F2A44" stroke-linecap="round" stroke-linejoin="round">
+    <g class="legs">
+      <path d="M76 168v22M122 168v22" stroke-width="9" fill="none"/>
+      <ellipse cx="72" cy="196" rx="15" ry="8" fill="#FF6B6B" stroke-width="4"/>
+      <ellipse cx="126" cy="196" rx="15" ry="8" fill="#FF6B6B" stroke-width="4"/>
+    </g>
+    <rect x="52" y="38" width="116" height="134" rx="22" fill="#fff" stroke-width="5"/>
+    <rect x="40" y="30" width="116" height="140" rx="22" fill="#FFD23F" stroke-width="5"/>
+    <path d="M62 38v124" stroke="#E8A900" stroke-width="6" fill="none"/>
+    <path d="M122 30v36l11-9 11 9V30z" fill="#FF6B6B" stroke-width="4"/>
+    <ellipse cx="68" cy="122" rx="9" ry="6" fill="#FF9AA2" stroke="none" opacity=".85"/>
+    <ellipse cx="128" cy="122" rx="9" ry="6" fill="#FF9AA2" stroke="none" opacity=".85"/>
+    <g class="e-open">
+      <circle cx="80" cy="96" r="13" fill="#fff" stroke-width="4"/><circle class="pupil" cx="82" cy="98" r="6" fill="#1F2A44" stroke="none"/>
+      <circle cx="116" cy="96" r="13" fill="#fff" stroke-width="4"/><circle class="pupil" cx="118" cy="98" r="6" fill="#1F2A44" stroke="none"/>
+    </g>
+    <g class="e-happy" fill="none" stroke-width="5"><path d="M67 99Q80 83 93 99"/><path d="M103 99Q116 83 129 99"/></g>
+    <g class="brows" fill="none" stroke-width="5"><path d="M68 78L92 86"/><path d="M128 78L104 86"/></g>
+    <path class="m-smile" d="M84 118Q98 132 112 118" fill="none" stroke-width="5"/>
+    <g class="m-big"><path d="M80 114Q98 146 116 114Z" fill="#1F2A44" stroke-width="4"/><ellipse cx="98" cy="130" rx="8" ry="5" fill="#FF6B6B" stroke="none"/></g>
+    <ellipse class="m-o" cx="98" cy="124" rx="8" ry="10" fill="#1F2A44" stroke-width="3"/>
+    <path class="m-wavy" d="M86 128Q92 120 98 128T110 128" fill="none" stroke-width="5"/>
+    <g class="arm arm-l"><path d="M42 118Q22 124 14 146" stroke-width="8" fill="none"/><circle cx="14" cy="148" r="9" fill="#FFD23F" stroke-width="4"/></g>
+    <g class="arm arm-r"><path d="M168 118Q184 124 190 146" stroke-width="8" fill="none"/><circle cx="190" cy="148" r="9" fill="#FFD23F" stroke-width="4"/></g>
+  </g>
+</svg>`;
+  const initMascots = () => document.querySelectorAll('.mascot').forEach(m => { m.innerHTML = MASCOT_SVG; });
+  const mood = m => document.querySelectorAll('.mascot').forEach(x => { x.dataset.mood = m; });
+
+  function confetti() {
+    if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const box = $('confetti'), colors = ['#FFD23F', '#FF6B6B', '#1B8FD6', '#12A36B', '#7B61FF'];
+    for (let i = 0; i < 28; i++) {
+      const p = document.createElement('i');
+      p.style.left = (8 + Math.random() * 84) + 'vw'; p.style.background = colors[i % colors.length];
+      p.style.animationDelay = (Math.random() * 0.25) + 's';
+      p.style.setProperty('--dx', (Math.random() * 160 - 80) + 'px'); p.style.setProperty('--r', (Math.random() * 720 - 360) + 'deg');
+      box.appendChild(p); setTimeout(() => p.remove(), 2000);
+    }
+  }
+
+  function buildTracker() {
+    const t = $('tracker'); t.innerHTML = '';
+    LEVELS.forEach((l, i) => {
+      const li = document.createElement('li');
+      const n = document.createElement('span'); n.className = 'n'; n.textContent = String(i + 1);
+      const s = document.createElement('span'); s.className = 't'; s.textContent = l.short[S.lang];
+      li.append(n, s); t.appendChild(li);
+    });
+  }
+  function setTracker(level) {
+    const idx = LEVELS.indexOf(level);
+    [...$('tracker').children].forEach((li, i) => { li.className = i < idx ? 'done' : i === idx ? 'now' : ''; li.querySelector('.t').textContent = LEVELS[i].short[S.lang]; });
+  }
 
   /* ================= PAGHAHAMBING ================= */
   const tokens = s => s.split(/\s+/).filter(Boolean);
@@ -511,7 +705,11 @@
   /* ================= UI ================= */
   const show = id => ['screenStart', 'screenPlay', 'screenEnd'].forEach(s => { $(s).hidden = (s !== id); });
   const setStatus = s => { $('status').textContent = s; };
-  function setMic(state, label) { const m = $('mic'); m.dataset.state = state; m.disabled = (state === 'thinking'); $('micLabel').textContent = label || ''; }
+  function setMic(state, label) {
+    const m = $('mic'); m.dataset.state = state; m.disabled = (state === 'thinking');
+    $('micArea').dataset.state = state; $('micLabel').textContent = label || '';
+    if (state === 'listening') mood('listen'); else if (state === 'thinking') mood('think');
+  }
   async function banner(text, ms) { $('bannerText').textContent = text; $('banner').hidden = false; await sleep(ms || 1500); $('banner').hidden = true; }
 
   let micWaiter = null, nextWaiter = null;
@@ -524,10 +722,11 @@
     el.innerHTML = '';
     tokens(text).forEach(w => { const s = document.createElement('span'); s.className = 'w'; s.textContent = w; el.appendChild(s); });
     $('levelName').textContent = level.name[S.lang];
+    setTracker(level); mood('idle');
     $('count').textContent = TR[S.lang].itemOf(level.unit[S.lang], pos, total);
     $('barFill').style.width = Math.round(((pos - 1) / total) * 100) + '%';
     $('result').hidden = true; $('nextBtn').hidden = true;
-    $('skip').textContent = tr('skip'); $('listen').textContent = tr('listenBtn'); $('nextBtn').textContent = tr('next');
+    $('skip').textContent = tr('skip'); $('listenTxt').textContent = tr('listenBtn'); $('nextBtn').textContent = tr('next');
   }
 
   function showResult(level, ev, verdict, r, wcpm) {
@@ -543,6 +742,8 @@
       if (wcpm) pill(`${tr('wcpm')}: ${wcpm} ${tr('wpm')}`);
     } else if (r.usePA && r.pa !== null) pill(`${tr('clarity')}: ${r.pa}/100`);
     $('result').hidden = false;
+    mood(verdict === 'tama' ? 'happy' : verdict === 'halos' ? 'ok' : 'oops');
+    if (verdict === 'tama') confetti();
   }
 
   /* ================= ISANG BABASAHIN ================= */
@@ -562,12 +763,12 @@
       let r;
       try { r = await listen(level, text); }
       catch (e) {
-        setMic('idle', '');
+        setMic('idle', ''); mood('idle');
         if (e.fallback) { setStatus(tr('azureOut')); await sleep(1200); continue; }
         errors++; setStatus(tr('errorPrefix') + ' ' + e.message); await sleep(1800); continue;
       }
       setMic('thinking', ''); setStatus(tr('thinking'));
-      if (!r.text.trim()) { empties++; setMic('idle', ''); setStatus(tr('none')); await sleep(1500); continue; }
+      if (!r.text.trim()) { empties++; setMic('idle', ''); mood('idle'); setStatus(tr('none')); await sleep(1500); continue; }
 
       attempts++;
       const ev = evalItem(level, text, r);
@@ -575,10 +776,10 @@
       const wcpm = (level.mode === 'long' && r.seconds) ? Math.round(ev.ok / (r.seconds / 60)) : null;
       if (!best || VALUE[verdict] >= VALUE[best.verdict]) best = { ev, verdict, r, wcpm };
       showResult(level, ev, verdict, r, wcpm);
-      setStatus('');
+      setStatus(verdict === 'tama' ? TR[S.lang].praise[Math.floor(Math.random() * TR[S.lang].praise.length)] : '');
 
-      if (verdict === 'tama') { S.stars++; $('stars').textContent = S.stars; await sleep(level.mode === 'long' ? 600 : 1600); break; }
-      if (attempts < maxAttempts) { setMic('idle', ''); setStatus(tr('again')); await sleep(1400); }
+      if (verdict === 'tama') { S.stars++; $('stars').textContent = S.stars; await sleep(level.mode === 'long' ? 600 : 1800); break; }
+      if (attempts < maxAttempts) { setMic('idle', ''); setStatus(tr('again')); await sleep(1500); mood('idle'); }
       else if (level.mode !== 'long') { setStatus(tr('correct')); await speak(text); await sleep(500); }
     }
 
@@ -611,7 +812,7 @@
   /* ================= BUONG SESSION ================= */
   async function runSession() {
     S.results = []; S.stars = 0; S.azureFailed = false; $('stars').textContent = '0';
-    show('screenPlay');
+    show('screenPlay'); $('screenPlay').style.display = 'flex';
     for (const level of LEVELS) {
       await banner(level.name[S.lang], 1400);
       const N = CONFIG.session[level.key];
@@ -646,18 +847,19 @@
   }
 
   async function showEnd() {
-    show('screenEnd');
+    show('screenEnd'); $('screenPlay').style.display = 'none';
+    mood('happy'); confetti();
     $('endTitle').textContent = tr('endTitle');
     const st = statsByLevel(); const sum = $('sum'); sum.innerHTML = '';
     const line = (k, v) => { const d = document.createElement('div'); const a = document.createElement('span'); a.textContent = k; const b = document.createElement('b'); b.textContent = v; d.append(a, b); sum.appendChild(d); };
     LEVELS.forEach(l => {
       const s = st[l.key];
-      if (l.mode === 'long') line(l.name[S.lang].replace(/^[^:]+:\s*/, ''), `${Math.round(s.acc * 100)}%` + (s.wcpm ? ` · ${s.wcpm} ${tr('wpm')}` : ''));
-      else line(l.name[S.lang].replace(/^[^:]+:\s*/, ''), `${s.got % 1 ? s.got.toFixed(1) : s.got} / ${s.n}`);
+      if (l.mode === 'long') line(l.short[S.lang], `${Math.round(s.acc * 100)}%` + (s.wcpm ? ` (${s.wcpm} ${tr('wpm')})` : ''));
+      else line(l.short[S.lang], `${s.got % 1 ? s.got.toFixed(1) : s.got} / ${s.n}`);
     });
     line('★', String(S.stars));
 
-    const missed = S.results.filter(r => r.levelKey !== 'paragraphs' && r.score < 1).map(r => r.text);
+    const missed = [...new Set(S.results.filter(r => r.levelKey !== 'paragraphs' && r.score < 1).map(r => r.text))];
     const pr = $('practice'); pr.innerHTML = '';
     if (missed.length) { const b = document.createElement('strong'); b.textContent = tr('practiceHead') + ' '; pr.append(b, missed.slice(0, 8).join(', ')); }
     else pr.textContent = tr('practiceNone');
@@ -697,6 +899,7 @@
     $('langFil').setAttribute('aria-pressed', String(l === 'fil'));
     $('langEn').setAttribute('aria-pressed', String(l === 'en'));
     document.documentElement.lang = l === 'fil' ? 'fil' : 'en';
+    buildTracker();
   }
   $('langFil').addEventListener('click', () => setLang('fil'));
   $('langEn').addEventListener('click', () => setLang('en'));
@@ -711,8 +914,8 @@
     S.learner = code; store('bt_learner', code);
     runSession();
   });
-  $('again').addEventListener('click', () => runSession());
-  $('newUser').addEventListener('click', () => { $('learner').value = ''; show('screenStart'); refreshStart(); });
+  $('again').addEventListener('click', () => { $('screenEnd').hidden = true; runSession(); });
+  $('newUser').addEventListener('click', () => { $('learner').value = ''; mood('idle'); show('screenStart'); $('screenPlay').style.display = 'none'; refreshStart(); });
 
   /* ================= SETTINGS ================= */
   const dlg = $('settings');
@@ -727,6 +930,8 @@
   });
 
   /* ================= SIMULA ================= */
+  initMascots();
+  $('screenPlay').style.display = 'none';
   setLang(S.lang);
   $('learner').value = store('bt_learner') || '';
   refreshStart();
