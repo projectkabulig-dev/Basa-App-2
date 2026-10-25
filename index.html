@@ -437,23 +437,23 @@
 
   /* ================= PAGSASAAYOS ================= */
   const CONFIG = {
-    appsScriptUrl: 'https://script.google.com/macros/s/AKfycbx-DP8McrCYegjiR5yIjulkq3VJ2e6yMdaaqNqD1wcEVDdMDFpXKutHAbJouSwTWyUatQ/exec',                         // opsyonal: Web App URL para sa talaan ng guro
-    locale:      { fil: 'fil-PH', en: 'en-US' }, // Web Speech. Subukan din ang 'en-PH' para sa English
+    appsScriptUrl: '',
+    locale:      { fil: 'fil-PH', en: 'en-US' },
     azureLocale: { fil: 'fil-PH', en: 'en-US' },
-    pronunciationScore: { fil: false, en: true },  // Azure lamang. I-on sa Filipino matapos subukan
-    // Paano humihinto ang pakikinig bawat antas. 'auto': kusang hihinto kapag natahimik ang bata. 'manual': pipindutin ng bata ang mikropono kapag tapos na (hindi apektado ng pag-pause).
+    pronunciationScore: { fil: false, en: true },
     stopMode: { words: 'auto', sentences: 'manual', paragraphs: 'manual' },
-    accentTolerance: true,                     // English: ituturing na pareho ang th/t,d  v/b  f/p  z/s (accent ng mga batang Pilipino)
-    numberWordsPerSet: 2,                      // ilan sa 8 salita bawat set ang pangalan ng bilang
-    silenceMs: { once: 2000, long: 3500 },     // para sa 'auto' lamang
-    maxListenMs: { once: 45000, long: 180000 },// pananggalang: kusang titigil kung nakalimutang pindutin ang mikropono
+    accentTolerance: true,
+    numberWordsPerSet: 2,
+    silenceMs: { once: 2000, long: 3500 },
+    maxListenMs: { once: 45000, long: 180000 },
     passScore: 55,
-    gate: 0.8,                                 // 80% para umakyat ng antas
+    gate: 0.8,
     session: { words: 8, sentences: 4, paragraphs: 3 },
-    listenRate: { slow: 0.65, veryslow: 0.45 },   // bilis ng "Pakinggan muna" (1 = karaniwan)
-    voiceFallback: { fil: [] },                   // hal. ['id', 'ms'] kung walang Filipino na boses ang device (subukan muna)
-    teacher: { maxWords: 100, maxSentences: 60, maxParagraphs: 20, maxWordsPerSentence: 25, maxWordsPerParagraph: 120 },   // hangganan ng ilalagay ng guro
-    useAlternativesForWords: true              // tinatanggap ang alternatibong narinig ng engine sa iisang salita
+    // >>> PATCH C: mas mabagal ang boses <<<
+    listenRate: { slow: 0.5, veryslow: 0.3 },
+    voiceFallback: { fil: [] },
+    teacher: { maxWords: 100, maxSentences: 60, maxParagraphs: 20, maxWordsPerSentence: 25, maxWordsPerParagraph: 120 },
+    useAlternativesForWords: true
   };
 
   /* ================= BANGKO NG BABASAHIN ================= */
@@ -570,10 +570,9 @@
     engine: store('bt_engine') === 'azure' ? 'azure' : 'web'
   });
 
-  const S = { lang: store('bt_lang') === 'en' ? 'en' : 'fil', learner: '', stars: 0, results: [], stop: null, wantMore: false, azureFailed: false, last: {}, diff: (['easy', 'medium', 'hard'].includes(store('bt_diff')) ? store('bt_diff') : 'easy'), speed: store('bt_speed') === 'veryslow' ? 'veryslow' : 'slow', source: store('bt_source') === 'teacher' ? 'teacher' : 'app', usedTeacher: false, jump: null, curLevel: 0, doneLevels: new Set() };
+  const S = { lang: store('bt_lang') === 'en' ? 'en' : 'fil', learner: '', stars: 0, results: [], stop: null, wantMore: false, azureFailed: false, last: {}, diff: (['easy', 'medium', 'hard'].includes(store('bt_diff')) ? store('bt_diff') : 'easy'), speed: store('bt_speed') === 'veryslow' ? 'veryslow' : 'slow', source: store('bt_source') === 'teacher' ? 'teacher' : 'app', usedTeacher: false, jump: null, curLevel: 0, doneLevels: new Set(), curText: '' };
   const tr = k => TR[S.lang][k];
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  // Pinagsasama ang mga bahagi ng narinig. Kung ang susunod na bahagi ay pagpapatuloy lang ng nauna (nangyayari sa ilang Android Chrome), isa lang ang bibilangin.
   function joinParts(parts) {
     const out = [];
     parts.forEach(p => {
@@ -657,7 +656,7 @@
   }
 
   /* ================= PAGHAHAMBING ================= */
-  const tokens = s => s.split(/\s+/).filter(Boolean);
+  const tokens = s => String(s || '').split(/\s+/).filter(Boolean);
   const norm = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^\p{L}\p{N}]/gu, '');
   function lev(a, b) {
     const m = a.length, n = b.length; if (!m) return n; if (!n) return m;
@@ -671,13 +670,12 @@
   }
   const sim = (a, b) => (!a && !b) ? 1 : 1 - lev(a, b) / Math.max(a.length, b.length);
 
-  // ----- Mga bilang: "lima", "5", "limang", "dalawampu't lima", "25", "twenty-five" ay iisang bilang -----
   const NUMW = (() => {
     const fil = { isa: 1, dalawa: 2, tatlo: 3, apat: 4, lima: 5, anim: 6, pito: 7, walo: 8, siyam: 9, sampu: 10,
       labingisa: 11, labindalawa: 12, labingdalawa: 12, labintatlo: 13, labingtatlo: 13, labingapat: 14, labinlima: 15, labinglima: 15,
       labinganim: 16, labimpito: 17, labingpito: 17, labingwalo: 18, labinwalo: 18, labinsiyam: 19, labingsiyam: 19,
       dalawampu: 20, tatlumpu: 30, apatnapu: 40, limampu: 50, animnapu: 60, pitumpu: 70, walumpu: 80, siyamnapu: 90, isandaan: 100, sandaan: 100 };
-    Object.keys(fil).forEach(k => {                       // ligature: tatlo -> tatlong, isandaan -> isandaang
+    Object.keys(fil).forEach(k => {
       if (/[aiou]$/.test(k)) fil[k + 'ng'] = fil[k];
       else if (/n$/.test(k)) fil[k + 'g'] = fil[k];
     });
@@ -700,19 +698,19 @@
     while (k < pieces.length) {
       const w = pieces[k].w;
       if (/^\d+$/.test(w)) { units.push({ key: '#' + parseInt(w, 10), num: true, o: [pieces[k].o], e: k }); k++; continue; }
-      if (!en && (w === 'labing' || w === 'labin' || w === 'labim') && ones(k + 1)) {      // "labing isa" = 11
+      if (!en && (w === 'labing' || w === 'labin' || w === 'labim') && ones(k + 1)) {
         units.push({ key: '#' + (10 + ones(k + 1)), num: true, o: owners(k, k + 1), e: k + 1 }); k += 2; continue;
       }
       let v = M[w];
       if (v !== undefined) {
         let end = k;
-        if (v >= 20 && v < 100 && v % 10 === 0) {                                          // dalawampu't lima / twenty five
+        if (v >= 20 && v < 100 && v % 10 === 0) {
           let j = k + 1; if (!en && pieces[j] && pieces[j].w === 'at') j++;
           if (ones(j)) { v += ones(j); end = j; }
-        } else if (!en && v === 1 && pieces[k + 1] && pieces[k + 1].w === 'daan') { v = 100; end = k + 1; }   // isang daan
+        } else if (!en && v === 1 && pieces[k + 1] && pieces[k + 1].w === 'daan') { v = 100; end = k + 1; }
         units.push({ key: '#' + v, num: true, o: owners(k, end), e: end }); k = end + 1; continue;
       }
-      if (en && w === 'hundred') {                                                          // one hundred
+      if (en && w === 'hundred') {
         const last = units[units.length - 1];
         if (last && last.num && last.e === k - 1) {
           const n = parseInt(last.key.slice(1), 10);
@@ -724,7 +722,6 @@
     return units;
   }
 
-  // Pinakamainam na pagtutugma ng mga salita (LCS): eksakto = 2, malapit = 1. Ang bilang ay tinutumbasan ayon sa halaga.
   function align(target, heard, lang) {
     lang = lang || S.lang;
     const T = tokens(target), TU = numUnits(T, lang), HU = numUnits(tokens(heard), lang);
@@ -749,8 +746,6 @@
     return st.map(s => s === null ? 'ok' : s);
   }
 
-  // Mga salitang magkatunog na hindi mapaghihiwalay ng mikropono kapag isang salita lang ang binigkas (Antas 1, English).
-  // Hal. kapag ang dapat basahin ay "two", tinatanggap ang "to" o "too". Hindi ito ginagamit sa mga pangungusap at talata.
   const HOMOPHONES_EN = { one: ['won'], two: ['to', 'too'], four: ['for', 'fore'], eight: ['ate'] };
   function acceptHomophones(target, heard) {
     const map = {};
@@ -759,9 +754,6 @@
     return tokens(heard).map(w => map[norm(w)] || w).join(' ');
   }
 
-  // Accent ng mga batang Pilipino sa English: th -> t o d, v -> b, f -> p, z -> s.
-  // ISANG DIREKSYON lang: mula sa dapat basahin papunta sa maaaring marinig. Kaya tinatanggap ang "tree" para sa "three" at ang "pan" para sa "fan",
-  // pero hindi ang "fan" para sa "pan". Hindi kasama ang mga patinig (sit/seat, bed/bad ay mali pa rin).
   function accentVariants(w) {
     let set = new Set([w]);
     const rule = (src, subs) => { const out = new Set(set); set.forEach(x => { if (x.includes(src)) subs.forEach(s => out.add(x.split(src).join(s))); }); set = out; };
@@ -774,16 +766,15 @@
     const tt = target.replace(/-/g, ' ').split(/\s+/).map(norm).filter(Boolean), tset = new Set(tt), rules = [];
     tt.forEach(t => {
       const vs = accentVariants(t);
-      // Ang mga salitang bilang at ang 3-letrang salita ay eksakto lang; ang iba ay may isang pagkakamaling-letra (hal. very -> bery -> berry)
       if (vs.length) rules.push({ t, vs, strict: NUMW.en[t] !== undefined || t.length < 4 });
     });
     if (!rules.length) return heard;
     return tokens(String(heard).replace(/-/g, ' ')).map(raw => {
       const w = norm(raw);
-      if (!w || tset.has(w)) return raw;                               // kung nasa mismong dapat basahin, huwag galawin
-      const exact = rules.find(r => r.vs.includes(w));                 // UNAHIN ang eksaktong tugma sa lahat ng salita
+      if (!w || tset.has(w)) return raw;
+      const exact = rules.find(r => r.vs.includes(w));
       if (exact) return exact.t;
-      let best = null;                                                 // saka ang pinakamalapit (hanggang isang letra ang layo)
+      let best = null;
       rules.forEach(r => { if (r.strict) return; const d = Math.min(...r.vs.map(v => lev(v, w))); if (d <= 1 && (!best || d < best.d)) best = { t: r.t, d }; });
       return best ? best.t : raw;
     }).join(' ');
@@ -796,7 +787,7 @@
     cands.forEach(c => {
       let adj = c;
       if (S.lang === 'en') { if (level.key === 'words') adj = acceptHomophones(target, adj); adj = acceptAccent(target, adj); }
-      const st = align(target, adj);   // 'heard' ay nananatiling orihinal
+      const st = align(target, adj);
       const ok = st.filter(s => s === 'ok').length, near = st.filter(s => s === 'near').length;
       const sc = ok * 2 + near;
       if (!best || sc > best.sc) best = { st, heard: c, sc, ok, near };
@@ -813,11 +804,12 @@
   }
   const VALUE = { tama: 1, halos: 0.5, ulit: 0 };
 
-  /* ================= PAGBUO NG MGA BABASAHIN (laging bago) ================= */
+  /* ================= PAGBUO NG MGA BABASAHIN ================= */
   const DIFFS = ['easy', 'medium', 'hard'];
   const DIFF_NAME = { fil: { easy: 'Madali', medium: 'Katamtaman', hard: 'Mahirap' }, en: { easy: 'Easy', medium: 'Medium', hard: 'Hard' } };
-  const SENT_RANGE = { easy: [3, 5], medium: [5, 7], hard: [7, 10] };   // bilang ng salita sa isang pangungusap
-  const NUM_POOL = {                                                    // mga bilang sa Antas 1 (mga salita)
+  // >>> PATCH D: mas maikli ang sentences <<<
+  const SENT_RANGE = { easy: [2, 4], medium: [4, 6], hard: [6, 8] };
+  const NUM_POOL = {
     easy: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
     medium: [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 30, 40, 50, 60, 70, 80, 90],
     hard: Array.from({ length: 79 }, (_, i) => 21 + i).filter(n => n % 10 !== 0).concat([100])
@@ -826,7 +818,6 @@
   const ch = a => a[Math.floor(Math.random() * a.length)];
   const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
 
-  // Ang bilang bilang salita: 1 hanggang 100, sa Filipino at English
   function numWords(n, lang) {
     if (lang === 'en') {
       const o = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
@@ -844,7 +835,6 @@
     const T = tens[Math.floor(n / 10)];
     return n % 10 ? T + "'t " + o[n % 10] : T;
   }
-  // Filipino: tatlo + ng, isandaan + g, apat + " na"
   const numLink = w => /[aeiou]$/.test(w) ? w + 'ng' : /n$/.test(w) ? w + 'g' : w + ' na';
   const npf = (n, x, lang) => lang === 'en'
     ? numWords(n, 'en') + ' ' + (n === 1 ? x.es : x.ep)
@@ -880,18 +870,18 @@
   const pron = g => g === 'f' ? { s: 'she', o: 'her', p: 'her' } : { s: 'he', o: 'him', p: 'his' };
   const twoNames = () => { const a = ch(NAMES); let b; do { b = ch(NAMES); } while (b.n === a.n); return [a, b]; };
   const twoBuy = () => { const a = ch(BUY); let b; do { b = ch(BUY); } while (b === a); return [a, b]; };
-  const twoNouns = () => {                                          // dalawang bagay na may iisang lugar
+  const twoNouns = () => {
     for (let k = 0; k < 300; k++) { const x1 = ch(NOUNS), x2 = ch(NOUNS); if (x1 === x2) continue; const i = x1.pf.findIndex(p => x2.pf.includes(p)); if (i >= 0) return [x1, x2, i]; }
     return [NOUNS[0], NOUNS[1], 0];
   };
   const nr = d => d === 'easy' ? [2, 10] : d === 'medium' ? [2, 20] : [11, 99];
   const cnt = d => rn(...nr(d));
-  const pairAdd = d => {                                            // a + b = c, nasa saklaw ng antas
+  const pairAdd = d => {
     if (d === 'easy') { const a = rn(1, 8), b = rn(1, 10 - a); return [a, b, a + b]; }
     if (d === 'medium') { const a = rn(2, 18), b = rn(2, 20 - a); return [a, b, a + b]; }
     const a = rn(11, 88), b = rn(11, 100 - a); return [a, b, a + b];
   };
-  const pairSub = d => {                                            // a - b = c
+  const pairSub = d => {
     if (d === 'easy') { const a = rn(3, 10), b = rn(1, a - 1); return [a, b, a - b]; }
     if (d === 'medium') { const a = rn(5, 20), b = rn(2, a - 1); return [a, b, a - b]; }
     const a = rn(30, 100), b = rn(11, a - 11); return [a, b, a - b];
@@ -899,6 +889,7 @@
   const mkS = (text, nums, math) => ({ text, nums, math: math || null });
   const mkP = (sents, nums, math) => ({ text: sents.join(' '), nums, math: math || null, count: sents.length });
 
+  // >>> PATCH A: mas maraming templates (6 bawat diff) <<<
   const SENT = {
     fil: {
       easy: [
@@ -951,6 +942,7 @@
     }
   };
 
+  // >>> PATCH A: 6 templates bawat (lang, diff) <<<
   const PARA = {
     fil: {
       easy: [
@@ -959,7 +951,13 @@
         () => { const [a, b, c] = pairSub('easy'), x = ch(BUY), nm = ch(NAMES).n;
           return mkP([`May ${FIL.np(a, x)} ${ch(x.pf)}.`, `Kumuha si ${nm} ng ${FIL.w(b)}.`, `Ang ${FIL.w(a)} bawas ${FIL.w(b)} ay ${FIL.w(c)}.`], [a, b, a, b, c], ['sub', a, b, c]); },
         () => { const [a, b, c] = pairAdd('easy'), x = ch(OWN), [n1, n2] = twoNames();
-          return mkP([`Si ${n1.n} ay may ${FIL.np(a, x)}.`, `Si ${n2.n} ay may ${FIL.np(b, x)}.`, `Ang lahat ay ${FIL.w(c)}.`], [a, b, c], ['add', a, b, c]); }
+          return mkP([`Si ${n1.n} ay may ${FIL.np(a, x)}.`, `Si ${n2.n} ay may ${FIL.np(b, x)}.`, `Ang lahat ay ${FIL.w(c)}.`], [a, b, c], ['add', a, b, c]); },
+        () => { const n = cnt('easy'), x = ch(NOUNS);
+          return mkP([`Tingnan mo ang ${x.fil}.`, `May ${FIL.w(n)} ito.`, `Ang galing!`], [n]); },
+        () => { const n = cnt('easy'), x = ch(OWN), nm = ch(NAMES).n;
+          return mkP([`Si ${nm} ay masaya.`, `May ${FIL.np(n, x)} siya.`, `Nagpasalamat siya.`], [n]); },
+        () => { const n = cnt('easy'), x = ch(NOUNS);
+          return mkP([`Ito ay ${x.fil}.`, `May ${FIL.w(n)} ito.`, `Ang ganda!`], [n]); }
       ],
       medium: [
         () => { const [a, b, c] = pairAdd('medium'), x = ch(OWN), nm = ch(NAMES).n, g = ch(GIVERS.fil);
@@ -969,7 +967,11 @@
         () => { const [a, b, c] = pairAdd('medium'), x = ch(OWN), [n1, n2] = twoNames();
           return mkP([`Si ${n1.n} ay may ${FIL.np(a, x)}.`, `Si ${n2.n} ay may ${FIL.np(b, x)}.`, `Ilan lahat ang ${x.fil}?`, `Ang ${FIL.w(a)} at ${FIL.w(b)} ay ${FIL.w(c)}.`], [a, b, a, b, c], ['add', a, b, c]); },
         () => { const [a, b, c] = pairAdd('medium'), [x1, x2] = twoBuy();
-          return mkP([`Ang ${x1.fil} ay ${FIL.np(a, PISO)}.`, `Ang ${x2.fil} ay ${FIL.np(b, PISO)}.`, `Ilan ang bayad sa dalawa?`, `Ang ${FIL.w(a)} at ${FIL.w(b)} ay ${FIL.w(c)}.`], [a, b, 2, a, b, c], ['add', a, b, c]); }
+          return mkP([`Ang ${x1.fil} ay ${FIL.np(a, PISO)}.`, `Ang ${x2.fil} ay ${FIL.np(b, PISO)}.`, `Ilan ang bayad sa dalawa?`, `Ang ${FIL.w(a)} at ${FIL.w(b)} ay ${FIL.w(c)}.`], [a, b, 2, a, b, c], ['add', a, b, c]); },
+        () => { const n = cnt('medium'), x = ch(OWN), nm = ch(NAMES).n;
+          return mkP([`Si ${nm} ay may ${FIL.np(n, x)}.`, `Binilang niya ito.`, `Tama ang bilang niya.`], [n]); },
+        () => { const [a, b, c] = pairSub('medium'), x = ch(OWN), nm = ch(NAMES).n;
+          return mkP([`Si ${nm} ay may ${FIL.np(a, x)}.`, `Ibinalik niya ang ${FIL.w(b)}.`, `Ilan ang natira?`, `Ang sagot ay ${FIL.w(c)}.`], [a, b, c], ['sub', a, b, c]); }
       ],
       hard: [
         () => { const [a, b, c] = pairAdd('hard'), x = ch(OWN), nm = ch(NAMES).n, g = ch(GIVERS.fil);
@@ -979,7 +981,11 @@
         () => { const [a, b, c] = pairAdd('hard'), x = ch(OWN), [n1, n2] = twoNames();
           return mkP([`Si ${n1.n} ay nagbilang ng ${FIL.np(a, x)}.`, `Si ${n2.n} ay nagbilang ng ${FIL.np(b, x)}.`, `Ilan lahat ang nabilang nila?`, `Ang ${FIL.w(a)} at ${FIL.w(b)} ay ${FIL.w(c)}.`, `${cap(FIL.np(c, x))} ang nabilang nina ${n1.n} at ${n2.n}.`], [a, b, a, b, c, c], ['add', a, b, c]); },
         () => { const [a, b, c] = pairAdd('hard'), [x1, x2] = twoBuy(), nm = ch(NAMES).n;
-          return mkP([`Ang ${x1.fil} ay ${FIL.np(a, PISO)}.`, `Ang ${x2.fil} ay ${FIL.np(b, PISO)}.`, `Ilan ang bayad sa dalawa?`, `Ang ${FIL.w(a)} at ${FIL.w(b)} ay ${FIL.w(c)}.`, `Nagbayad si ${nm} ng ${FIL.np(c, PISO)}.`], [a, b, 2, a, b, c, c], ['add', a, b, c]); }
+          return mkP([`Ang ${x1.fil} ay ${FIL.np(a, PISO)}.`, `Ang ${x2.fil} ay ${FIL.np(b, PISO)}.`, `Ilan ang bayad sa dalawa?`, `Ang ${FIL.w(a)} at ${FIL.w(b)} ay ${FIL.w(c)}.`, `Nagbayad si ${nm} ng ${FIL.np(c, PISO)}.`], [a, b, 2, a, b, c, c], ['add', a, b, c]); },
+        () => { const n = cnt('hard'), x = ch(OWN), nm = ch(NAMES).n;
+          return mkP([`Maraming ${x.fil} si ${nm}.`, `May ${FIL.np(n, x)} siya.`, `Masaya siya sa kanyang ${x.fil}.`], [n]); },
+        () => { const [a, b, c] = pairSub('hard'), x = ch(BUY), nm = ch(NAMES).n;
+          return mkP([`Si ${nm} ay may ${FIL.np(a, x)}.`, `Ibinigay niya ang ${FIL.w(b)} sa kaibigan.`, `Ilan ang natira sa kanya?`, `Ang ${FIL.w(a)} bawas ${FIL.w(b)} ay ${FIL.w(c)}.`], [a, b, c], ['sub', a, b, c]); }
       ]
     },
     en: {
@@ -989,7 +995,13 @@
         () => { const [a, b, c] = pairSub('easy'), x = ch(BUY), nm = ch(NAMES).n;
           return mkP([`There are ${ENG.np(a, x)} ${ch(x.pe)}.`, `${nm} took ${ENG.w(b)}.`, `${cap(ENG.w(a))} take away ${ENG.w(b)} is ${ENG.w(c)}.`], [a, b, a, b, c], ['sub', a, b, c]); },
         () => { const [a, b, c] = pairAdd('easy'), x = ch(OWN), [n1, n2] = twoNames();
-          return mkP([`${n1.n} has ${ENG.np(a, x)}.`, `${n2.n} has ${ENG.np(b, x)}.`, `Altogether they have ${ENG.w(c)}.`], [a, b, c], ['add', a, b, c]); }
+          return mkP([`${n1.n} has ${ENG.np(a, x)}.`, `${n2.n} has ${ENG.np(b, x)}.`, `Altogether they have ${ENG.w(c)}.`], [a, b, c], ['add', a, b, c]); },
+        () => { const n = cnt('easy'), x = ch(NOUNS);
+          return mkP([`Look at the ${x.es}.`, `There are ${ENG.w(n)} of them.`, `How nice!`], [n]); },
+        () => { const n = cnt('easy'), x = ch(OWN), nm = ch(NAMES).n;
+          return mkP([`${nm} is happy.`, `${nm} has ${ENG.np(n, x)}.`, `${nm} says thank you.`], [n]); },
+        () => { const n = cnt('easy'), x = ch(NOUNS);
+          return mkP([`This is a ${x.es}.`, `There are ${ENG.w(n)} here.`, `So pretty!`], [n]); }
       ],
       medium: [
         () => { const [a, b, c] = pairAdd('medium'), x = ch(OWN), nm = ch(NAMES), p = pron(nm.g), g = ch(GIVERS.en);
@@ -999,7 +1011,11 @@
         () => { const [a, b, c] = pairAdd('medium'), x = ch(OWN), [n1, n2] = twoNames();
           return mkP([`${n1.n} has ${ENG.np(a, x)}.`, `${n2.n} has ${ENG.np(b, x)}.`, `How many ${x.ep} do they have?`, `${cap(ENG.w(a))} and ${ENG.w(b)} make ${ENG.w(c)}.`], [a, b, a, b, c], ['add', a, b, c]); },
         () => { const [a, b, c] = pairAdd('medium'), [x1, x2] = twoBuy();
-          return mkP([`The ${x1.es} costs ${ENG.np(a, PISO)}.`, `The ${x2.es} costs ${ENG.np(b, PISO)}.`, `How much do both cost?`, `${cap(ENG.w(a))} and ${ENG.w(b)} make ${ENG.w(c)}.`], [a, b, a, b, c], ['add', a, b, c]); }
+          return mkP([`The ${x1.es} costs ${ENG.np(a, PISO)}.`, `The ${x2.es} costs ${ENG.np(b, PISO)}.`, `How much do both cost?`, `${cap(ENG.w(a))} and ${ENG.w(b)} make ${ENG.w(c)}.`], [a, b, a, b, c], ['add', a, b, c]); },
+        () => { const n = cnt('medium'), x = ch(OWN), nm = ch(NAMES).n;
+          return mkP([`${nm} has ${ENG.np(n, x)}.`, `${nm} counts them.`, `${nm} counts correctly.`], [n]); },
+        () => { const [a, b, c] = pairSub('medium'), x = ch(OWN), nm = ch(NAMES).n;
+          return mkP([`${nm} has ${ENG.np(a, x)}.`, `${nm} gives back ${ENG.w(b)}.`, `How many are left?`, `The answer is ${ENG.w(c)}.`], [a, b, c], ['sub', a, b, c]); }
       ],
       hard: [
         () => { const [a, b, c] = pairAdd('hard'), x = ch(OWN), nm = ch(NAMES), p = pron(nm.g), g = ch(GIVERS.en);
@@ -1009,7 +1025,11 @@
         () => { const [a, b, c] = pairAdd('hard'), x = ch(OWN), [n1, n2] = twoNames();
           return mkP([`${n1.n} counted ${ENG.np(a, x)}.`, `${n2.n} counted ${ENG.np(b, x)}.`, `How many did they count?`, `${cap(ENG.w(a))} and ${ENG.w(b)} make ${ENG.w(c)}.`, `They counted ${ENG.np(c, x)} in all.`], [a, b, a, b, c, c], ['add', a, b, c]); },
         () => { const [a, b, c] = pairAdd('hard'), [x1, x2] = twoBuy(), nm = ch(NAMES).n;
-          return mkP([`The ${x1.es} costs ${ENG.np(a, PISO)}.`, `The ${x2.es} costs ${ENG.np(b, PISO)}.`, `How much do both cost?`, `${cap(ENG.w(a))} and ${ENG.w(b)} make ${ENG.w(c)}.`, `${nm} paid ${ENG.np(c, PISO)}.`], [a, b, a, b, c, c], ['add', a, b, c]); }
+          return mkP([`The ${x1.es} costs ${ENG.np(a, PISO)}.`, `The ${x2.es} costs ${ENG.np(b, PISO)}.`, `How much do both cost?`, `${cap(ENG.w(a))} and ${ENG.w(b)} make ${ENG.w(c)}.`, `${nm} paid ${ENG.np(c, PISO)}.`], [a, b, a, b, c, c], ['add', a, b, c]); },
+        () => { const n = cnt('hard'), x = ch(OWN), nm = ch(NAMES).n;
+          return mkP([`${nm} has many ${x.ep}.`, `${nm} has ${ENG.np(n, x)}.`, `${nm} is happy with them.`], [n]); },
+        () => { const [a, b, c] = pairSub('hard'), x = ch(BUY), nm = ch(NAMES).n;
+          return mkP([`${nm} has ${ENG.np(a, x)}.`, `${nm} gave ${ENG.w(b)} to a friend.`, `How many are left?`, `${cap(ENG.w(a))} take away ${ENG.w(b)} is ${ENG.w(c)}.`], [a, b, c], ['sub', a, b, c]); }
       ]
     }
   };
@@ -1017,26 +1037,28 @@
   function genSentence(lang, diff) {
     const [lo, hi] = SENT_RANGE[diff], list = SENT[lang][diff];
     for (let i = 0; i < 60; i++) { const t = ch(list)(), n = tokens(t.text).length; if (n >= lo && n <= hi) return t; }
-    return list[0]();                                                 // ang unang template ay palaging nasa saklaw
+    return list[0]();
   }
   function genParagraph(lang, diff) {
     if (diff === 'hard' && Math.random() < 0.3) { const e = ch(BANK[lang].extras); return { text: e, nums: null, math: null, count: e.split(/(?<=[.?!])\s+/).length, extra: true }; }
     return ch(PARA[lang][diff])();
   }
-  // Laging bago: hindi inuulit ang nabasa na ng batang iyon (naaalala ang huling 60)
+
+  // >>> PATCH B: session-level shuffle-without-replacement <<<
   function genItems(kind, n) {
     const seenKey = `bt_seen_${S.learner}_${S.lang}_${S.diff}_${kind}`;
-    const seen = jget(seenKey, []), out = [];
-    while (out.length < n) {
-      let t = null;
-      for (let tries = 0; tries < 14; tries++) {
-        const c = kind === 'sentences' ? genSentence(S.lang, S.diff) : genParagraph(S.lang, S.diff);
-        t = c.text;
-        if (!seen.includes(t) && !out.includes(t)) break;
-      }
-      out.push(t);
+    const seen = jget(seenKey, []);
+    const out = [];
+    let pool = [];
+    for (let i = 0; i < 80 && pool.length < n * 4; i++) {
+      const c = kind === 'sentences' ? genSentence(S.lang, S.diff) : genParagraph(S.lang, S.diff);
+      if (!pool.includes(c.text)) pool.push(c.text);
     }
-    jset(seenKey, seen.concat(out).slice(-60));
+    let fresh = pool.filter(t => !seen.includes(t));
+    if (fresh.length < n) fresh = pool;
+    shuffle(fresh);
+    out.push(...fresh.slice(0, n));
+    jset(seenKey, seen.concat(out).slice(-120));
     return out;
   }
 
@@ -1053,8 +1075,8 @@
     let used = jget(uk, []).filter(x => list.includes(x));
     const need = want - out.length;
     const free = list.filter(x => !used.includes(x) && !out.includes(x));
-    let take = free.length >= need ? shuffle(free).slice(0, need) : free.slice();                  // ang mga hindi pa nababasa muna
-    if (take.length < need) {                                                                     // naubos na: simula ulit sa pagbilang
+    let take = free.length >= need ? shuffle(free).slice(0, need) : free.slice();
+    if (take.length < need) {
       used = [];
       take = take.concat(shuffle(list.filter(x => !out.includes(x) && !take.includes(x))).slice(0, need - take.length));
     }
@@ -1064,7 +1086,7 @@
   }
   function pick(levelKey, n) {
     S.usedTeacher = false;
-    if (S.source === 'teacher') {                                      // babasahin ng guro; kung wala para sa antas na ito, ang app na ang bahala
+    if (S.source === 'teacher') {
       const t = pickTeacher(levelKey, n);
       if (t.length) { S.usedTeacher = true; return t; }
     }
@@ -1075,8 +1097,7 @@
     const takeMissed = levelKey === 'paragraphs' ? 0 : Math.min(2, missed.length, n - 1);
     for (let i = 0; i < takeMissed; i++) out.push(missed.shift());
     jset(mk, missed);
-    if (levelKey !== 'words') return out.concat(genItems(levelKey, n - out.length));   // mga pangungusap at talata: laging bagong binubuo
-    // Mga salita: ilang pangalan ng bilang + mga karaniwang salita. Hindi inuulit hanggang maubos ang listahan.
+    if (levelKey !== 'words') return out.concat(genItems(levelKey, n - out.length));
     const take = (pool, key, count, skip) => {
       let used = jget(uk(key), []);
       const all = () => pool.map((_, i) => i).filter(i => !skip(pool[i]));
@@ -1107,11 +1128,10 @@
       if (!SR) { reject(new Error(tr('unsupported'))); return; }
       const rec = new SR();
       const manual = mode === 'manual';
-      const keepOpen = manual || !!continuous;   // tuloy-tuloy ang pakikinig para hindi maputol ng pag-pause
+      const keepOpen = manual || !!continuous;
       rec.lang = locale; rec.interimResults = true; rec.maxAlternatives = 3; rec.continuous = keepOpen;
       let text = '', prefix = '', alts = [], t0 = 0, t1 = 0, done = false;
       let readyCalled = false, wd = null, cap = null;
-      // Kusang tapusin ang pakikinig kapag natahimik na ang bata (hindi na kailangang pindutin ulit ang mikropono).
       const armWatchdog = () => {
         clearTimeout(wd);
         wd = setTimeout(() => { if (!done && text.trim()) { S.wantMore = false; try { rec.stop(); } catch (_) {} } },
@@ -1200,20 +1220,29 @@
   const loadVoices = () => { try { VOICES = speechSynthesis.getVoices() || []; } catch (e) { VOICES = []; } };
   if ('speechSynthesis' in window) { loadVoices(); speechSynthesis.onvoiceschanged = loadVoices; }
   const voiceOn = () => store('bt_voice') !== 'off';
+
+  // >>> PATCH C: neutral voice, iwasan ang slang <<<
   function pickVoice() {
     if (!VOICES.length) loadVoices();
     const lg = v => (v.lang || '').toLowerCase().replace('_', '-');
     const find = re => VOICES.find(v => re.test(lg(v)));
-    if (S.lang === 'fil') return find(/^(fil|tl)/) || CONFIG.voiceFallback.fil.map(pre => find(new RegExp('^' + pre))).find(Boolean) || null;
-    return find(/^en-ph/) || find(/^en-us/) || find(/^en/) || null;       // English ng Pilipinas muna kung mayroon
+    const AVOID = /(slang|au-|in-|ng-|za-|ie-)/i;
+    if (S.lang === 'fil') {
+      const fil = find(/^(fil|tl)/);
+      if (fil) return fil;
+      return null;   // walang Filipino voice: huwag mag-speak (maling bigkas)
+    }
+    const PREFERRED_EN = /^(en-ph|en-gb|en-us)/;
+    return VOICES.find(v => PREFERRED_EN.test(lg(v)) && !AVOID.test(v.name)) || find(/^en/) || null;
   }
   function utter(text, o) {
     o = o || {};
     return new Promise(res => {
       if (!('speechSynthesis' in window)) return res();
       try { speechSynthesis.cancel(); } catch (e) {}
-      const u = new SpeechSynthesisUtterance(text);
       const v = pickVoice();
+      if (!v && S.lang === 'fil') return res();   // walang Filipino voice: skip
+      const u = new SpeechSynthesisUtterance(text);
       if (v) { u.voice = v; u.lang = v.lang; } else u.lang = CONFIG.locale[S.lang];
       u.rate = o.rate || 0.85; u.pitch = o.pitch || 1;
       let done = false; const fin = () => { if (!done) { done = true; res(); } };
@@ -1222,8 +1251,9 @@
       setTimeout(fin, 9000);
     });
   }
-  const speak = t => utter(t, { rate: CONFIG.listenRate[S.speed] });            // "Pakinggan muna" at pagbasa ng tamang salita (mabagal)
-  const say = t => voiceOn() ? utter(t, { rate: 1, pitch: 1.2 }) : Promise.resolve(); // papuri ni Basa Buddy
+  // >>> PATCH C: pitch 1.0 (hindi 1.2) para sa pagbasa <<<
+  const speak = t => utter(t, { rate: CONFIG.listenRate[S.speed], pitch: 1.0 });
+  const say = t => voiceOn() ? utter(t, { rate: 1, pitch: 1.2 }) : Promise.resolve();
   function syncVoiceBtn() { const b = $('voiceBtn'); b.dataset.on = String(voiceOn()); b.setAttribute('aria-pressed', String(voiceOn())); }
   function updateVoiceInfo() {
     const v = pickVoice();
@@ -1296,7 +1326,6 @@
     $('banner').hidden = true;
   }
 
-  // Lumipat sa ibang antas kahit hindi pa tapos ang kasalukuyan (pasulong o paatras).
   function jumpTo(i) {
     if ($('screenPlay').hidden || i === S.curLevel) return;
     S.jump = i;
@@ -1320,7 +1349,6 @@
       const act = await waitMic(); chk(id);
       if (act === 'skip') { skipped = true; break; }
 
-      // Huwag magsalita hanggang hindi pa pula ang mikropono: doon pa lang tunay na nakikinig ang engine.
       setMic('starting', ''); setStatus(tr('getReady'));
       const onReady = () => {
         if (id !== runId || S.jump !== null) return;
@@ -1458,7 +1486,6 @@
     const visited = LEVELS.filter(l => st[l.key].n > 0);
     const overall = visited.length ? visited.reduce((a, l) => a + st[l.key].acc, 0) / visited.length : 0;
     const localMsg = overall >= 0.8 ? tr('local').good : overall >= 0.5 ? tr('local').mid : tr('local').low;
-    // Mungkahi: umakyat kung magaling, o magpraktis sa mas madali kung nahirapan (ang bata pa rin ang magpapasya)
     const sg = $('suggest'); sg.hidden = true;
     if (S.source !== 'teacher') { const di = DIFFS.indexOf(S.diff); let to = null;
       if (overall >= 0.8 && di < DIFFS.length - 1) { to = DIFFS[di + 1]; $('suggestTxt').textContent = tr('suggestUp'); }
@@ -1489,7 +1516,7 @@
     if (micWaiter) { const w = micWaiter; micWaiter = null; w('skip'); }
   });
   $('nextBtn').addEventListener('click', () => { if (nextWaiter) { const w = nextWaiter; nextWaiter = null; w(); } });
-  $('listen').addEventListener('click', () => { if (S.curText && !S.stop) speak(S.curText); });   // hindi magsasalita habang nakikinig ang mikropono
+  $('listen').addEventListener('click', () => { if (S.curText && !S.stop) speak(S.curText); });
 
   function setLang(l) {
     S.lang = l; store('bt_lang', l);
@@ -1498,7 +1525,6 @@
     document.documentElement.lang = l === 'fil' ? 'fil' : 'en';
     buildTracker(); syncDiff(); syncSpeed(); syncSource();
   }
-  // Kapag nagpalit ng wika habang nagbabasa, magsisimula ng bagong session sa bagong wika.
   function switchLang(l) {
     if (l === S.lang) return;
     const playing = !$('screenPlay').hidden, cur = S.curLevel || 0;
@@ -1512,7 +1538,6 @@
     if (!voiceOn()) { try { speechSynthesis.cancel(); } catch (e) {} }
   });
 
-  /* ================= HIRAP (difficulty) AT BILIS NG "PAKINGGAN MUNA" ================= */
   const DIFF_ID = { easy: 'dEasy', medium: 'dMedium', hard: 'dHard' };
   const diffName = d => DIFF_NAME[S.lang][d];
   function syncDiff() {
@@ -1530,23 +1555,22 @@
   }
   [['spSlow', 'slow'], ['spVerySlow', 'veryslow']].forEach(([id, v]) => $(id).addEventListener('click', () => {
     S.speed = v; store('bt_speed', v); syncSpeed();
-    if (!S.stop && S.curText) speak(S.curText);                      // pinapakinggan agad sa napiling bilis
+    if (!S.stop && S.curText) speak(S.curText);
   }));
   $('suggestBtn').addEventListener('click', () => { setDiff($('suggestBtn').dataset.diff); $('screenEnd').hidden = true; runSession(); });
 
-  /* ================= BABASAHIN NG GURO (kopya-paste; naka-save sa device na ito) ================= */
   const ABBR = ['gng', 'bb', 'g', 'mr', 'mrs', 'ms', 'dr', 'sr', 'jr', 'gat', 'engr', 'atty'];
   const cleanLine = x => x.replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/^\s*(?:[-•*·]|\d+[.)])\s+/, '').replace(/\s+/g, ' ').trim();
-  function splitSentences(line) {                                       // hindi puputulin pagkatapos ng Gng., Mr., Dr. atbp.
+  function splitSentences(line) {
     const t = line.replace(/\b([A-Za-z]{1,4})\./g, (m, w) => ABBR.includes(w.toLowerCase()) ? w + '\u0001' : m);
     return t.split(/(?<=[.?!])\s+(?=[A-Z0-9"'\u201c\u2018])/).map(x => x.replace(/\u0001/g, '.'));
   }
   function parseTeacher(kind, text) {
     const L = CONFIG.teacher, raw = String(text || '');
     let parts;
-    if (kind === 'words') parts = raw.split(/[\n,;\t]+/);                                           // isa kada linya o paghiwalayin ng kuwit
-    else if (kind === 'sentences') parts = raw.split(/\n/).flatMap(splitSentences);                 // isa kada linya; hinahati rin ang mahabang linya
-    else parts = /\n\s*\n/.test(raw) ? raw.split(/\n\s*\n/) : raw.split(/\n/);                      // blangkong linya = bagong talata
+    if (kind === 'words') parts = raw.split(/[\n,;\t]+/);
+    else if (kind === 'sentences') parts = raw.split(/\n/).flatMap(splitSentences);
+    else parts = /\n\s*\n/.test(raw) ? raw.split(/\n\s*\n/) : raw.split(/\n/);
     const seen = new Set(), items = []; let skipped = 0;
     parts.map(cleanLine).filter(x => /[\p{L}\p{N}]/u.test(x)).forEach(x => {
       if (seen.has(x)) return; seen.add(x);
@@ -1565,7 +1589,7 @@
     $('srcLabel').textContent = tr('srcLabel'); $('srcApp').textContent = tr('srcApp'); $('srcTeacher').textContent = tr('srcTeacher'); $('openTeacher').textContent = tr('openTeacher');
     const L = teacherLists(S.lang), has = hasTeacher(S.lang);
     $('srcHint').textContent = S.source === 'teacher' ? (has ? tr('srcSummary')(L.words.length, L.sentences.length, L.paragraphs.length) : tr('srcNone')) : '';
-    $('diffGroup').classList.toggle('dim', S.source === 'teacher' && has);        // ang hirap ay para sa binuo ng app lang
+    $('diffGroup').classList.toggle('dim', S.source === 'teacher' && has);
   }
   function setSource(v) { S.source = v; store('bt_source', v); syncSource(); }
   $('srcApp').addEventListener('click', () => setSource('app'));
@@ -1602,7 +1626,7 @@
   $('teacherForm').addEventListener('submit', e => {
     e.preventDefault(); readDraft();
     ['fil', 'en'].forEach(l => { const d = tDraft[l]; jset('bt_teacher_' + l, { words: parseTeacher('words', d.words).items, sentences: parseTeacher('sentences', d.sentences).items, paragraphs: parseTeacher('paragraphs', d.paragraphs).items }); });
-    if (S.source === 'app' && hasTeacher(S.lang)) S.source = 'teacher', store('bt_source', 'teacher');   // pagkatapos mag-save, sa Guro na agad
+    if (S.source === 'app' && hasTeacher(S.lang)) S.source = 'teacher', store('bt_source', 'teacher');
     if (!hasTeacher(S.lang) && S.source === 'teacher') setSource('app');
     syncSource(); tDlg.close();
   });
@@ -1620,7 +1644,6 @@
   $('again').addEventListener('click', () => { $('screenEnd').hidden = true; runSession(); });
   $('newUser').addEventListener('click', () => { $('learner').value = ''; mood('idle'); show('screenStart'); $('screenPlay').style.display = 'none'; refreshStart(); });
 
-  /* ================= SETTINGS ================= */
   const dlg = $('settings');
   $('openSettings').addEventListener('click', () => {
     const c = cfg(); $('fEngine').value = c.engine; $('fUrl').value = c.url; $('fCode').value = c.code;
@@ -1634,7 +1657,6 @@
     tokenCache = { token: null, region: null, exp: 0 }; refreshStart();
   });
 
-  /* ================= SIMULA ================= */
   initMascots();
   syncVoiceBtn(); $('hdrLang').hidden = true;
   $('screenPlay').style.display = 'none';
