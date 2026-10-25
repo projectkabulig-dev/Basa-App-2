@@ -522,11 +522,11 @@
     </div>
 
     <label>Apps Script URL (opsyonal)
-      <input id="fUrl" type="url" placeholder="https://script.google.com/macros/s/AKfycbx-DP8McrCYegjiR5yIjulkq3VJ2e6yMdaaqNqD1wcEVDdMDFpXKutHAbJouSwTWyUatQ/exec" autocomplete="off">
+      <input id="fUrl" type="url" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off">
       <small>Para sa talaan ng guro at mensahe ni Claude. Walang laman = gagana pa rin ang app.</small>
     </label>
     <label>Access code (opsyonal)
-      <input id="fCode" type="basa app" autocomplete="off">
+      <input id="fCode" type="text" autocomplete="off">
     </label>
     <div class="actions">
       <button class="btn small" type="button" id="cancelSettings">Kanselahin</button>
@@ -560,9 +560,10 @@
   };
 
   /* ============================================================
-   * >>> GENERATIVE v2 <<<
-   * Bagong sistema: 1–1,000,000 na bilang, word tiers,
-   * generative sentences at paragraphs, variety, validation.
+   * >>> RECORD FIX v1 <<<
+   * Pinaka-mahalagang pagbabago: tanggalin ang no-cors,
+   * idagdag ang logSignIn() at logWrongLog(),
+   * gumamit ng GET fallback para sa signin.
    * ============================================================ */
 
   // ---------- BILANG 1–1,000,000 ----------
@@ -612,8 +613,6 @@
     return String(n);
   }
 
-  // ---------- NUM_POOL per grade ----------
-  // Bawat grade ay may sariling saklaw ng bilang. G6 = 1,000,000.
   const NUM_POOL = {
     1: { easy: rng(1, 10),       medium: rng(1, 10),       hard: rng(1, 20) },
     2: { easy: rng(1, 20),       medium: rng(1, 50),       hard: rng(1, 100) },
@@ -624,11 +623,6 @@
   };
   function rng(a, b) { const out = []; for (let i = a; i <= b; i++) out.push(i); return out; }
 
-  // ---------- WORD TIERS ----------
-  // tier 1: G1–G2 (2-3 syllables)
-  // tier 2: G2–G4 (3-4 syllables)
-  // tier 3: G3–G6 (4-5 syllables)
-  // tier 4: G5–G6 (5+ syllables, academic)
   const WORDS = {
     fil: {
       1: ['aso', 'ate', 'ama', 'ina', 'bata', 'baso', 'bato', 'bola', 'baka', 'buko', 'damo', 'isda', 'ibon', 'ilaw', 'kama', 'kuya', 'lola', 'lolo', 'mama', 'papa', 'mata', 'mesa', 'pusa', 'puno', 'ulan', 'upo', 'tao', 'araw', 'kamay', 'ilong', 'bibig', 'tala'],
@@ -656,7 +650,6 @@
     return out;
   }
 
-  // ---------- SUBJECTS, VERBS, OBJECTS, PLACES, TIMES ----------
   const SUBJECTS = {
     fil: ['Ana', 'Ben', 'Mia', 'Lito', 'Rosa', 'Carlo', 'Nena', 'Dino', 'Tomas', 'Liza', 'si Nanay', 'si Tatay', 'si Lola', 'si Lolo', 'ang bata', 'ang guro'],
     en: ['Ana', 'Ben', 'Mia', 'Lito', 'Rosa', 'Carlo', 'Nena', 'Dino', 'Tomas', 'Liza', 'Mom', 'Dad', 'Grandma', 'Grandpa', 'the child', 'the teacher']
@@ -682,7 +675,6 @@
     en: ['quickly', 'slowly', 'happily', 'early', 'loudly', 'quietly']
   };
 
-  // ---------- HELPERS ----------
   const rn = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
   const ch = a => a[Math.floor(Math.random() * a.length)];
   const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
@@ -694,7 +686,6 @@
     return numLink(numWordsFil(n)) + ' ' + noun;
   }
 
-  // ---------- GRADE SENTENCE RANGES ----------
   const GRADE_SENT = {
     1: { easy: [2, 3], medium: [3, 4], hard: [4, 5] },
     2: { easy: [2, 4], medium: [4, 5], hard: [5, 6] },
@@ -705,8 +696,6 @@
   };
   function sentRange() { return GRADE_SENT[S.grade][S.diff]; }
 
-  // ---------- GENERATIVE SENTENCE BUILDER ----------
-  // Bawat tawag ay bagong sentence. Sinusuri ang haba at inaayos kung mali.
   function buildSentence(lang, grade, diff) {
     const [lo, hi] = GRADE_SENT[grade][diff];
     const nums = NUM_POOL[grade][diff];
@@ -715,7 +704,6 @@
       const n = tokens(s).length;
       if (n >= lo && n <= hi) return { text: s, nums: extractNums(s, lang) };
     }
-    // Fallback: minimal sentence na siguradong pasok
     return { text: fallbackSentence(lang, nums), nums: [] };
   }
   function fallbackSentence(lang, nums) {
@@ -733,7 +721,6 @@
     const adv = ch(ADVERBS[lang]);
     const numPhrase = npf(n, obj, lang);
 
-    // G1: pinakasimple
     if (grade === 1) {
       const forms = [
         () => lang === 'en' ? `There are ${numPhrase}.` : `May ${numPhrase}.`,
@@ -744,7 +731,6 @@
       ];
       return ch(forms)();
     }
-    // G2: may lugar
     if (grade === 2) {
       const forms = [
         () => lang === 'en' ? `There are ${numPhrase} ${place}.` : `May ${numPhrase} ${place}.`,
@@ -754,7 +740,6 @@
       ];
       return ch(forms)();
     }
-    // G3: may lugar at panahon
     if (grade === 3) {
       const forms = [
         () => lang === 'en' ? `${subj} ${verb} ${numPhrase} ${place} ${time}.` : `${cap(verb)} si ${subj.replace(/^si /, '')} ng ${numPhrase} ${place} ${time}.`,
@@ -764,7 +749,6 @@
       ];
       return ch(forms)();
     }
-    // G4: dalawang sugnay
     if (grade === 4) {
       const forms = [
         () => lang === 'en' ? `${subj} ${verb} ${numPhrase} ${place}, and ${subj.split(' ').pop()} ${verb} ${obj}.` : `${cap(verb)} si ${subj.replace(/^si /, '')} ng ${numPhrase} ${place}, at ${verb} siya ng ${obj}.`,
@@ -773,7 +757,6 @@
       ];
       return ch(forms)();
     }
-    // G5: dalawang sugnay + pang-abay
     if (grade === 5) {
       const forms = [
         () => lang === 'en' ? `${time}, ${subj} ${verb} ${numPhrase} ${place}, and ${verb} ${obj} ${adv}.` : `${cap(time)}, ${verb} si ${subj.replace(/^si /, '')} ng ${numPhrase} ${place}, at ${verb} siya ng ${obj} nang ${adv}.`,
@@ -782,7 +765,6 @@
       ];
       return ch(forms)();
     }
-    // G6: tatlong sugnay o mas mahaba
     const forms = [
       () => lang === 'en' ? `${time}, ${subj} ${verb} ${numPhrase} ${place}, ${verb} ${obj} ${adv}, and ${verb} ${numPhrase} ${place}.` : `${cap(time)}, ${verb} si ${subj.replace(/^si /, '')} ng ${numPhrase} ${place}, ${verb} siya ng ${obj} nang ${adv}, at ${verb} siya ng ${numPhrase} ${place}.`,
       () => lang === 'en' ? `If ${subj} has ${numPhrase} ${place}, and gives ${npf(rn(1, n - 1), obj, 'en')} to a friend, ${subj.split(' ').pop()} has ${npf(Math.max(1, n - 1), obj, 'en')} left.` : `Kung may ${numPhrase} si ${subj.replace(/^si /, '')} ${place}, at nagbigay siya ng ${npf(rn(1, n - 1), obj, 'fil')} sa kaibigan, may natitira pang ${npf(Math.max(1, n - 1), obj, 'fil')} sa kanya.`,
@@ -794,7 +776,6 @@
   function extractNums(text, lang) {
     const out = [];
     const t = text.toLowerCase();
-    // Hanapin ang mga numero sa text (Filipino at English)
     if (lang === 'fil') {
       const numMap = ['isa', 'dalawa', 'tatlo', 'apat', 'lima', 'anim', 'pito', 'walo', 'siyam', 'sampu'];
       numMap.forEach((w, i) => { if (t.includes(w)) out.push(i + 1); });
@@ -805,13 +786,11 @@
     return out;
   }
 
-  // ---------- GENERATIVE PARAGRAPH BUILDER ----------
   function buildParagraph(lang, grade, diff) {
     const p = makeParagraph(lang, grade, diff);
     const n = tokens(p).length;
     const [lo, hi] = grade === 1 ? [4, 10] : grade === 2 ? [6, 15] : grade === 3 ? [10, 25] : grade === 4 ? [15, 35] : grade === 5 ? [25, 50] : [35, 70];
     if (n >= lo && n <= hi) return { text: p, nums: extractNums(p, lang), count: p.split(/(?<=[.?!])\s+/).length };
-    // Fallback: 3 simpleng pangungusap
     if (lang === 'en') return { text: 'The child read a book. The child counted ten apples. The child played outside.', nums: [10], count: 3 };
     return { text: 'Nagbasa ng aklat ang bata. Nagbilang siya ng sampung mansanas. Naglaro siya sa labas.', nums: [10], count: 3 };
   }
@@ -837,7 +816,6 @@
   }
   function verbEn() { return ch(VERBS.en); }
 
-  // ---------- GEN ITEMS (session-level variety) ----------
   function genItems(kind, n) {
     const seenKey = `bt_seen_${S.learner}_${S.lang}_${S.diff}_g${S.grade}_${kind}`;
     const seen = jget(seenKey, []);
@@ -856,7 +834,6 @@
     return out;
   }
 
-  // ---------- PICK (words: tier-aware + NUM_POOL per grade) ----------
   function pick(levelKey, n) {
     S.usedTeacher = false;
     if (S.source === 'teacher') {
@@ -875,18 +852,15 @@
       while (got.length < count && free.length) { const i = free.shift(); got.push(pool[i]); used.push(i); }
       jset(uk(key), used); return got;
     };
-    // 2 numero mula sa NUM_POOL ng grade
     const nums = NUM_POOL[S.grade][S.diff];
     const numCount = Math.min(CONFIG.numberWordsPerSet, n);
     take(nums, 'numbers', numCount, v => out.includes(numWords(v, S.lang))).forEach(v => out.push(numWords(v, S.lang)));
-    // Natitirang salita mula sa word pool ng grade
     const wp = wordPool(S.lang, S.grade);
     take(wp, 'words', n - out.length, w => out.includes(w)).forEach(w => out.push(w));
     for (let i = out.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [out[i], out[j]] = [out[j], out[i]]; }
     return out;
   }
 
-  // ---------- numUnits (para sa alignment) ----------
   function numUnits(rawTokens, lang) {
     const units = [];
     rawTokens.forEach((t, i) => {
@@ -898,9 +872,6 @@
     return units;
   }
 
-  /* ============================================================
-   * MGA GAMIT (pareho sa dati)
-   * ============================================================ */
   const $ = id => document.getElementById(id);
   const store = (k, v) => { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } };
   const jget = (k, d) => { try { return JSON.parse(store(k)) || d; } catch (e) { return d; } };
@@ -939,9 +910,6 @@
   }
   const sim = (a, b) => (!a && !b) ? 1 : 1 - lev(a, b) / Math.max(a.length, b.length);
 
-  /* ============================================================
-   * TR (Filipino at English) — pinagsama
-   * ============================================================ */
   const TR = {
     fil: {
       press: 'Pindutin ang mikropono, basahin nang malakas, at pindutin ulit kapag tapos na!',
@@ -1039,9 +1007,6 @@
     }
   };
 
-  /* ============================================================
-   * MASCOT, CONF, MISC
-   * ============================================================ */
   const MASCOT_SVG = `
 <svg viewBox="0 0 200 210" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Basa Buddy">
   <g stroke="#1F2A44" stroke-linecap="round" stroke-linejoin="round">
@@ -1090,9 +1055,6 @@
     S.last[key] = i; return list[i];
   }
 
-  /* ============================================================
-   * ALIGNMENT AT VERDICT (pareho sa dati)
-   * ============================================================ */
   function align(target, heard, lang) {
     lang = lang || S.lang;
     const T = tokens(target), TU = numUnits(T, lang), HU = numUnits(tokens(heard), lang);
@@ -1183,9 +1145,6 @@
   ];
   const GRADE_ID = { 1: 'g1', 2: 'g2', 3: 'g3', 4: 'g4', 5: 'g5', 6: 'g6' };
 
-  /* ============================================================
-   * MGA NATITIRANG FUNCTION (pickTeacher, rememberMissed, etc.)
-   * ============================================================ */
   function teacherLists(lang) { const o = jget('bt_teacher_' + lang, {}); return { words: o.words || [], sentences: o.sentences || [], paragraphs: o.paragraphs || [] }; }
   function hasTeacher(lang) { const L = teacherLists(lang); return L.words.length + L.sentences.length + L.paragraphs.length > 0; }
   function pickTeacher(levelKey, n) {
@@ -1239,9 +1198,6 @@
     return 'other';
   }
 
-  /* ============================================================
-   * MIKROPONO / SPEECH
-   * ============================================================ */
   function joinParts(parts) {
     const out = [];
     parts.forEach(p => {
@@ -1342,9 +1298,6 @@
     return r;
   }
 
-  /* ============================================================
-   * BOSES
-   * ============================================================ */
   let VOICES = [];
   const loadVoices = () => { try { VOICES = speechSynthesis.getVoices() || []; } catch (e) { VOICES = []; } };
   if ('speechSynthesis' in window) { loadVoices(); speechSynthesis.onvoiceschanged = loadVoices; }
@@ -1395,9 +1348,6 @@
   const speak = t => utter(t, { rate: CONFIG.listenRate[S.speed], pitch: 1.0 });
   const say = t => voiceOn() ? utter(t, { rate: 1, pitch: 1.2 }) : Promise.resolve();
 
-  /* ============================================================
-   * UI
-   * ============================================================ */
   function buildTracker() {
     const t = $('tracker'); t.innerHTML = '';
     LEVELS.forEach((l, i) => {
@@ -1592,17 +1542,49 @@
     return res;
   }
 
+  // >>> RECORD FIX v1: logResult() — tanggalin ang no-cors, idagdag ang CORS-safe fetch <<<
   function logResult(res) {
-    const c = cfg(); if (!c.url || !c.code) return;
-    try {
-      fetch(c.url, {
-        method: 'POST', mode: 'no-cors', keepalive: true,
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'result', code: c.code, learner: S.learner, lang: S.lang, diff: S.usedTeacher ? 'teacher' : S.diff, level: res.levelKey, target: res.text, heard: res.heard,
-          verdict: res.verdict, tama: res.verdict === 'tama' ? 1 : 0, attempts: res.attempts, score: res.pa, wcpm: res.wcpm, engine: res.engine,
-          missed_words: res.missWords.join('|') })
-      });
-    } catch (e) {}
+    const c = cfg(); if (!c.url || !c.code) { console.warn('[BasaTayo] Walang URL/code — skip logResult.'); return; }
+    const body = { action: 'result', code: c.code, learner: S.learner, lang: S.lang, diff: S.usedTeacher ? 'teacher' : S.diff, level: res.levelKey, target: res.text, heard: res.heard,
+      verdict: res.verdict, tama: res.verdict === 'tama' ? 1 : 0, attempts: res.attempts, score: res.pa, wcpm: res.wcpm, engine: res.engine,
+      missed_words: res.missWords.join('|') };
+    fetch(c.url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(body)
+    }).then(r => r.json()).then(j => {
+      if (!j.ok) console.warn('[BasaTayo] logResult failed:', j.error);
+      else console.log('[BasaTayo] logResult OK');
+    }).catch(e => console.warn('[BasaTayo] logResult error:', e.message));
+  }
+
+  // >>> RECORD FIX v1: logSignIn() — bagong function <<<
+  function logSignIn() {
+    const c = cfg(); if (!c.url || !c.code) { console.warn('[BasaTayo] Walang URL/code — skip logSignIn.'); return; }
+    const body = { action: 'signin', code: c.code, learner: S.learner, grade: S.grade, lang: S.lang, diff: S.diff, source: S.source };
+    fetch(c.url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(body)
+    }).then(r => r.json()).then(j => {
+      if (!j.ok) console.warn('[BasaTayo] logSignIn failed:', j.error);
+      else console.log('[BasaTayo] logSignIn OK, session:', j.sessionId);
+    }).catch(e => console.warn('[BasaTayo] logSignIn error:', e.message));
+  }
+
+  // >>> RECORD FIX v1: logWrongLog() — bagong function <<<
+  function logWrongLog() {
+    if (!S.wrongLog.length) return;
+    const c = cfg(); if (!c.url || !c.code) { console.warn('[BasaTayo] Walang URL/code — skip logWrongLog.'); return; }
+    const body = { action: 'wronglog', code: c.code, learner: S.learner, grade: S.grade, lang: S.lang, level: 'mixed', diff: S.diff, items: S.wrongLog };
+    fetch(c.url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(body)
+    }).then(r => r.json()).then(j => {
+      if (!j.ok) console.warn('[BasaTayo] logWrongLog failed:', j.error);
+      else console.log('[BasaTayo] logWrongLog OK, items:', S.wrongLog.length);
+    }).catch(e => console.warn('[BasaTayo] logWrongLog error:', e.message));
   }
 
   async function runLevel(level, id) {
@@ -1633,6 +1615,7 @@
     try {
       S.results = []; S.stars = 0; S.azureFailed = false; S.jump = null; store('bt_diff_' + S.learner, S.diff); S.doneLevels = new Set(); $('stars').textContent = '0';
       S.wrongLog = [];
+      logSignIn();   // >>> RECORD FIX v1: itala ang sign-in
       show('screenPlay'); $('screenPlay').style.display = 'flex';
       let li = startIdx || 0;
       while (li < LEVELS.length) {
@@ -1705,6 +1688,7 @@
     line('★', String(S.stars));
 
     renderReport();
+    logWrongLog();   // >>> RECORD FIX v1: itala lahat ng mali
 
     const missed = [...new Set(S.results.filter(r => r.levelKey !== 'paragraphs' && r.score < 1).map(r => r.text))];
     const pr = $('practice'); pr.innerHTML = '';
@@ -1734,9 +1718,6 @@
     } else { buddy.className = 'buddy'; buddy.textContent = localMsg; }
   }
 
-  /* ============================================================
-   * KONTROL
-   * ============================================================ */
   $('mic').addEventListener('click', () => {
     if (S.stop) { S.stop(); return; }
     if (micWaiter) { const w = micWaiter; micWaiter = null; w('mic'); }
@@ -1926,11 +1907,9 @@
   $('settingsForm').addEventListener('submit', () => {
     store('bt_engine', $('fEngine').value); store('bt_voice', $('fVoice').value); syncVoiceBtn(); store('bt_url', $('fUrl').value.trim()); store('bt_code', $('fCode').value.trim());
     tokenCache = { token: null, region: null, exp: 0 }; refreshStart();
+    console.log('[BasaTayo] Settings saved. URL:', store('bt_url') ? 'OK' : 'WALA', '| Code:', store('bt_code') ? 'OK' : 'WALA');
   });
 
-  /* ============================================================
-   * SIMULA
-   * ============================================================ */
   initMascots();
   syncVoiceBtn(); $('hdrLang').hidden = true;
   $('screenPlay').style.display = 'none';
@@ -1939,6 +1918,7 @@
   syncVoiceGender();
   syncPlayDiff();
   refreshStart();
+  console.log('[BasaTayo] App ready. URL:', store('bt_url') ? 'Naka-set' : 'Wala', '| Code:', store('bt_code') ? 'Naka-set' : 'Wala');
 })();
 </script>
 </body>
