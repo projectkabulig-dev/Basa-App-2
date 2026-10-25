@@ -1,5 +1,4 @@
 <!doctype html>
-<!-- Basa Tayo! PAMPUBLIKONG BERSYON: walang backend at walang nakatagong key o link. -->
 <html lang="fil" translate="no">
 <head>
 <meta charset="utf-8">
@@ -200,8 +199,6 @@
   .dlg small{font-weight:700; color:var(--mute)}
   .dlg input,.dlg select{font:inherit; padding:10px 12px; border:3px solid var(--ink); border-radius:14px; width:100%; background:#fff}
   .dlg .actions{display:flex; justify-content:flex-end; gap:10px; flex-wrap:wrap}
-  .consent{display:flex; gap:10px; align-items:flex-start; text-align:left; max-width:380px; margin:14px auto 0; font-weight:700; font-size:.92rem; line-height:1.35; cursor:pointer}
-  .consent input{width:24px; height:24px; flex:none; accent-color:var(--ok); margin-top:1px}
   footer{color:var(--ink); font-size:.85rem; font-weight:700; text-align:center; padding:10px 14px; background:rgba(255,255,255,.92); border:3px solid var(--ink); border-radius:18px}
 
   .hdrlang{display:inline-flex; background:#fff; border:3px solid var(--ink); border-radius:999px; padding:3px; gap:3px; box-shadow:0 4px 0 var(--ink)}
@@ -266,6 +263,9 @@
     <button class="iconbtn" id="voiceBtn" type="button" data-on="true" aria-pressed="true" aria-label="Boses ni Basa Buddy">
       <svg viewBox="0 0 24 24" fill="none" stroke="#1F2A44" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z" fill="#FFD23F"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/><path class="slash" d="M3 3l18 18" stroke="#E5484D" stroke-width="3"/></svg>
     </button>
+    <button class="iconbtn" id="openSettings" type="button" aria-label="Settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#1F2A44" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+    </button>
   </div>
 </header>
 
@@ -300,7 +300,6 @@
         <small>Code o initials lang, hindi buong pangalan.</small>
       </label>
       <div class="warn" id="supportWarn" hidden>Hindi gumagana ang mikropono sa browser na ito. Gumamit ng Chrome o Edge.</div>
-      <label class="consent" id="consentRow" hidden><input type="checkbox" id="consent"><span id="consentTxt"></span></label>
       <div class="row" style="margin-top:14px"><button class="btn sun" id="begin" type="button">Simulan</button></div>
       <p class="note" id="logNote"></p>
     </div>
@@ -376,7 +375,7 @@
     </div>
   </section>
 
-  <footer>Hindi sine-save ng app ang boses. Para maintindihan ang binabasa, ipinapadala ng browser (Chrome o Edge) ang audio sa sarili nitong serbisyo sa speech recognition, kaya magpaalam sa magulang o guro bago gamitin.<span id="footLog" hidden> Kung pumayag ang magulang o guro, itinatala ang code, resulta, at ang binasa ng bata (walang boses at walang buong pangalan).</span> Pang-praktis ito, hindi pamalit sa pormal na pagtatasa.</footer>
+  <footer>Hindi sine-save ang boses. Ang transcript, resulta, at code lang ang nasa talaan ng guro (kung naka-konekta). Pang-praktis ito, hindi pamalit sa pormal na pagtatasa.</footer>
 </main>
 
 <div class="banner" id="banner" hidden><div id="bannerText"></div></div>
@@ -399,17 +398,49 @@
 </dialog>
 
 
+<dialog id="settings">
+  <form method="dialog" class="dlg" id="settingsForm">
+    <h2>Settings</h2>
+    <label>Mikropono / speech engine
+      <select id="fEngine">
+        <option value="web">Web Speech (libre, walang account)</option>
+        <option value="azure">Azure (may pronunciation score; kailangan ng backend)</option>
+      </select>
+      <small>Kapag pumalya ang Azure, awtomatikong babalik sa Web Speech.</small>
+    </label>
+    <label>Boses ni Basa Buddy (papuri at paghikayat)
+      <select id="fVoice">
+        <option value="on">Naka-on</option>
+        <option value="off">Naka-off</option>
+      </select>
+      <small id="voiceInfo"></small>
+    </label>
+    <div><button class="btn small" type="button" id="testVoice">Subukan ang boses</button></div>
+    <label>Apps Script URL (opsyonal)
+      <input id="fUrl" type="url" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off">
+      <small>Para sa talaan ng guro at mensahe ni Claude. Walang laman = gagana pa rin ang app.</small>
+    </label>
+    <label>Access code (opsyonal)
+      <input id="fCode" type="text" autocomplete="off">
+    </label>
+    <div class="actions">
+      <button class="btn small" type="button" id="cancelSettings">Kanselahin</button>
+      <button class="btn small sea" value="save" id="saveSettings">I-save</button>
+    </div>
+  </form>
+</dialog>
 
+<script src="https://aka.ms/csspeech/jsbrowserpackageraw"></script>
 <script>
 (() => {
   'use strict';
 
   /* ================= PAGSASAAYOS ================= */
   const CONFIG = {
-    // I-paste dito ang Web App URL ng Code_public.gs para maitala ang mga gumagamit. Walang laman = walang pagtatala.
-    logUrl: '',
-    consentDefault: false,                     // true lang kung may blanket consent na ang paaralan
+    appsScriptUrl: '',                         // opsyonal: Web App URL para sa talaan ng guro
     locale:      { fil: 'fil-PH', en: 'en-US' }, // Web Speech. Subukan din ang 'en-PH' para sa English
+    azureLocale: { fil: 'fil-PH', en: 'en-US' },
+    pronunciationScore: { fil: false, en: true },  // Azure lamang. I-on sa Filipino matapos subukan
     // Paano humihinto ang pakikinig bawat antas. 'auto': kusang hihinto kapag natahimik ang bata. 'manual': pipindutin ng bata ang mikropono kapag tapos na (hindi apektado ng pag-pause).
     stopMode: { words: 'auto', sentences: 'manual', paragraphs: 'manual' },
     accentTolerance: true,                     // English: ituturing na pareho ang th/t,d  v/b  f/p  z/s (accent ng mga batang Pilipino)
@@ -474,6 +505,7 @@
       next: 'Susunod', skip: 'Laktawan', listenBtn: 'Pakinggan muna',
       unsupported: 'Hindi gumagana ang mikropono sa browser na ito. Gumamit ng Chrome o Edge.',
       micDenied: 'Hindi pinayagan ang mikropono. Payagan ito sa settings ng browser.',
+      azureOut: 'Gagamit muna tayo ng libreng mikropono. Pindutin ulit ang mikropono.',
       errorPrefix: 'May problema:',
       another: 'Isa pang set para sa antas na ito!', levelUp: 'Magaling! Susunod na antas.',
       endTitle: 'Tapos na! Magaling ka!', sumPara: 'Talata', accuracy: 'Tama',
@@ -513,6 +545,7 @@
       next: 'Next', skip: 'Skip', listenBtn: 'Listen first',
       unsupported: 'The microphone does not work in this browser. Use Chrome or Edge.',
       micDenied: 'Microphone was blocked. Allow it in your browser settings.',
+      azureOut: 'We will use the free microphone for now. Press the mic again.',
       errorPrefix: 'Problem:',
       another: 'One more set for this level!', levelUp: 'Great! Next level.',
       endTitle: 'All done! Well done!', sumPara: 'Paragraph', accuracy: 'Correct',
@@ -531,8 +564,13 @@
   const jset = (k, v) => store(k, JSON.stringify(v));
   const sleep = ms => new Promise(r => setTimeout(r, ms));
   const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  const cfg = () => ({
+    url: (store('bt_url') || CONFIG.appsScriptUrl || '').trim(),
+    code: (store('bt_code') || '').trim(),
+    engine: store('bt_engine') === 'azure' ? 'azure' : 'web'
+  });
 
-  const S = { lang: store('bt_lang') === 'en' ? 'en' : 'fil', learner: '', stars: 0, results: [], stop: null, wantMore: false, last: {}, diff: (['easy', 'medium', 'hard'].includes(store('bt_diff')) ? store('bt_diff') : 'easy'), speed: store('bt_speed') === 'veryslow' ? 'veryslow' : 'slow', source: store('bt_source') === 'teacher' ? 'teacher' : 'app', usedTeacher: false, jump: null, curLevel: 0, doneLevels: new Set() };
+  const S = { lang: store('bt_lang') === 'en' ? 'en' : 'fil', learner: '', stars: 0, results: [], stop: null, wantMore: false, azureFailed: false, last: {}, diff: (['easy', 'medium', 'hard'].includes(store('bt_diff')) ? store('bt_diff') : 'easy'), speed: store('bt_speed') === 'veryslow' ? 'veryslow' : 'slow', source: store('bt_source') === 'teacher' ? 'teacher' : 'app', usedTeacher: false, jump: null, curLevel: 0, doneLevels: new Set() };
   const tr = k => TR[S.lang][k];
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   // Pinagsasama ang mga bahagi ng narinig. Kung ang susunod na bahagi ay pagpapatuloy lang ng nauna (nangyayari sa ilang Android Chrome), isa lang ang bibilangin.
@@ -1111,7 +1149,47 @@
     });
   }
 
+  let tokenCache = { token: null, region: null, exp: 0 };
+  async function getToken() {
+    if (tokenCache.token && Date.now() < tokenCache.exp) return tokenCache;
+    const c = cfg();
+    const r = await fetch(c.url + '?action=token&code=' + encodeURIComponent(c.code));
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.error || 'token');
+    tokenCache = { token: j.token, region: j.region, exp: Date.now() + 8 * 60 * 1000 };
+    return tokenCache;
+  }
+  async function azureOnce(target, locale, usePA) {
+    if (!window.SpeechSDK) throw new Error('sdk');
+    const { token, region } = await getToken();
+    const sc = SpeechSDK.SpeechConfig.fromAuthorizationToken(token, region);
+    sc.speechRecognitionLanguage = locale;
+    const rec = new SpeechSDK.SpeechRecognizer(sc, SpeechSDK.AudioConfig.fromDefaultMicrophoneInput());
+    if (usePA) {
+      new SpeechSDK.PronunciationAssessmentConfig(target, SpeechSDK.PronunciationAssessmentGradingSystem.HundredMark, SpeechSDK.PronunciationAssessmentGranularity.Word, true).applyTo(rec);
+    }
+    return new Promise((resolve, reject) => {
+      rec.recognizeOnceAsync(res => {
+        rec.close();
+        if (res.reason === SpeechSDK.ResultReason.RecognizedSpeech) {
+          let pa = null;
+          if (usePA) { try { const p = SpeechSDK.PronunciationAssessmentResult.fromResult(res); if (typeof p.accuracyScore === 'number') pa = Math.round(p.accuracyScore); } catch (e) {} }
+          resolve({ text: res.text || '', alts: [res.text || ''], seconds: 0, pa });
+        } else if (res.reason === SpeechSDK.ResultReason.NoMatch) resolve({ text: '', alts: [], seconds: 0, pa: null });
+        else reject(new Error('azure'));
+      }, err => { rec.close(); reject(new Error(String(err))); });
+    });
+  }
+
   async function listen(level, text, onReady) {
+    const c = cfg();
+    const useAzure = c.engine === 'azure' && level.mode === 'once' && !S.azureFailed && c.url && c.code;
+    if (useAzure) {
+      const usePA = !!CONFIG.pronunciationScore[S.lang];
+      if (onReady) onReady();
+      try { const r = await azureOnce(text, CONFIG.azureLocale[S.lang], usePA); r.engine = 'azure'; r.usePA = usePA; return r; }
+      catch (e) { S.azureFailed = true; const err = new Error('azure'); err.fallback = true; throw err; }
+    }
     const r = await webSpeech(CONFIG.locale[S.lang], level.mode === 'long', onReady, CONFIG.stopMode[level.key]);
     r.engine = 'web'; r.usePA = false; r.pa = null;
     return r;
@@ -1147,6 +1225,11 @@
   const speak = t => utter(t, { rate: CONFIG.listenRate[S.speed] });            // "Pakinggan muna" at pagbasa ng tamang salita (mabagal)
   const say = t => voiceOn() ? utter(t, { rate: 1, pitch: 1.2 }) : Promise.resolve(); // papuri ni Basa Buddy
   function syncVoiceBtn() { const b = $('voiceBtn'); b.dataset.on = String(voiceOn()); b.setAttribute('aria-pressed', String(voiceOn())); }
+  function updateVoiceInfo() {
+    const v = pickVoice();
+    $('voiceInfo').textContent = v ? `Boses: ${v.name} (${v.lang})` : 'Walang nakitang boses para sa wikang ito; gagamitin ang default na boses ng device.';
+  }
+
   /* ================= UI ================= */
   const show = id => { ['screenStart', 'screenPlay', 'screenEnd'].forEach(s => { $(s).hidden = (s !== id); }); $('hdrLang').hidden = (id === 'screenStart'); };
   const setStatus = s => { $('status').textContent = s; };
@@ -1249,6 +1332,7 @@
       catch (e) {
         chk(id);
         setMic('idle', ''); mood('idle');
+        if (e.fallback) { setStatus(tr('azureOut')); await sleep(1200); chk(id); continue; }
         errors++; setStatus(tr('errorPrefix') + ' ' + e.message); await sleep(1800); chk(id); continue;
       }
       chk(id);
@@ -1290,18 +1374,14 @@
     return res;
   }
 
-  /* ================= PAGTATALA (kailangan ng pahintulot) ================= */
-  const logOn = () => !!CONFIG.logUrl;
-  const consentGiven = () => logOn() && $('consent').checked;
   function logResult(res) {
-    if (!consentGiven()) return;
+    const c = cfg(); if (!c.url || !c.code) return;
     try {
-      fetch(CONFIG.logUrl, {
+      fetch(c.url, {
         method: 'POST', mode: 'no-cors', keepalive: true,
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ k: 'basa-tayo', action: 'result', hp: '', learner: S.learner, lang: S.lang, diff: S.usedTeacher ? 'teacher' : S.diff, level: res.levelKey,
-          target: String(res.text).slice(0, 400), heard: String(res.heard || '').slice(0, 200), verdict: res.verdict,
-          tama: res.verdict === 'tama' ? 1 : 0, attempts: res.attempts, wcpm: res.wcpm, engine: 'web' })
+        body: JSON.stringify({ action: 'result', code: c.code, learner: S.learner, lang: S.lang, diff: S.usedTeacher ? 'teacher' : S.diff, level: res.levelKey, target: res.text, heard: res.heard,
+          verdict: res.verdict, tama: res.verdict === 'tama' ? 1 : 0, attempts: res.attempts, score: res.pa, wcpm: res.wcpm, engine: res.engine })
       });
     } catch (e) {}
   }
@@ -1333,7 +1413,7 @@
   async function runSession(startIdx) {
     const id = ++runId;
     try {
-      S.results = []; S.stars = 0; S.jump = null; store('bt_diff_' + S.learner, S.diff); S.doneLevels = new Set(); $('stars').textContent = '0';
+      S.results = []; S.stars = 0; S.azureFailed = false; S.jump = null; store('bt_diff_' + S.learner, S.diff); S.doneLevels = new Set(); $('stars').textContent = '0';
       show('screenPlay'); $('screenPlay').style.display = 'flex';
       let li = startIdx || 0;
       while (li < LEVELS.length) {
@@ -1384,7 +1464,18 @@
       if (overall >= 0.8 && di < DIFFS.length - 1) { to = DIFFS[di + 1]; $('suggestTxt').textContent = tr('suggestUp'); }
       else if (overall < 0.5 && di > 0) { to = DIFFS[di - 1]; $('suggestTxt').textContent = tr('suggestDown'); }
       if (to) { $('suggestBtn').textContent = tr('tryBtn') + diffName(to); $('suggestBtn').dataset.diff = to; sg.hidden = false; } }
-    buddy.className = 'buddy'; buddy.textContent = localMsg;
+    const c = cfg();
+    if (c.url && c.code) {
+      buddy.textContent = tr('buddyWait');
+      const ctrl = new AbortController(); const t = setTimeout(() => ctrl.abort(), 10000);
+      try {
+        const r = await fetch(c.url, { method: 'POST', signal: ctrl.signal, headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'summary', code: c.code, learner: S.learner, lang: S.lang, stats: st, missed: missed.slice(0, 8) }) });
+        const j = await r.json();
+        buddy.className = 'buddy'; buddy.textContent = (j.ok && j.feedback) ? j.feedback : localMsg;
+      } catch (e) { buddy.className = 'buddy'; buddy.textContent = localMsg; }
+      finally { clearTimeout(t); }
+    } else { buddy.className = 'buddy'; buddy.textContent = localMsg; }
   }
 
   /* ================= KONTROL ================= */
@@ -1405,7 +1496,7 @@
     ['langFil', 'hLangFil'].forEach(i => $(i).setAttribute('aria-pressed', String(l === 'fil')));
     ['langEn', 'hLangEn'].forEach(i => $(i).setAttribute('aria-pressed', String(l === 'en')));
     document.documentElement.lang = l === 'fil' ? 'fil' : 'en';
-    buildTracker(); refreshStart(); syncDiff(); syncSpeed(); syncSource();
+    buildTracker(); syncDiff(); syncSpeed(); syncSource();
   }
   // Kapag nagpalit ng wika habang nagbabasa, magsisimula ng bagong session sa bagong wika.
   function switchLang(l) {
@@ -1517,22 +1608,31 @@
   });
 
   function refreshStart() {
-    $('supportWarn').hidden = !!SR;
-    const en = S.lang === 'en';
-    $('consentRow').hidden = !logOn(); $('footLog').hidden = !logOn();
-    $('consentTxt').textContent = en
-      ? 'A parent or teacher agrees to record the code and reading results (no voice, no full name).'
-      : 'Pumapayag ang magulang o guro na itala ang code at resulta ng pagbasa (walang boses, walang buong pangalan).';
-    $('logNote').textContent = en ? 'No voice is saved. Ask a parent or teacher before you start.' : 'Walang sine-save na boses. Magpaalam sa magulang o guro bago magsimula.';
+    const c = cfg();
+    $('supportWarn').hidden = !!SR || c.engine === 'azure';
+    $('logNote').textContent = (c.url && c.code) ? TR.fil.logOn : TR.fil.noLog;
   }
-  $('consent').addEventListener('change', () => store('bt_consent', $('consent').checked ? '1' : '0'));
   $('begin').addEventListener('click', () => {
-    const code = $('learner').value.trim().toUpperCase().replace(/\s+/g, '-').replace(/[^A-Z0-9._-]/g, '').replace(/^[^A-Z0-9]+/, '').slice(0, 20) || 'BISITA';
+    const code = $('learner').value.trim().toUpperCase().replace(/\s+/g, '-') || 'BISITA';
     S.learner = code; store('bt_learner', code);
     runSession();
   });
   $('again').addEventListener('click', () => { $('screenEnd').hidden = true; runSession(); });
   $('newUser').addEventListener('click', () => { $('learner').value = ''; mood('idle'); show('screenStart'); $('screenPlay').style.display = 'none'; refreshStart(); });
+
+  /* ================= SETTINGS ================= */
+  const dlg = $('settings');
+  $('openSettings').addEventListener('click', () => {
+    const c = cfg(); $('fEngine').value = c.engine; $('fUrl').value = c.url; $('fCode').value = c.code;
+    $('fVoice').value = voiceOn() ? 'on' : 'off'; updateVoiceInfo();
+    if (typeof dlg.showModal === 'function') dlg.showModal(); else dlg.setAttribute('open', '');
+  });
+  $('cancelSettings').addEventListener('click', () => dlg.close());
+  $('testVoice').addEventListener('click', () => { utter(pickPhrase('praise'), { rate: 1, pitch: 1.2 }); updateVoiceInfo(); });
+  $('settingsForm').addEventListener('submit', () => {
+    store('bt_engine', $('fEngine').value); store('bt_voice', $('fVoice').value); syncVoiceBtn(); store('bt_url', $('fUrl').value.trim()); store('bt_code', $('fCode').value.trim());
+    tokenCache = { token: null, region: null, exp: 0 }; refreshStart();
+  });
 
   /* ================= SIMULA ================= */
   initMascots();
@@ -1540,7 +1640,6 @@
   $('screenPlay').style.display = 'none';
   setLang(S.lang);
   $('learner').value = store('bt_learner') || '';
-  { const c = store('bt_consent'); $('consent').checked = c === null ? !!CONFIG.consentDefault : c === '1'; }
   refreshStart();
 })();
 </script>
