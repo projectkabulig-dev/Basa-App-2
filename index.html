@@ -883,6 +883,7 @@
     engine: store('bt_engine') === 'azure' ? 'azure' : 'web'
   });
 
+  const GRADES = [1, 2, 3, 4, 5, 6];   // <-- BAGONG LINYA DITO
   const S = {
     lang: store('bt_lang') === 'en' ? 'en' : 'fil',
     learner: '', stars: 0, results: [], stop: null, wantMore: false, azureFailed: false, last: {},
@@ -894,7 +895,6 @@
     usedTeacher: false, jump: null, curLevel: 0, doneLevels: new Set(), curText: '',
     wrongLog: []
   };
-  const GRADES = [1, 2, 3, 4, 5, 6];
   const tr = k => TR[S.lang][k];
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   const norm = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^\p{L}\p{N}]/gu, '');
