@@ -25,7 +25,6 @@
   button{font:inherit; color:inherit; cursor:pointer}
   button:focus-visible,input:focus-visible,select:focus-visible{outline:4px solid var(--grape); outline-offset:3px}
 
-  /* ---------- tanawin: ulap at dagat ---------- */
   .scene{position:fixed; inset:0; z-index:0; pointer-events:none}
   .cloud{position:absolute; width:130px; opacity:.95}
   .cloud.c1{top:70px; left:-20px}
@@ -40,10 +39,11 @@
   .iconbtn{width:40px; height:40px; border-radius:50%; background:#fff; border:3px solid var(--ink); box-shadow:0 4px 0 var(--ink); display:grid; place-items:center; padding:0}
   .iconbtn:active{transform:translateY(3px); box-shadow:0 1px 0 var(--ink)}
   .iconbtn svg{width:22px; height:22px}
+  #backBtn{background:var(--sun)}
+  #backBtn svg{width:24px;height:24px}
 
   main{position:relative; z-index:1; width:100%; max-width:640px; padding:6px 16px 130px; display:flex; flex-direction:column; gap:18px}
 
-  /* ---------- mga gamit ---------- */
   .card{background:var(--paper); border:3px solid var(--ink); border-radius:28px; box-shadow:0 7px 0 var(--ink); padding:22px 18px}
   .btn{font-family:'Fredoka',sans-serif; font-weight:700; font-size:1.2rem; border:3px solid var(--ink); border-radius:18px; padding:12px 26px; background:#fff; box-shadow:0 5px 0 var(--ink); transition:transform .08s, box-shadow .08s}
   .btn:active{transform:translateY(4px); box-shadow:0 1px 0 var(--ink)}
@@ -54,7 +54,6 @@
   .btn svg{width:20px; height:20px; vertical-align:-4px; margin-right:6px}
   .row{display:flex; justify-content:center; gap:12px; flex-wrap:wrap}
 
-  /* ---------- si Basa Buddy ---------- */
   .mascot{width:112px; height:120px; flex:none}
   .mascot.big{width:170px; height:182px; margin:0 auto}
   .mascot svg{width:100%; height:100%; overflow:visible; display:block}
@@ -89,7 +88,6 @@
   .bubble p{margin:0}
   .bubble:has(#status:empty){visibility:hidden}
 
-  /* ---------- simula ---------- */
   .start{text-align:center; display:flex; flex-direction:column; gap:20px}
   .logo{font-family:'Fredoka',sans-serif; font-weight:700; font-size:clamp(3rem,15vw,4.8rem); margin:6px 0 0; line-height:1; letter-spacing:.02em; -webkit-text-stroke:3px var(--ink); paint-order:stroke fill; text-shadow:0 5px 0 var(--ink)}
   .logo span{display:inline-block}
@@ -107,7 +105,6 @@
   .warn{background:#FFF1C7; border:3px solid var(--ink); border-radius:16px; padding:10px 14px; margin:10px auto; max-width:380px; font-weight:800}
   .note{margin:14px 0 0; color:var(--mute); font-size:.92rem; font-weight:700}
 
-  /* ---------- pagbasa ---------- */
   .tracker{list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(3,1fr); gap:10px}
   .tracker li{background:#fff; border:3px solid var(--ink); border-radius:16px; font-family:'Fredoka',sans-serif; font-weight:600; font-size:.98rem; min-width:0; opacity:.8; transition:transform .1s}
   .tracker li button{display:flex; align-items:center; gap:8px; width:100%; background:none; border:0; padding:6px 10px; font:inherit; color:inherit; cursor:pointer; border-radius:12px; min-width:0}
@@ -171,7 +168,6 @@
   .heard q{font-weight:800; color:var(--ink)}
   .pill{display:inline-block; margin:10px 4px 0; font-family:'Fredoka',sans-serif; font-weight:600; background:var(--sun); border:3px solid var(--ink); border-radius:999px; padding:3px 16px}
 
-  /* ---------- tapos ---------- */
   .end{text-align:center; display:flex; flex-direction:column; gap:18px}
   .endtitle{font-family:'Fredoka',sans-serif; font-weight:700; font-size:clamp(1.9rem,8vw,2.6rem); margin:0; line-height:1.1}
   .sum{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:12px}
@@ -221,9 +217,15 @@
   .diffbadge{position:absolute; top:10px; left:12px; font-family:'Fredoka',sans-serif; font-weight:600; font-size:.8rem; background:var(--foam); border:2px solid var(--ink); border-radius:999px; padding:1px 10px}
   .target.mid{font-size:clamp(2.4rem,12vw,4rem)}
   .target.small{font-size:clamp(1.7rem,8.5vw,2.8rem)}
-  .speed{display:flex; justify-content:center; gap:8px; margin-top:10px}
-  .speed button{font-family:'Fredoka',sans-serif; font-weight:600; font-size:.88rem; padding:4px 14px; background:#fff; border:2px solid var(--ink); border-radius:999px}
-  .speed button[aria-pressed="true"]{background:var(--sun)}
+
+  /* NEW: speed + skip row */
+  .speed-skip{display:flex; justify-content:center; align-items:center; gap:8px; margin-top:10px; flex-wrap:wrap}
+  .speed-skip .speed{display:flex; gap:8px; margin:0}
+  .speed-skip button{font-family:'Fredoka',sans-serif; font-weight:600; font-size:.88rem; padding:4px 14px; background:#fff; border:2px solid var(--ink); border-radius:999px}
+  .speed-skip .speed button[aria-pressed="true"]{background:var(--sun)}
+  .speed-skip #skip{font-size:.88rem; padding:4px 14px; border:2px solid var(--ink); border-radius:999px; background:#fff; box-shadow:none}
+  .speed-skip #skip:active{transform:translateY(2px)}
+
   .suggest{margin-top:16px; padding-top:14px; border-top:2px dashed var(--line); text-align:center}
   .suggest p{margin:0 0 10px; font-weight:800}
 
@@ -235,6 +237,46 @@
   .dlg label > span{font-family:'Fredoka',sans-serif; font-weight:600; font-size:1.05rem}
   .dlg .langs{max-width:none}
   .dlg{max-height:88vh; overflow:auto}
+
+  .grades{display:grid; grid-template-columns:repeat(6,1fr); gap:6px; max-width:440px; margin:8px auto 0}
+  .grades button{display:flex; flex-direction:column; align-items:center; gap:1px; font-family:'Fredoka',sans-serif; font-weight:700; font-size:.95rem; padding:7px 2px; background:#fff; border:3px solid var(--ink); border-radius:14px; box-shadow:0 4px 0 var(--ink); transition:transform .08s, box-shadow .08s}
+  .grades button b{font-size:1.15rem}
+  .grades button small{font-family:'Nunito',sans-serif; font-size:.68rem; font-weight:700; color:var(--mute)}
+  .grades button[aria-pressed="true"]{background:var(--sun); transform:translateY(2px); box-shadow:0 2px 0 var(--ink)}
+  @media (max-width:520px){ .grades{grid-template-columns:repeat(3,1fr)} }
+
+  .actions-row{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    margin-top:14px;
+    flex-wrap:wrap;
+  }
+  .actions-row .btn.big-start{
+    font-size:1.35rem;
+    padding:14px 32px;
+    box-shadow:0 6px 0 var(--ink);
+    order:1;
+  }
+  .actions-row .mini-tools{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    order:2;
+  }
+  .actions-row .mini-tools .starcount{
+    font-size:1rem;
+    padding:2px 10px 2px 7px;
+  }
+  .actions-row .mini-tools .iconbtn{
+    width:44px;
+    height:44px;
+  }
+  @media (max-width:520px){
+    .actions-row .btn.big-start{order:1; flex:1 1 100%;}
+    .actions-row .mini-tools{order:2; flex:1 1 100%; justify-content:center;}
+  }
 
   @media (prefers-reduced-motion:reduce){ *,*::before,*::after{animation:none !important; transition:none !important} .micarea[data-state="listening"] .ring{opacity:.5; transform:scale(1.15)} }
 </style>
@@ -251,22 +293,14 @@
 </div>
 
 <header>
+  <button class="iconbtn" id="backBtn" type="button" aria-label="Bumalik sa landing page" hidden>
+    <svg viewBox="0 0 24 24" fill="none" stroke="#1F2A44" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+  </button>
   <div class="hdrlang" id="hdrLang" role="group" aria-label="Wika ng babasahin" hidden>
     <button type="button" id="hLangFil" aria-pressed="true">Filipino</button>
     <button type="button" id="hLangEn" aria-pressed="false">English</button>
   </div>
-  <div class="tools">
-    <div class="starcount" aria-label="Mga bituin">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3 6.1 20.6l1.3-6.6L2.5 9.4l6.6-.8z" fill="#fff" stroke="#1F2A44" stroke-width="2" stroke-linejoin="round"/></svg>
-      <span id="stars">0</span>
-    </div>
-    <button class="iconbtn" id="voiceBtn" type="button" data-on="true" aria-pressed="true" aria-label="Boses ni Basa Buddy">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#1F2A44" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z" fill="#FFD23F"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/><path class="slash" d="M3 3l18 18" stroke="#E5484D" stroke-width="3"/></svg>
-    </button>
-    <button class="iconbtn" id="openSettings" type="button" aria-label="Settings">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#1F2A44" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
-    </button>
-  </div>
+  <div class="tools"></div>
 </header>
 
 <main>
@@ -282,6 +316,17 @@
         <button type="button" id="langFil" aria-pressed="true">Filipino</button>
         <button type="button" id="langEn" aria-pressed="false">English</button>
       </div>
+
+      <p class="mini" id="gradeLabel">Grade</p>
+      <div class="grades" id="gradeGroup" role="group" aria-label="Grade level">
+        <button type="button" id="g1" aria-pressed="true"><b>1</b><small>G1</small></button>
+        <button type="button" id="g2" aria-pressed="false"><b>2</b><small>G2</small></button>
+        <button type="button" id="g3" aria-pressed="false"><b>3</b><small>G3</small></button>
+        <button type="button" id="g4" aria-pressed="false"><b>4</b><small>G4</small></button>
+        <button type="button" id="g5" aria-pressed="false"><b>5</b><small>G5</small></button>
+        <button type="button" id="g6" aria-pressed="false"><b>6</b><small>G6</small></button>
+      </div>
+
       <p class="mini" id="srcLabel">Babasahin</p>
       <div class="srcs" role="group" aria-label="Pinagmulan ng babasahin">
         <button type="button" id="srcApp" aria-pressed="true">App</button>
@@ -300,7 +345,23 @@
         <small>Code o initials lang, hindi buong pangalan.</small>
       </label>
       <div class="warn" id="supportWarn" hidden>Hindi gumagana ang mikropono sa browser na ito. Gumamit ng Chrome o Edge.</div>
-      <div class="row" style="margin-top:14px"><button class="btn sun" id="begin" type="button">Simulan</button></div>
+
+      <div class="actions-row">
+        <button class="btn sun big-start" id="begin" type="button">Simulan</button>
+        <div class="mini-tools">
+          <div class="starcount" id="starCount" aria-label="Mga bituin">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3 6.1 20.6l1.3-6.6L2.5 9.4l6.6-.8z" fill="#fff" stroke="#1F2A44" stroke-width="2" stroke-linejoin="round"/></svg>
+            <span id="stars">0</span>
+          </div>
+          <button class="iconbtn" id="voiceBtn" type="button" data-on="true" aria-pressed="true" aria-label="Boses ni Basa Buddy">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#1F2A44" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z" fill="#FFD23F"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/><path class="slash" d="M3 3l18 18" stroke="#E5484D" stroke-width="3"/></svg>
+          </button>
+          <button class="iconbtn" id="openSettings" type="button" aria-label="Settings">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#1F2A44" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+          </button>
+        </div>
+      </div>
+
       <p class="note" id="logNote"></p>
     </div>
   </section>
@@ -325,9 +386,14 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="#1F2A44" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z" fill="#FFD23F"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg><span id="listenTxt">Pakinggan muna</span>
         </button>
       </div>
-      <div class="speed" role="group" aria-label="Bilis ng pagbasa">
-        <button type="button" id="spSlow" aria-pressed="true">Mabagal</button>
-        <button type="button" id="spVerySlow" aria-pressed="false">Napakabagal</button>
+
+      <!-- NEW: speed + skip row -->
+      <div class="speed-skip" role="group" aria-label="Bilis at laktawan">
+        <div class="speed">
+          <button type="button" id="spSlow" aria-pressed="true">Mabagal</button>
+          <button type="button" id="spVerySlow" aria-pressed="false">Napakabagal</button>
+        </div>
+        <button type="button" id="skip">Laktawan</button>
       </div>
     </div>
 
@@ -353,7 +419,6 @@
 
     <div class="row">
       <button class="btn sea" id="nextBtn" type="button" hidden>Susunod</button>
-      <button class="btn small" id="skip" type="button">Laktawan</button>
     </div>
   </section>
 
@@ -435,7 +500,6 @@
 (() => {
   'use strict';
 
-  /* ================= PAGSASAAYOS ================= */
   const CONFIG = {
     appsScriptUrl: '',
     locale:      { fil: 'fil-PH', en: 'en-US' },
@@ -449,14 +513,12 @@
     passScore: 55,
     gate: 0.8,
     session: { words: 8, sentences: 4, paragraphs: 3 },
-    // >>> PATCH C: mas mabagal ang boses <<<
     listenRate: { slow: 0.5, veryslow: 0.3 },
     voiceFallback: { fil: [] },
     teacher: { maxWords: 100, maxSentences: 60, maxParagraphs: 20, maxWordsPerSentence: 25, maxWordsPerParagraph: 120 },
     useAlternativesForWords: true
   };
 
-  /* ================= BANGKO NG BABASAHIN ================= */
   const BANK = {
     fil: {
       words: {"easy": ["aso", "ate", "ama", "ina", "bata", "baso", "bato", "bola", "baka", "buko", "damo", "isda", "ibon", "ilaw", "kama", "kuya", "lola", "lolo", "mama", "papa", "mata", "mesa", "pusa", "puno", "ulan", "upo", "tao", "araw", "kamay", "ilong", "bibig", "tala"], "medium": ["bahay", "buwan", "tubig", "lapis", "libro", "upuan", "silid", "pinto", "saging", "mangga", "kanin", "gatas", "itlog", "bangka", "dagat", "manok", "kabayo", "guro", "bayan", "hangin", "tinapay", "kamatis", "sitaw", "kalabaw", "bintana", "kapatid", "halaman", "pagkain", "salamin", "bukid", "bundok", "hardin", "sapatos"], "hard": ["paaralan", "kaibigan", "magulang", "bulaklak", "kuwaderno", "tindahan", "palengke", "mangingisda", "dalampasigan", "kalendaryo", "hapunan", "almusal", "meryenda", "eroplano", "sasakyan", "kuwento", "pamilya", "estudyante", "kapitbahay", "kaklase", "bahaghari", "pagbabasa", "mananahi", "magsasaka", "ospital", "simbahan", "gulayan", "matematika", "pagbilang"]},
@@ -473,6 +535,23 @@
     { key: 'sentences',  mode: 'once', gate: true,  name: { fil: 'Antas 2: Mga Pangungusap', en: 'Level 2: Sentences' }, short: { fil: 'Pangungusap', en: 'Sentences' }, unit: { fil: 'Pangungusap', en: 'Sentence' } },
     { key: 'paragraphs', mode: 'long', gate: false, name: { fil: 'Antas 3: Talata',          en: 'Level 3: Paragraph' }, short: { fil: 'Talata',      en: 'Paragraph' }, unit: { fil: 'Talata',      en: 'Paragraph' } }
   ];
+
+  const GRADES = [1, 2, 3, 4, 5, 6];
+  const GRADE_ID = { 1: 'g1', 2: 'g2', 3: 'g3', 4: 'g4', 5: 'g5', 6: 'g6' };
+
+  const GRADE_SENT = {
+    1: { easy: [2, 3], medium: [3, 4], hard: [4, 5] },
+    2: { easy: [2, 4], medium: [4, 5], hard: [5, 6] },
+    3: { easy: [3, 4], medium: [4, 6], hard: [6, 8] },
+    4: { easy: [4, 5], medium: [5, 7], hard: [7, 9] },
+    5: { easy: [5, 6], medium: [6, 8], hard: [8, 10] },
+    6: { easy: [6, 7], medium: [7, 9], hard: [9, 12] }
+  };
+  const PARA_GRADE = {
+    easy:   { min: 1, max: 3 },
+    medium: { min: 2, max: 5 },
+    hard:   { min: 4, max: 6 }
+  };
 
   const TR = {
     fil: {
@@ -513,7 +592,11 @@
       buddyWait: 'Sandali, may sasabihin ako sa iyo…',
       noLog: 'Hindi naka-konekta sa talaan ng guro. Gagana pa rin ang app.', logOn: 'Naka-konekta sa talaan ng guro.',
       itemOf: (u, a, b) => `${u} ${a} / ${b}`,
-      local: { good: 'Napakahusay ng basa mo ngayon!', mid: 'Mahusay! Konting praktis pa at mas gagaling ka.', low: 'Magaling na simula! Basahin ulit nang dahan-dahan bukas.' }
+      local: { good: 'Napakahusay ng basa mo ngayon!', mid: 'Mahusay! Konting praktis pa at mas gagaling ka.', low: 'Magaling na simula! Basahin ulit nang dahan-dahan bukas.' },
+      back: 'Bumalik sa landing page? Matatapos ang session na ito.',
+      backYes: 'Oo, bumalik', backNo: 'Hindi, magpatuloy',
+      gradeLabel: 'Grade',
+      gradeHint: (g) => `Grade ${g}: ${GRADE_SENT[g].easy[0]}–${GRADE_SENT[g].hard[1]} salita bawat pangungusap.`
     },
     en: {
       press: 'Press the mic, read out loud, then press again when you are done!',
@@ -553,11 +636,14 @@
       buddyWait: 'One moment, I have something to tell you…',
       noLog: 'Not connected to the teacher log. The app still works.', logOn: 'Connected to the teacher log.',
       itemOf: (u, a, b) => `${u} ${a} of ${b}`,
-      local: { good: 'You read very well today!', mid: 'Nice work! A little more practice and you will improve.', low: 'Good start! Read slowly again tomorrow.' }
+      local: { good: 'You read very well today!', mid: 'Nice work! A little more practice and you will improve.', low: 'Good start! Read slowly again tomorrow.' },
+      back: 'Back to landing page? This will end the current session.',
+      backYes: 'Yes, go back', backNo: 'No, keep reading',
+      gradeLabel: 'Grade',
+      gradeHint: (g) => `Grade ${g}: ${GRADE_SENT[g].easy[0]}–${GRADE_SENT[g].hard[1]} words per sentence.`
     }
   };
 
-  /* ================= GAMIT ================= */
   const $ = id => document.getElementById(id);
   const store = (k, v) => { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } };
   const jget = (k, d) => { try { return JSON.parse(store(k)) || d; } catch (e) { return d; } };
@@ -570,7 +656,15 @@
     engine: store('bt_engine') === 'azure' ? 'azure' : 'web'
   });
 
-  const S = { lang: store('bt_lang') === 'en' ? 'en' : 'fil', learner: '', stars: 0, results: [], stop: null, wantMore: false, azureFailed: false, last: {}, diff: (['easy', 'medium', 'hard'].includes(store('bt_diff')) ? store('bt_diff') : 'easy'), speed: store('bt_speed') === 'veryslow' ? 'veryslow' : 'slow', source: store('bt_source') === 'teacher' ? 'teacher' : 'app', usedTeacher: false, jump: null, curLevel: 0, doneLevels: new Set(), curText: '' };
+  const S = {
+    lang: store('bt_lang') === 'en' ? 'en' : 'fil',
+    learner: '', stars: 0, results: [], stop: null, wantMore: false, azureFailed: false, last: {},
+    diff: (['easy', 'medium', 'hard'].includes(store('bt_diff')) ? store('bt_diff') : 'easy'),
+    grade: (GRADES.includes(Number(store('bt_grade'))) ? Number(store('bt_grade')) : 1),
+    speed: store('bt_speed') === 'veryslow' ? 'veryslow' : 'slow',
+    source: store('bt_source') === 'teacher' ? 'teacher' : 'app',
+    usedTeacher: false, jump: null, curLevel: 0, doneLevels: new Set(), curText: ''
+  };
   const tr = k => TR[S.lang][k];
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   function joinParts(parts) {
@@ -588,7 +682,6 @@
     S.last[key] = i; return list[i];
   }
 
-  /* ================= SI BASA BUDDY ================= */
   const MASCOT_SVG = `
 <svg viewBox="0 0 200 210" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Basa Buddy, ang kaibigan mong aklat">
   <g stroke="#1F2A44" stroke-linecap="round" stroke-linejoin="round">
@@ -655,7 +748,6 @@
     });
   }
 
-  /* ================= PAGHAHAMBING ================= */
   const tokens = s => String(s || '').split(/\s+/).filter(Boolean);
   const norm = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^\p{L}\p{N}]/gu, '');
   function lev(a, b) {
@@ -804,11 +896,9 @@
   }
   const VALUE = { tama: 1, halos: 0.5, ulit: 0 };
 
-  /* ================= PAGBUO NG MGA BABASAHIN ================= */
   const DIFFS = ['easy', 'medium', 'hard'];
   const DIFF_NAME = { fil: { easy: 'Madali', medium: 'Katamtaman', hard: 'Mahirap' }, en: { easy: 'Easy', medium: 'Medium', hard: 'Hard' } };
-  // >>> PATCH D: mas maikli ang sentences <<<
-  const SENT_RANGE = { easy: [2, 4], medium: [4, 6], hard: [6, 8] };
+  function sentRange() { return GRADE_SENT[S.grade][S.diff]; }
   const NUM_POOL = {
     easy: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
     medium: [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 30, 40, 50, 60, 70, 80, 90],
@@ -889,7 +979,6 @@
   const mkS = (text, nums, math) => ({ text, nums, math: math || null });
   const mkP = (sents, nums, math) => ({ text: sents.join(' '), nums, math: math || null, count: sents.length });
 
-  // >>> PATCH A: mas maraming templates (6 bawat diff) <<<
   const SENT = {
     fil: {
       easy: [
@@ -942,7 +1031,6 @@
     }
   };
 
-  // >>> PATCH A: 6 templates bawat (lang, diff) <<<
   const PARA = {
     fil: {
       easy: [
@@ -1035,18 +1123,19 @@
   };
 
   function genSentence(lang, diff) {
-    const [lo, hi] = SENT_RANGE[diff], list = SENT[lang][diff];
+    const [lo, hi] = sentRange(), list = SENT[lang][diff];
     for (let i = 0; i < 60; i++) { const t = ch(list)(), n = tokens(t.text).length; if (n >= lo && n <= hi) return t; }
     return list[0]();
   }
   function genParagraph(lang, diff) {
-    if (diff === 'hard' && Math.random() < 0.3) { const e = ch(BANK[lang].extras); return { text: e, nums: null, math: null, count: e.split(/(?<=[.?!])\s+/).length, extra: true }; }
+    const g = PARA_GRADE[diff];
+    const useExtra = diff === 'hard' && Math.random() < 0.3 && S.grade >= g.min && S.grade <= g.max;
+    if (useExtra) { const e = ch(BANK[lang].extras); return { text: e, nums: null, math: null, count: e.split(/(?<=[.?!])\s+/).length, extra: true }; }
     return ch(PARA[lang][diff])();
   }
 
-  // >>> PATCH B: session-level shuffle-without-replacement <<<
   function genItems(kind, n) {
-    const seenKey = `bt_seen_${S.learner}_${S.lang}_${S.diff}_${kind}`;
+    const seenKey = `bt_seen_${S.learner}_${S.lang}_${S.diff}_g${S.grade}_${kind}`;
     const seen = jget(seenKey, []);
     const out = [];
     let pool = [];
@@ -1062,7 +1151,6 @@
     return out;
   }
 
-  /* ================= PAGPILI NG BABASAHIN ================= */
   function pickTeacher(levelKey, n) {
     const list = teacherLists(S.lang)[levelKey] || [];
     if (!list.length) return [];
@@ -1091,7 +1179,7 @@
       if (t.length) { S.usedTeacher = true; return t; }
     }
     const diff = S.diff, B = BANK[S.lang];
-    const uk = k => `bt_used_${S.learner}_${S.lang}_${diff}_${k}`, mk = `bt_missed_${S.learner}_${S.lang}_${diff}_${levelKey}`;
+    const uk = k => `bt_used_${S.learner}_${S.lang}_${diff}_g${S.grade}_${k}`, mk = `bt_missed_${S.learner}_${S.lang}_${diff}_g${S.grade}_${levelKey}`;
     const missed = jget(mk, []);
     const out = [];
     const takeMissed = levelKey === 'paragraphs' ? 0 : Math.min(2, missed.length, n - 1);
@@ -1116,13 +1204,12 @@
   }
   function rememberMissed(levelKey, texts) {
     if (!texts.length) return;
-    const mk = `bt_missed_${S.learner}_${S.lang}_${S.usedTeacher ? 'teacher' : S.diff}_${levelKey}`;
+    const mk = `bt_missed_${S.learner}_${S.lang}_${S.usedTeacher ? 'teacher' : S.diff}_g${S.grade}_${levelKey}`;
     const list = jget(mk, []);
     texts.forEach(t => { if (!list.includes(t)) list.push(t); });
     jset(mk, list.slice(-12));
   }
 
-  /* ================= MIKROPONO ================= */
   function webSpeech(locale, continuous, onReady, mode) {
     return new Promise((resolve, reject) => {
       if (!SR) { reject(new Error(tr('unsupported'))); return; }
@@ -1215,13 +1302,10 @@
     return r;
   }
 
-  /* ================= BOSES (text-to-speech) ================= */
   let VOICES = [];
   const loadVoices = () => { try { VOICES = speechSynthesis.getVoices() || []; } catch (e) { VOICES = []; } };
   if ('speechSynthesis' in window) { loadVoices(); speechSynthesis.onvoiceschanged = loadVoices; }
   const voiceOn = () => store('bt_voice') !== 'off';
-
-  // >>> PATCH C: neutral voice, iwasan ang slang <<<
   function pickVoice() {
     if (!VOICES.length) loadVoices();
     const lg = v => (v.lang || '').toLowerCase().replace('_', '-');
@@ -1230,7 +1314,7 @@
     if (S.lang === 'fil') {
       const fil = find(/^(fil|tl)/);
       if (fil) return fil;
-      return null;   // walang Filipino voice: huwag mag-speak (maling bigkas)
+      return null;
     }
     const PREFERRED_EN = /^(en-ph|en-gb|en-us)/;
     return VOICES.find(v => PREFERRED_EN.test(lg(v)) && !AVOID.test(v.name)) || find(/^en/) || null;
@@ -1241,7 +1325,7 @@
       if (!('speechSynthesis' in window)) return res();
       try { speechSynthesis.cancel(); } catch (e) {}
       const v = pickVoice();
-      if (!v && S.lang === 'fil') return res();   // walang Filipino voice: skip
+      if (!v && S.lang === 'fil') return res();
       const u = new SpeechSynthesisUtterance(text);
       if (v) { u.voice = v; u.lang = v.lang; } else u.lang = CONFIG.locale[S.lang];
       u.rate = o.rate || 0.85; u.pitch = o.pitch || 1;
@@ -1251,7 +1335,6 @@
       setTimeout(fin, 9000);
     });
   }
-  // >>> PATCH C: pitch 1.0 (hindi 1.2) para sa pagbasa <<<
   const speak = t => utter(t, { rate: CONFIG.listenRate[S.speed], pitch: 1.0 });
   const say = t => voiceOn() ? utter(t, { rate: 1, pitch: 1.2 }) : Promise.resolve();
   function syncVoiceBtn() { const b = $('voiceBtn'); b.dataset.on = String(voiceOn()); b.setAttribute('aria-pressed', String(voiceOn())); }
@@ -1260,8 +1343,11 @@
     $('voiceInfo').textContent = v ? `Boses: ${v.name} (${v.lang})` : 'Walang nakitang boses para sa wikang ito; gagamitin ang default na boses ng device.';
   }
 
-  /* ================= UI ================= */
-  const show = id => { ['screenStart', 'screenPlay', 'screenEnd'].forEach(s => { $(s).hidden = (s !== id); }); $('hdrLang').hidden = (id === 'screenStart'); };
+  const show = id => {
+    ['screenStart', 'screenPlay', 'screenEnd'].forEach(s => { $(s).hidden = (s !== id); });
+    $('hdrLang').hidden = (id === 'screenStart');
+    $('backBtn').hidden = (id === 'screenStart');
+  };
   const setStatus = s => { $('status').textContent = s; };
   function setMic(state, label) {
     const m = $('mic'); m.dataset.state = state; m.disabled = (state === 'thinking' || state === 'starting');
@@ -1312,7 +1398,6 @@
     if (verdict === 'tama') confetti();
   }
 
-  /* ================= ISANG BABASAHIN ================= */
   let runId = 0;
   const ABORT = 'ABORT';
   const JUMP = 'JUMP';
@@ -1414,7 +1499,6 @@
     } catch (e) {}
   }
 
-  /* ================= BUONG SESSION ================= */
   async function runLevel(level, id) {
     const idx = LEVELS.indexOf(level);
     await banner(level.name[S.lang], 1400); chk(id);
@@ -1505,7 +1589,6 @@
     } else { buddy.className = 'buddy'; buddy.textContent = localMsg; }
   }
 
-  /* ================= KONTROL ================= */
   $('mic').addEventListener('click', () => {
     if (S.stop) { S.stop(); return; }
     if (micWaiter) { const w = micWaiter; micWaiter = null; w('mic'); }
@@ -1523,7 +1606,7 @@
     ['langFil', 'hLangFil'].forEach(i => $(i).setAttribute('aria-pressed', String(l === 'fil')));
     ['langEn', 'hLangEn'].forEach(i => $(i).setAttribute('aria-pressed', String(l === 'en')));
     document.documentElement.lang = l === 'fil' ? 'fil' : 'en';
-    buildTracker(); syncDiff(); syncSpeed(); syncSource();
+    buildTracker(); syncDiff(); syncSpeed(); syncSource(); syncGrade();
   }
   function switchLang(l) {
     if (l === S.lang) return;
@@ -1546,8 +1629,26 @@
   }
   function setDiff(d) { if (!DIFFS.includes(d)) return; S.diff = d; store('bt_diff', d); syncDiff(); }
   DIFFS.forEach(d => $(DIFF_ID[d]).addEventListener('click', () => setDiff(d)));
+
+  function syncGrade() {
+    GRADES.forEach(g => { const b = $(GRADE_ID[g]); if (b) b.setAttribute('aria-pressed', String(g === S.grade)); });
+    $('gradeLabel').textContent = tr('gradeLabel');
+  }
+  function setGrade(g) {
+    if (!GRADES.includes(g)) return;
+    S.grade = g; store('bt_grade', g); syncGrade();
+    if (!$('screenPlay').hidden) { abortRun(); runSession(S.curLevel || 0); }
+  }
+  GRADES.forEach(g => $(GRADE_ID[g]).addEventListener('click', () => setGrade(g)));
+
   const cleanCode = v => v.trim().toUpperCase().replace(/\s+/g, '-').replace(/[^A-Z0-9._-]/g, '').replace(/^[^A-Z0-9]+/, '').slice(0, 20);
-  $('learner').addEventListener('input', () => { const c = cleanCode($('learner').value), d = c && store('bt_diff_' + c); if (DIFFS.includes(d)) setDiff(d); });
+  $('learner').addEventListener('input', () => {
+    const c = cleanCode($('learner').value);
+    const d = c && store('bt_diff_' + c);
+    if (DIFFS.includes(d)) setDiff(d);
+    const g = c && Number(store('bt_grade_' + c));
+    if (GRADES.includes(g)) setGrade(g);
+  });
 
   function syncSpeed() {
     $('spSlow').setAttribute('aria-pressed', String(S.speed === 'slow')); $('spVerySlow').setAttribute('aria-pressed', String(S.speed === 'veryslow'));
@@ -1558,6 +1659,18 @@
     if (!S.stop && S.curText) speak(S.curText);
   }));
   $('suggestBtn').addEventListener('click', () => { setDiff($('suggestBtn').dataset.diff); $('screenEnd').hidden = true; runSession(); });
+
+  $('backBtn').addEventListener('click', () => {
+    if ($('screenStart').hidden === false) return;
+    const ok = window.confirm(tr('back'));
+    if (!ok) return;
+    abortRun();
+    mood('idle');
+    show('screenStart');
+    $('screenPlay').style.display = 'none';
+    $('screenEnd').hidden = true;
+    refreshStart();
+  });
 
   const ABBR = ['gng', 'bb', 'g', 'mr', 'mrs', 'ms', 'dr', 'sr', 'jr', 'gat', 'engr', 'atty'];
   const cleanLine = x => x.replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/^\s*(?:[-•*·]|\d+[.)])\s+/, '').replace(/\s+/g, ' ').trim();
@@ -1639,6 +1752,7 @@
   $('begin').addEventListener('click', () => {
     const code = $('learner').value.trim().toUpperCase().replace(/\s+/g, '-') || 'BISITA';
     S.learner = code; store('bt_learner', code);
+    store('bt_grade_' + code, S.grade);
     runSession();
   });
   $('again').addEventListener('click', () => { $('screenEnd').hidden = true; runSession(); });
