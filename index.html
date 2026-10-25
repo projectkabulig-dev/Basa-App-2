@@ -125,7 +125,7 @@
   .bar i{display:block; height:100%; width:0; background:repeating-linear-gradient(135deg,var(--ok) 0 10px,#25B97B 10px 20px); transition:width .35s}
   .count{font-family:'Fredoka',sans-serif; font-weight:600; white-space:nowrap}
 
-  .target-card{text-align:center; padding:26px 16px 22px}
+  .target-card{text-align:center; padding:26px 16px 22px; position:relative}
   .target{font-family:'Fredoka',sans-serif; font-weight:600; line-height:1.1; font-size:clamp(3.2rem,17vw,6.2rem); margin:0 0 14px; display:flex; flex-wrap:wrap; justify-content:center; gap:.08em .3em; overflow-wrap:anywhere}
   .target.sent{font-size:clamp(2rem,9vw,3.2rem); line-height:1.2}
   .target.para{display:block; text-align:left; font-family:'Nunito',sans-serif; font-weight:800; font-size:clamp(1.3rem,5.4vw,1.7rem); line-height:2.1}
@@ -218,13 +218,19 @@
   .target.mid{font-size:clamp(2.4rem,12vw,4rem)}
   .target.small{font-size:clamp(1.7rem,8.5vw,2.8rem)}
 
-  /* NEW: speed + skip row */
+  /* NEW: play diff toggle */
+  .play-diff{position:absolute; top:8px; right:10px; display:flex; gap:4px}
+  .play-diff button{font-family:'Fredoka',sans-serif; font-weight:700; font-size:.75rem; padding:3px 9px; background:#fff; border:2px solid var(--ink); border-radius:999px; color:var(--mute)}
+  .play-diff button[aria-pressed="true"]{background:var(--sun); color:var(--ink); box-shadow:0 2px 0 var(--ink)}
+
+  /* NEW: speed + skip + next row */
   .speed-skip{display:flex; justify-content:center; align-items:center; gap:8px; margin-top:10px; flex-wrap:wrap}
   .speed-skip .speed{display:flex; gap:8px; margin:0}
   .speed-skip button{font-family:'Fredoka',sans-serif; font-weight:600; font-size:.88rem; padding:4px 14px; background:#fff; border:2px solid var(--ink); border-radius:999px}
   .speed-skip .speed button[aria-pressed="true"]{background:var(--sun)}
-  .speed-skip #skip{font-size:.88rem; padding:4px 14px; border:2px solid var(--ink); border-radius:999px; background:#fff; box-shadow:none}
-  .speed-skip #skip:active{transform:translateY(2px)}
+  .speed-skip #skip, .speed-skip #nextBtn{font-size:.88rem; padding:4px 14px; border:2px solid var(--ink); border-radius:999px; background:#fff; box-shadow:none}
+  .speed-skip #skip:active, .speed-skip #nextBtn:active{transform:translateY(2px)}
+  .speed-skip #nextBtn{background:var(--sea); color:#fff; border-color:var(--ink)}
 
   .suggest{margin-top:16px; padding-top:14px; border-top:2px dashed var(--line); text-align:center}
   .suggest p{margin:0 0 10px; font-weight:800}
@@ -277,6 +283,11 @@
     .actions-row .btn.big-start{order:1; flex:1 1 100%;}
     .actions-row .mini-tools{order:2; flex:1 1 100%; justify-content:center;}
   }
+
+  .vgender{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; max-width:380px; margin:8px auto 0}
+  .vgender button{display:flex; flex-direction:column; align-items:center; gap:2px; font-family:'Fredoka',sans-serif; font-weight:700; font-size:.95rem; padding:8px 4px; background:#fff; border:3px solid var(--ink); border-radius:16px; box-shadow:0 4px 0 var(--ink); transition:transform .08s, box-shadow .08s}
+  .vgender button i{font-style:normal; font-size:1.4rem; line-height:1}
+  .vgender button[aria-pressed="true"]{background:var(--sun); transform:translateY(2px); box-shadow:0 2px 0 var(--ink)}
 
   @media (prefers-reduced-motion:reduce){ *,*::before,*::after{animation:none !important; transition:none !important} .micarea[data-state="listening"] .ring{opacity:.5; transform:scale(1.15)} }
 </style>
@@ -375,6 +386,12 @@
 
     <div class="card target-card">
       <span class="diffbadge" id="diffBadge"></span>
+      <!-- NEW: play diff toggle -->
+      <div class="play-diff" id="playDiff" role="group" aria-label="Hirap habang nagbabasa">
+        <button type="button" id="pdEasy" aria-pressed="true" data-diff="easy">Easy</button>
+        <button type="button" id="pdMedium" aria-pressed="false" data-diff="medium">Medium</button>
+        <button type="button" id="pdHard" aria-pressed="false" data-diff="hard">Hard</button>
+      </div>
       <div class="target" id="target" aria-label="Babasahin"></div>
       <div class="result" id="result" hidden>
         <p class="verdict" id="verdict"></p>
@@ -386,14 +403,14 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="#1F2A44" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z" fill="#FFD23F"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg><span id="listenTxt">Pakinggan muna</span>
         </button>
       </div>
-
-      <!-- NEW: speed + skip row -->
       <div class="speed-skip" role="group" aria-label="Bilis at laktawan">
         <div class="speed">
           <button type="button" id="spSlow" aria-pressed="true">Mabagal</button>
           <button type="button" id="spVerySlow" aria-pressed="false">Napakabagal</button>
         </div>
         <button type="button" id="skip">Laktawan</button>
+        <!-- NEW: next in speed-skip, only for paragraphs -->
+        <button type="button" id="nextBtn" hidden>Susunod</button>
       </div>
     </div>
 
@@ -415,10 +432,6 @@
       </div>
       <p class="miclabel" id="micLabel"></p>
       <div class="wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
-    </div>
-
-    <div class="row">
-      <button class="btn sea" id="nextBtn" type="button" hidden>Susunod</button>
     </div>
   </section>
 
@@ -481,6 +494,14 @@
       <small id="voiceInfo"></small>
     </label>
     <div><button class="btn small" type="button" id="testVoice">Subukan ang boses</button></div>
+
+    <p class="mini" style="margin:6px 0 0" id="vgLabel">Uri ng boses</p>
+    <div class="vgender" id="voiceGender" role="group" aria-label="Uri ng boses">
+      <button type="button" id="vgFemale" aria-pressed="true"><i>👩</i><span>Babae</span></button>
+      <button type="button" id="vgMale" aria-pressed="false"><i>👨</i><span>Lalaki</span></button>
+      <button type="button" id="vgAny" aria-pressed="false"><i>🔄</i><span>Kahit alin</span></button>
+    </div>
+
     <label>Apps Script URL (opsyonal)
       <input id="fUrl" type="url" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off">
       <small>Para sa talaan ng guro at mensahe ni Claude. Walang laman = gagana pa rin ang app.</small>
@@ -596,7 +617,11 @@
       back: 'Bumalik sa landing page? Matatapos ang session na ito.',
       backYes: 'Oo, bumalik', backNo: 'Hindi, magpatuloy',
       gradeLabel: 'Grade',
-      gradeHint: (g) => `Grade ${g}: ${GRADE_SENT[g].easy[0]}–${GRADE_SENT[g].hard[1]} salita bawat pangungusap.`
+      gradeHint: (g) => `Grade ${g}: ${GRADE_SENT[g].easy[0]}–${GRADE_SENT[g].hard[1]} salita bawat pangungusap.`,
+      vgLabel: 'Uri ng boses', vgFemale: 'Babae', vgMale: 'Lalaki', vgAny: 'Kahit alin',
+      vgInfo: (name, lang) => `Aktibong boses: ${name} (${lang})`,
+      vgNone: 'Walang tugmang boses para sa napiling uri. Gagamitin ang default.',
+      playDiff: 'Hirap'
     },
     en: {
       press: 'Press the mic, read out loud, then press again when you are done!',
@@ -640,7 +665,11 @@
       back: 'Back to landing page? This will end the current session.',
       backYes: 'Yes, go back', backNo: 'No, keep reading',
       gradeLabel: 'Grade',
-      gradeHint: (g) => `Grade ${g}: ${GRADE_SENT[g].easy[0]}–${GRADE_SENT[g].hard[1]} words per sentence.`
+      gradeHint: (g) => `Grade ${g}: ${GRADE_SENT[g].easy[0]}–${GRADE_SENT[g].hard[1]} words per sentence.`,
+      vgLabel: 'Voice type', vgFemale: 'Female', vgMale: 'Male', vgAny: 'Any',
+      vgInfo: (name, lang) => `Active voice: ${name} (${lang})`,
+      vgNone: 'No matching voice for the selected type. Using the default voice.',
+      playDiff: 'Level'
     }
   };
 
@@ -663,6 +692,7 @@
     grade: (GRADES.includes(Number(store('bt_grade'))) ? Number(store('bt_grade')) : 1),
     speed: store('bt_speed') === 'veryslow' ? 'veryslow' : 'slow',
     source: store('bt_source') === 'teacher' ? 'teacher' : 'app',
+    voiceGender: (['female', 'male', 'any'].includes(store('bt_voice_gender')) ? store('bt_voice_gender') : 'female'),
     usedTeacher: false, jump: null, curLevel: 0, doneLevels: new Set(), curText: ''
   };
   const tr = k => TR[S.lang][k];
@@ -1306,18 +1336,35 @@
   const loadVoices = () => { try { VOICES = speechSynthesis.getVoices() || []; } catch (e) { VOICES = []; } };
   if ('speechSynthesis' in window) { loadVoices(); speechSynthesis.onvoiceschanged = loadVoices; }
   const voiceOn = () => store('bt_voice') !== 'off';
+
+  const FEMALE_NAMES = /(aria|zira|samantha|karen|tessa|fiona|moira|susan|female|babae|girl|victoria|allison|ava|joanna|salli|kendra|kimberly|ivy|nicole|amy|emma|olivia|mia|sophia|google us english)/i;
+  const MALE_NAMES = /(guy|david|daniel|alex|mark|rishi|fred|tom|male|lalaki|boy|matthew|justin|joey|brian|russell|eric|arthur|liam|noah|ethan|james)/i;
+  function voiceMatchesGender(v, gender) {
+    if (gender === 'any') return true;
+    const name = v.name || '';
+    const isFemale = FEMALE_NAMES.test(name);
+    const isMale = MALE_NAMES.test(name);
+    if (gender === 'female') return isFemale && !isMale;
+    if (gender === 'male') return isMale && !isFemale;
+    return true;
+  }
   function pickVoice() {
     if (!VOICES.length) loadVoices();
     const lg = v => (v.lang || '').toLowerCase().replace('_', '-');
-    const find = re => VOICES.find(v => re.test(lg(v)));
     const AVOID = /(slang|au-|in-|ng-|za-|ie-)/i;
+    const gender = S.voiceGender;
+    let candidates;
     if (S.lang === 'fil') {
-      const fil = find(/^(fil|tl)/);
-      if (fil) return fil;
-      return null;
+      candidates = VOICES.filter(v => /^(fil|tl)/.test(lg(v)));
+      if (!candidates.length) return null;
+    } else {
+      const PREFERRED_EN = /^(en-ph|en-gb|en-us)/;
+      candidates = VOICES.filter(v => PREFERRED_EN.test(lg(v)) && !AVOID.test(v.name));
+      if (!candidates.length) candidates = VOICES.filter(v => /^en/.test(lg(v)));
     }
-    const PREFERRED_EN = /^(en-ph|en-gb|en-us)/;
-    return VOICES.find(v => PREFERRED_EN.test(lg(v)) && !AVOID.test(v.name)) || find(/^en/) || null;
+    const withGender = candidates.filter(v => voiceMatchesGender(v, gender));
+    if (withGender.length) return withGender[0];
+    return candidates[0] || null;
   }
   function utter(text, o) {
     o = o || {};
@@ -1340,7 +1387,22 @@
   function syncVoiceBtn() { const b = $('voiceBtn'); b.dataset.on = String(voiceOn()); b.setAttribute('aria-pressed', String(voiceOn())); }
   function updateVoiceInfo() {
     const v = pickVoice();
-    $('voiceInfo').textContent = v ? `Boses: ${v.name} (${v.lang})` : 'Walang nakitang boses para sa wikang ito; gagamitin ang default na boses ng device.';
+    if (v) $('voiceInfo').textContent = tr('vgInfo')(v.name, v.lang);
+    else $('voiceInfo').textContent = tr('vgNone');
+  }
+  function syncVoiceGender() {
+    const map = { female: 'vgFemale', male: 'vgMale', any: 'vgAny' };
+    Object.keys(map).forEach(k => { const b = $(map[k]); if (b) b.setAttribute('aria-pressed', String(S.voiceGender === k)); });
+    const label = $('vgLabel'); if (label) label.textContent = tr('vgLabel');
+    const f = $('vgFemale'), m = $('vgMale'), a = $('vgAny');
+    if (f) f.textContent = ''; if (f) { const i = document.createElement('i'); i.textContent = '👩'; const s = document.createElement('span'); s.textContent = tr('vgFemale'); f.append(i, s); }
+    if (m) m.textContent = ''; if (m) { const i = document.createElement('i'); i.textContent = '👨'; const s = document.createElement('span'); s.textContent = tr('vgMale'); m.append(i, s); }
+    if (a) a.textContent = ''; if (a) { const i = document.createElement('i'); i.textContent = '🔄'; const s = document.createElement('span'); s.textContent = tr('vgAny'); a.append(i, s); }
+  }
+  function setVoiceGender(g) {
+    if (!['female', 'male', 'any'].includes(g)) return;
+    S.voiceGender = g; store('bt_voice_gender', g); syncVoiceGender(); updateVoiceInfo();
+    if (voiceOn() && !S.stop) utter(pickPhrase('praise'), { rate: 1, pitch: 1.2 });
   }
 
   const show = id => {
@@ -1377,8 +1439,11 @@
     setTracker(level); S.curLevel = LEVELS.indexOf(level); S.curText = text; $('levelHint').textContent = tr('levelHint'); mood('idle');
     $('count').textContent = TR[S.lang].itemOf(level.unit[S.lang], pos, total);
     $('barFill').style.width = Math.round(((pos - 1) / total) * 100) + '%';
-    $('result').hidden = true; $('nextBtn').hidden = true;
+    $('result').hidden = true;
+    // >>> PATCH H: nextBtn visible only for paragraphs <<<
+    $('nextBtn').hidden = (level.mode !== 'long');
     $('skip').textContent = tr('skip'); $('listenTxt').textContent = tr('listenBtn'); $('nextBtn').textContent = tr('next');
+    syncPlayDiff();
   }
 
   function showResult(level, ev, verdict, r, wcpm) {
@@ -1606,7 +1671,7 @@
     ['langFil', 'hLangFil'].forEach(i => $(i).setAttribute('aria-pressed', String(l === 'fil')));
     ['langEn', 'hLangEn'].forEach(i => $(i).setAttribute('aria-pressed', String(l === 'en')));
     document.documentElement.lang = l === 'fil' ? 'fil' : 'en';
-    buildTracker(); syncDiff(); syncSpeed(); syncSource(); syncGrade();
+    buildTracker(); syncDiff(); syncSpeed(); syncSource(); syncGrade(); syncPlayDiff();
   }
   function switchLang(l) {
     if (l === S.lang) return;
@@ -1627,8 +1692,22 @@
     DIFFS.forEach(d => { const b = $(DIFF_ID[d]); b.setAttribute('aria-pressed', String(d === S.diff)); b.querySelector('span').textContent = diffName(d); });
     $('diffLabel').textContent = tr('diffLabel');
   }
-  function setDiff(d) { if (!DIFFS.includes(d)) return; S.diff = d; store('bt_diff', d); syncDiff(); }
+  function setDiff(d) { if (!DIFFS.includes(d)) return; S.diff = d; store('bt_diff', d); syncDiff(); syncPlayDiff(); }
   DIFFS.forEach(d => $(DIFF_ID[d]).addEventListener('click', () => setDiff(d)));
+
+  // >>> PATCH H: play-diff toggle handlers <<<
+  const PLAY_DIFF_ID = { easy: 'pdEasy', medium: 'pdMedium', hard: 'pdHard' };
+  function syncPlayDiff() {
+    DIFFS.forEach(d => { const b = $(PLAY_DIFF_ID[d]); if (b) b.setAttribute('aria-pressed', String(d === S.diff)); });
+    const lbl = $('playDiff'); if (lbl) lbl.setAttribute('aria-label', tr('playDiff'));
+  }
+  function setPlayDiff(d) {
+    if (!DIFFS.includes(d) || d === S.diff) return;
+    // Kung nasa play, i-restart ang kasalukuyang level sa bagong difficulty
+    S.diff = d; store('bt_diff', d); syncDiff(); syncPlayDiff();
+    if (!$('screenPlay').hidden) { abortRun(); runSession(S.curLevel || 0); }
+  }
+  DIFFS.forEach(d => $(PLAY_DIFF_ID[d]).addEventListener('click', () => setPlayDiff(d)));
 
   function syncGrade() {
     GRADES.forEach(g => { const b = $(GRADE_ID[g]); if (b) b.setAttribute('aria-pressed', String(g === S.grade)); });
@@ -1761,11 +1840,12 @@
   const dlg = $('settings');
   $('openSettings').addEventListener('click', () => {
     const c = cfg(); $('fEngine').value = c.engine; $('fUrl').value = c.url; $('fCode').value = c.code;
-    $('fVoice').value = voiceOn() ? 'on' : 'off'; updateVoiceInfo();
+    $('fVoice').value = voiceOn() ? 'on' : 'off'; updateVoiceInfo(); syncVoiceGender();
     if (typeof dlg.showModal === 'function') dlg.showModal(); else dlg.setAttribute('open', '');
   });
   $('cancelSettings').addEventListener('click', () => dlg.close());
   $('testVoice').addEventListener('click', () => { utter(pickPhrase('praise'), { rate: 1, pitch: 1.2 }); updateVoiceInfo(); });
+  [['vgFemale', 'female'], ['vgMale', 'male'], ['vgAny', 'any']].forEach(([id, g]) => $(id).addEventListener('click', () => setVoiceGender(g)));
   $('settingsForm').addEventListener('submit', () => {
     store('bt_engine', $('fEngine').value); store('bt_voice', $('fVoice').value); syncVoiceBtn(); store('bt_url', $('fUrl').value.trim()); store('bt_code', $('fCode').value.trim());
     tokenCache = { token: null, region: null, exp: 0 }; refreshStart();
@@ -1776,6 +1856,8 @@
   $('screenPlay').style.display = 'none';
   setLang(S.lang);
   $('learner').value = store('bt_learner') || '';
+  syncVoiceGender();
+  syncPlayDiff();
   refreshStart();
 })();
 </script>
