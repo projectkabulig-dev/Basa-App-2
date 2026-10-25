@@ -218,12 +218,10 @@
   .target.mid{font-size:clamp(2.4rem,12vw,4rem)}
   .target.small{font-size:clamp(1.7rem,8.5vw,2.8rem)}
 
-  /* NEW: play diff toggle */
   .play-diff{position:absolute; top:8px; right:10px; display:flex; gap:4px}
   .play-diff button{font-family:'Fredoka',sans-serif; font-weight:700; font-size:.75rem; padding:3px 9px; background:#fff; border:2px solid var(--ink); border-radius:999px; color:var(--mute)}
   .play-diff button[aria-pressed="true"]{background:var(--sun); color:var(--ink); box-shadow:0 2px 0 var(--ink)}
 
-  /* NEW: speed + skip + next row */
   .speed-skip{display:flex; justify-content:center; align-items:center; gap:8px; margin-top:10px; flex-wrap:wrap}
   .speed-skip .speed{display:flex; gap:8px; margin:0}
   .speed-skip button{font-family:'Fredoka',sans-serif; font-weight:600; font-size:.88rem; padding:4px 14px; background:#fff; border:2px solid var(--ink); border-radius:999px}
@@ -288,6 +286,18 @@
   .vgender button{display:flex; flex-direction:column; align-items:center; gap:2px; font-family:'Fredoka',sans-serif; font-weight:700; font-size:.95rem; padding:8px 4px; background:#fff; border:3px solid var(--ink); border-radius:16px; box-shadow:0 4px 0 var(--ink); transition:transform .08s, box-shadow .08s}
   .vgender button i{font-style:normal; font-size:1.4rem; line-height:1}
   .vgender button[aria-pressed="true"]{background:var(--sun); transform:translateY(2px); box-shadow:0 2px 0 var(--ink)}
+
+  /* NEW: report card */
+  .report{margin-top:16px; padding-top:14px; border-top:2px dashed var(--line)}
+  .report h3{margin:0 0 10px; font-family:'Fredoka',sans-serif; font-size:1.1rem; color:var(--ink)}
+  .report table{width:100%; border-collapse:collapse; font-size:.85rem}
+  .report th,.report td{padding:5px 6px; border-bottom:1px solid #E2E8F0; text-align:left; vertical-align:top}
+  .report th{background:#F5F8FA; font-family:'Fredoka',sans-serif; font-weight:700; color:var(--mute); font-size:.78rem}
+  .report td.wrong{color:var(--miss); font-weight:800}
+  .report td.right{color:var(--ok); font-weight:800}
+  .report td.pattern{font-family:'Fredoka',sans-serif; color:var(--sun-d); font-weight:700}
+  .report .empty{color:var(--mute); font-weight:700; padding:10px 0; text-align:center}
+  .report .download{display:flex; justify-content:center; margin-top:14px}
 
   @media (prefers-reduced-motion:reduce){ *,*::before,*::after{animation:none !important; transition:none !important} .micarea[data-state="listening"] .ring{opacity:.5; transform:scale(1.15)} }
 </style>
@@ -386,7 +396,6 @@
 
     <div class="card target-card">
       <span class="diffbadge" id="diffBadge"></span>
-      <!-- NEW: play diff toggle -->
       <div class="play-diff" id="playDiff" role="group" aria-label="Hirap habang nagbabasa">
         <button type="button" id="pdEasy" aria-pressed="true" data-diff="easy">Easy</button>
         <button type="button" id="pdMedium" aria-pressed="false" data-diff="medium">Medium</button>
@@ -409,7 +418,6 @@
           <button type="button" id="spVerySlow" aria-pressed="false">Napakabagal</button>
         </div>
         <button type="button" id="skip">Laktawan</button>
-        <!-- NEW: next in speed-skip, only for paragraphs -->
         <button type="button" id="nextBtn" hidden>Susunod</button>
       </div>
     </div>
@@ -445,6 +453,19 @@
     <div class="card">
       <div class="sum" id="sum"></div>
       <p class="practice" id="practice" style="margin-top:16px"></p>
+      <!-- NEW: report card -->
+      <div class="report" id="reportBox" hidden>
+        <h3 id="reportTitle">Mga salitang kailangang ayusin</h3>
+        <table>
+          <thead>
+            <tr><th>#</th><th>Antas</th><th>Dapat</th><th>Narinig</th><th>Pattern</th></tr>
+          </thead>
+          <tbody id="reportBody"></tbody>
+        </table>
+        <div class="download">
+          <button class="btn sea small" id="downloadReport" type="button">⬇ I-download ang ulat (CSV)</button>
+        </div>
+      </div>
       <div class="suggest" id="suggest" hidden><p id="suggestTxt"></p><button class="btn sea" id="suggestBtn" type="button"></button></div>
     </div>
     <div class="row">
@@ -621,7 +642,12 @@
       vgLabel: 'Uri ng boses', vgFemale: 'Babae', vgMale: 'Lalaki', vgAny: 'Kahit alin',
       vgInfo: (name, lang) => `Aktibong boses: ${name} (${lang})`,
       vgNone: 'Walang tugmang boses para sa napiling uri. Gagamitin ang default.',
-      playDiff: 'Hirap'
+      playDiff: 'Hirap',
+      reportTitle: 'Mga salitang kailangang ayusin',
+      reportEmpty: 'Walang mali sa session na ito. Magaling!',
+      reportCol: { n: '#', level: 'Antas', right: 'Dapat', wrong: 'Narinig', pattern: 'Pattern' },
+      download: '⬇ I-download ang ulat (CSV)',
+      patternNames: { th: 'th (think)', v: 'v (very)', f: 'f (fan)', z: 'z (zoo)', vowel: 'patinig', cluster: 'kumpol ng katinig', other: 'iba pa' }
     },
     en: {
       press: 'Press the mic, read out loud, then press again when you are done!',
@@ -669,7 +695,12 @@
       vgLabel: 'Voice type', vgFemale: 'Female', vgMale: 'Male', vgAny: 'Any',
       vgInfo: (name, lang) => `Active voice: ${name} (${lang})`,
       vgNone: 'No matching voice for the selected type. Using the default voice.',
-      playDiff: 'Level'
+      playDiff: 'Level',
+      reportTitle: 'Words to fix',
+      reportEmpty: 'No mistakes this session. Well done!',
+      reportCol: { n: '#', level: 'Level', right: 'Should be', wrong: 'Heard', pattern: 'Pattern' },
+      download: '⬇ Download report (CSV)',
+      patternNames: { th: 'th (think)', v: 'v (very)', f: 'f (fan)', z: 'z (zoo)', vowel: 'vowel', cluster: 'consonant cluster', other: 'other' }
     }
   };
 
@@ -693,7 +724,9 @@
     speed: store('bt_speed') === 'veryslow' ? 'veryslow' : 'slow',
     source: store('bt_source') === 'teacher' ? 'teacher' : 'app',
     voiceGender: (['female', 'male', 'any'].includes(store('bt_voice_gender')) ? store('bt_voice_gender') : 'female'),
-    usedTeacher: false, jump: null, curLevel: 0, doneLevels: new Set(), curText: ''
+    usedTeacher: false, jump: null, curLevel: 0, doneLevels: new Set(), curText: '',
+    // NEW: all wrong words sa buong session
+    wrongLog: []
   };
   const tr = k => TR[S.lang][k];
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -1440,7 +1473,6 @@
     $('count').textContent = TR[S.lang].itemOf(level.unit[S.lang], pos, total);
     $('barFill').style.width = Math.round(((pos - 1) / total) * 100) + '%';
     $('result').hidden = true;
-    // >>> PATCH H: nextBtn visible only for paragraphs <<<
     $('nextBtn').hidden = (level.mode !== 'long');
     $('skip').textContent = tr('skip'); $('listenTxt').textContent = tr('listenBtn'); $('nextBtn').textContent = tr('next');
     syncPlayDiff();
@@ -1524,6 +1556,21 @@
       if (!best || VALUE[verdict] >= VALUE[best.verdict]) best = { ev, verdict, r, wcpm };
       showResult(level, ev, verdict, r, wcpm);
 
+      // >>> NEW: itala ang bawat mali (miss o near) para sa report <<<
+      tokens(text).forEach((w, i) => {
+        const st = ev.st[i];
+        if (st === 'miss' || st === 'near') {
+          const wrongWord = findHeardWord(w, ev.heard, i, text);
+          S.wrongLog.push({
+            level: level.key,
+            expected: w,
+            heard: wrongWord,
+            status: st,
+            pattern: classifyPattern(w, wrongWord)
+          });
+        }
+      });
+
       if (verdict === 'tama') {
         S.stars++; $('stars').textContent = S.stars;
         const ph = pickPhrase('praise'); setStatus(ph);
@@ -1552,6 +1599,35 @@
     return res;
   }
 
+  // >>> NEW: hanapin kung anong salita ang narinig sa posisyon ng mali <<<
+  function findHeardWord(expected, heard, expectedIdx, fullText) {
+    const exp = norm(expected), hw = tokens(heard).map(norm);
+    if (!hw.length) return '(walang narinig)';
+    // Direct match sa parehong posisyon
+    if (hw[expectedIdx] && sim(exp, hw[expectedIdx]) >= 0.5) return hw[expectedIdx];
+    // Pinakamalapit na salita sa buong narinig
+    let best = hw[0], bestD = 9;
+    hw.forEach(w => { const d = lev(exp, w); if (d < bestD) { bestD = d; best = w; } });
+    return best;
+  }
+
+  // >>> NEW: kilalanin ang pattern ng mali (th, v, f, z, vowel, cluster, other) <<<
+  function classifyPattern(expected, heard) {
+    const e = norm(expected), h = norm(heard);
+    if (!e || !h) return 'other';
+    if (/th/.test(e) && /[tds]/.test(h)) return 'th';
+    if (/v/.test(e) && /b/.test(h) && !/v/.test(h)) return 'v';
+    if (/f/.test(e) && /p/.test(h) && !/f/.test(h)) return 'f';
+    if (/z/.test(e) && /s/.test(h) && !/z/.test(h)) return 'z';
+    // Vowel substitution: parehong consonant pattern, magkaibang vowel
+    const cons = s => s.replace(/[aeiou]/g, '');
+    const vow = s => s.replace(/[^aeiou]/g, '');
+    if (cons(e) === cons(h) && vow(e) !== vow(h)) return 'vowel';
+    // Consonant cluster: mas mahaba ang heard kaysa expected (may dagdag na patinig)
+    if (h.length > e.length + 1 && cons(e).length === cons(h).length) return 'cluster';
+    return 'other';
+  }
+
   function logResult(res) {
     const c = cfg(); if (!c.url || !c.code) return;
     try {
@@ -1559,7 +1635,8 @@
         method: 'POST', mode: 'no-cors', keepalive: true,
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ action: 'result', code: c.code, learner: S.learner, lang: S.lang, diff: S.usedTeacher ? 'teacher' : S.diff, level: res.levelKey, target: res.text, heard: res.heard,
-          verdict: res.verdict, tama: res.verdict === 'tama' ? 1 : 0, attempts: res.attempts, score: res.pa, wcpm: res.wcpm, engine: res.engine })
+          verdict: res.verdict, tama: res.verdict === 'tama' ? 1 : 0, attempts: res.attempts, score: res.pa, wcpm: res.wcpm, engine: res.engine,
+          missed_words: res.missWords.join('|') })
       });
     } catch (e) {}
   }
@@ -1591,6 +1668,7 @@
     const id = ++runId;
     try {
       S.results = []; S.stars = 0; S.azureFailed = false; S.jump = null; store('bt_diff_' + S.learner, S.diff); S.doneLevels = new Set(); $('stars').textContent = '0';
+      S.wrongLog = [];   // >>> NEW: reset ang wrong log bawat session
       show('screenPlay'); $('screenPlay').style.display = 'flex';
       let li = startIdx || 0;
       while (li < LEVELS.length) {
@@ -1611,6 +1689,44 @@
     return out;
   }
 
+  // >>> NEW: buuin ang report table sa end screen <<<
+  function renderReport() {
+    const box = $('reportBox'); const body = $('reportBody');
+    if (!S.wrongLog.length) { box.hidden = true; return; }
+    box.hidden = false;
+    $('reportTitle').textContent = tr('reportTitle');
+    $('downloadReport').textContent = tr('download');
+    body.innerHTML = '';
+    S.wrongLog.slice(0, 40).forEach((w, i) => {
+      const trEl = document.createElement('tr');
+      const n = document.createElement('td'); n.textContent = String(i + 1);
+      const lv = document.createElement('td'); lv.textContent = LEVELS.find(x => x.key === w.level).short[S.lang];
+      const rt = document.createElement('td'); rt.textContent = w.expected; rt.className = 'right';
+      const wr = document.createElement('td'); wr.textContent = w.heard || '—'; wr.className = 'wrong';
+      const pt = document.createElement('td'); pt.textContent = tr('patternNames')[w.pattern] || w.pattern; pt.className = 'pattern';
+      trEl.append(n, lv, rt, wr, pt); body.appendChild(trEl);
+    });
+  }
+
+  // >>> NEW: i-download ang report bilang CSV <<<
+  function downloadReport() {
+    if (!S.wrongLog.length) return;
+    const header = ['#', 'Code', 'Wika', 'Antas', 'Hirap', 'Dapat', 'Narinig', 'Pattern', 'Petsa'];
+    const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
+    const rows = S.wrongLog.map((w, i) => [
+      i + 1, S.learner, S.lang === 'fil' ? 'Filipino' : 'English', w.level, DIFF_NAME[S.lang][S.diff],
+      w.expected, w.heard, tr('patternNames')[w.pattern] || w.pattern, now
+    ]);
+    const csv = [header].concat(rows).map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\r\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `basa-tayo-report-${S.learner || 'session'}-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 500);
+  }
+
   async function showEnd() {
     show('screenEnd'); $('screenPlay').style.display = 'none';
     mood('happy'); confetti();
@@ -1625,6 +1741,8 @@
       else line(l.short[S.lang], `${s.got % 1 ? s.got.toFixed(1) : s.got} / ${s.n}`);
     });
     line('★', String(S.stars));
+
+    renderReport();
 
     const missed = [...new Set(S.results.filter(r => r.levelKey !== 'paragraphs' && r.score < 1).map(r => r.text))];
     const pr = $('practice'); pr.innerHTML = '';
@@ -1646,7 +1764,7 @@
       const ctrl = new AbortController(); const t = setTimeout(() => ctrl.abort(), 10000);
       try {
         const r = await fetch(c.url, { method: 'POST', signal: ctrl.signal, headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({ action: 'summary', code: c.code, learner: S.learner, lang: S.lang, stats: st, missed: missed.slice(0, 8) }) });
+          body: JSON.stringify({ action: 'summary', code: c.code, learner: S.learner, lang: S.lang, stats: st, missed: missed.slice(0, 8), wrongLog: S.wrongLog.slice(0, 20) }) });
         const j = await r.json();
         buddy.className = 'buddy'; buddy.textContent = (j.ok && j.feedback) ? j.feedback : localMsg;
       } catch (e) { buddy.className = 'buddy'; buddy.textContent = localMsg; }
@@ -1665,6 +1783,7 @@
   });
   $('nextBtn').addEventListener('click', () => { if (nextWaiter) { const w = nextWaiter; nextWaiter = null; w(); } });
   $('listen').addEventListener('click', () => { if (S.curText && !S.stop) speak(S.curText); });
+  $('downloadReport').addEventListener('click', downloadReport);   // >>> NEW
 
   function setLang(l) {
     S.lang = l; store('bt_lang', l);
@@ -1695,7 +1814,6 @@
   function setDiff(d) { if (!DIFFS.includes(d)) return; S.diff = d; store('bt_diff', d); syncDiff(); syncPlayDiff(); }
   DIFFS.forEach(d => $(DIFF_ID[d]).addEventListener('click', () => setDiff(d)));
 
-  // >>> PATCH H: play-diff toggle handlers <<<
   const PLAY_DIFF_ID = { easy: 'pdEasy', medium: 'pdMedium', hard: 'pdHard' };
   function syncPlayDiff() {
     DIFFS.forEach(d => { const b = $(PLAY_DIFF_ID[d]); if (b) b.setAttribute('aria-pressed', String(d === S.diff)); });
@@ -1703,7 +1821,6 @@
   }
   function setPlayDiff(d) {
     if (!DIFFS.includes(d) || d === S.diff) return;
-    // Kung nasa play, i-restart ang kasalukuyang level sa bagong difficulty
     S.diff = d; store('bt_diff', d); syncDiff(); syncPlayDiff();
     if (!$('screenPlay').hidden) { abortRun(); runSession(S.curLevel || 0); }
   }
