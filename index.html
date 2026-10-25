@@ -559,12 +559,21 @@
     useAlternativesForWords: true
   };
 
-  /* ============================================================
-   * >>> RECORD FIX v1 <<<
-   * Pinaka-mahalagang pagbabago: tanggalin ang no-cors,
-   * idagdag ang logSignIn() at logWrongLog(),
-   * gumamit ng GET fallback para sa signin.
-   * ============================================================ */
+  // ============================================================
+  // MGA CONSTANTE (Inilipat sa TAAS para iwasan ang ReferenceError)
+  // ============================================================
+  const GRADES = [1, 2, 3, 4, 5, 6];
+  const DIFFS = ['easy', 'medium', 'hard'];
+  const VALUE = { tama: 1, halos: 0.5, ulit: 0 };
+  const DIFF_NAME = { fil: { easy: 'Madali', medium: 'Katamtaman', hard: 'Mahirap' }, en: { easy: 'Easy', medium: 'Medium', hard: 'Hard' } };
+  const LEVELS = [
+    { key: 'words',      mode: 'once', gate: true,  name: { fil: 'Antas 1: Mga Salita',      en: 'Level 1: Words' },     short: { fil: 'Salita',      en: 'Words' },     unit: { fil: 'Salita',      en: 'Word' } },
+    { key: 'sentences',  mode: 'once', gate: true,  name: { fil: 'Antas 2: Mga Pangungusap', en: 'Level 2: Sentences' }, short: { fil: 'Pangungusap', en: 'Sentences' }, unit: { fil: 'Pangungusap', en: 'Sentence' } },
+    { key: 'paragraphs', mode: 'long', gate: false, name: { fil: 'Antas 3: Talata',          en: 'Level 3: Paragraph' }, short: { fil: 'Talata',      en: 'Paragraph' }, unit: { fil: 'Talata',      en: 'Paragraph' } }
+  ];
+  const GRADE_ID = { 1: 'g1', 2: 'g2', 3: 'g3', 4: 'g4', 5: 'g5', 6: 'g6' };
+  const DIFF_ID = { easy: 'dEasy', medium: 'dMedium', hard: 'dHard' };
+  const PLAY_DIFF_ID = { easy: 'pdEasy', medium: 'pdMedium', hard: 'pdHard' };
 
   // ---------- BILANG 1–1,000,000 ----------
   function numWords(n, lang) {
@@ -883,7 +892,6 @@
     engine: store('bt_engine') === 'azure' ? 'azure' : 'web'
   });
 
-  const GRADES = [1, 2, 3, 4, 5, 6];   // <-- BAGONG LINYA DITO
   const S = {
     lang: store('bt_lang') === 'en' ? 'en' : 'fil',
     learner: '', stars: 0, results: [], stop: null, wantMore: false, azureFailed: false, last: {},
@@ -895,6 +903,7 @@
     usedTeacher: false, jump: null, curLevel: 0, doneLevels: new Set(), curText: '',
     wrongLog: []
   };
+  
   const tr = k => TR[S.lang][k];
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   const norm = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^\p{L}\p{N}]/gu, '');
@@ -1134,16 +1143,6 @@
     if (ev.st.every(s => s === 'ok')) return (usePA && pa !== null && pa < CONFIG.passScore) ? 'halos' : 'tama';
     return ev.st.includes('miss') ? 'ulit' : 'halos';
   }
-  const VALUE = { tama: 1, halos: 0.5, ulit: 0 };
-
-  const DIFFS = ['easy', 'medium', 'hard'];
-  const DIFF_NAME = { fil: { easy: 'Madali', medium: 'Katamtaman', hard: 'Mahirap' }, en: { easy: 'Easy', medium: 'Medium', hard: 'Hard' } };
-  const LEVELS = [
-    { key: 'words',      mode: 'once', gate: true,  name: { fil: 'Antas 1: Mga Salita',      en: 'Level 1: Words' },     short: { fil: 'Salita',      en: 'Words' },     unit: { fil: 'Salita',      en: 'Word' } },
-    { key: 'sentences',  mode: 'once', gate: true,  name: { fil: 'Antas 2: Mga Pangungusap', en: 'Level 2: Sentences' }, short: { fil: 'Pangungusap', en: 'Sentences' }, unit: { fil: 'Pangungusap', en: 'Sentence' } },
-    { key: 'paragraphs', mode: 'long', gate: false, name: { fil: 'Antas 3: Talata',          en: 'Level 3: Paragraph' }, short: { fil: 'Talata',      en: 'Paragraph' }, unit: { fil: 'Talata',      en: 'Paragraph' } }
-  ];
-  const GRADE_ID = { 1: 'g1', 2: 'g2', 3: 'g3', 4: 'g4', 5: 'g5', 6: 'g6' };
 
   function teacherLists(lang) { const o = jget('bt_teacher_' + lang, {}); return { words: o.words || [], sentences: o.sentences || [], paragraphs: o.paragraphs || [] }; }
   function hasTeacher(lang) { const L = teacherLists(lang); return L.words.length + L.sentences.length + L.paragraphs.length > 0; }
@@ -1751,7 +1750,6 @@
     if (!voiceOn()) { try { speechSynthesis.cancel(); } catch (e) {} }
   });
 
-  const DIFF_ID = { easy: 'dEasy', medium: 'dMedium', hard: 'dHard' };
   function syncDiff() {
     DIFFS.forEach(d => { const b = $(DIFF_ID[d]); b.setAttribute('aria-pressed', String(d === S.diff)); b.querySelector('span').textContent = DIFF_NAME[S.lang][d]; });
     $('diffLabel').textContent = tr('diffLabel');
@@ -1759,7 +1757,6 @@
   function setDiff(d) { if (!DIFFS.includes(d)) return; S.diff = d; store('bt_diff', d); syncDiff(); syncPlayDiff(); }
   DIFFS.forEach(d => $(DIFF_ID[d]).addEventListener('click', () => setDiff(d)));
 
-  const PLAY_DIFF_ID = { easy: 'pdEasy', medium: 'pdMedium', hard: 'pdHard' };
   function syncPlayDiff() {
     DIFFS.forEach(d => { const b = $(PLAY_DIFF_ID[d]); if (b) b.setAttribute('aria-pressed', String(d === S.diff)); });
     const lbl = $('playDiff'); if (lbl) lbl.setAttribute('aria-label', tr('playDiff'));
