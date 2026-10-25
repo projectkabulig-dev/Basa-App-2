@@ -1,4 +1,5 @@
 <!doctype html>
+<!-- Basa Tayo! PAMPUBLIKONG BERSYON: walang backend at walang nakatagong key o link. -->
 <html lang="fil" translate="no">
 <head>
 <meta charset="utf-8">
@@ -179,6 +180,7 @@
   .sum div:nth-child(4n+1){background:#FFE9A3} .sum div:nth-child(4n+2){background:#CFF3E2} .sum div:nth-child(4n+3){background:#E3DBFF} .sum div:nth-child(4n+4){background:#FFD5D5}
   .sum span{font-size:.95rem}
   .sum b{font-size:1.6rem; color:var(--ink)}
+  .sum small{font-family:'Nunito',sans-serif; font-size:.8rem; font-weight:700; color:var(--mute); text-align:center; line-height:1.2}
   .practice{margin:0; font-weight:700; color:var(--mute); line-height:1.5}
   .practice strong{color:var(--ink)}
   .buddy{margin:0}
@@ -198,13 +200,44 @@
   .dlg small{font-weight:700; color:var(--mute)}
   .dlg input,.dlg select{font:inherit; padding:10px 12px; border:3px solid var(--ink); border-radius:14px; width:100%; background:#fff}
   .dlg .actions{display:flex; justify-content:flex-end; gap:10px; flex-wrap:wrap}
+  .consent{display:flex; gap:10px; align-items:flex-start; text-align:left; max-width:380px; margin:14px auto 0; font-weight:700; font-size:.92rem; line-height:1.35; cursor:pointer}
+  .consent input{width:24px; height:24px; flex:none; accent-color:var(--ok); margin-top:1px}
   footer{color:var(--ink); font-size:.85rem; font-weight:700; text-align:center; padding:10px 14px; background:rgba(255,255,255,.92); border:3px solid var(--ink); border-radius:18px}
 
   .hdrlang{display:inline-flex; background:#fff; border:3px solid var(--ink); border-radius:999px; padding:3px; gap:3px; box-shadow:0 4px 0 var(--ink)}
   .hdrlang button{border:0; background:transparent; font-family:'Fredoka',sans-serif; font-weight:700; font-size:.85rem; padding:4px 9px; border-radius:999px}
   .hdrlang button[aria-pressed="true"]{background:var(--sun)}
+  .stopshape{display:none}
+  .micarea[data-state="listening"] .stopshape{display:inline}
+  .micarea[data-state="listening"] .micg{display:none}
+  .micarea[data-auto="1"][data-state="listening"] .stopshape{display:none}
+  .micarea[data-auto="1"][data-state="listening"] .micg{display:inline}
   .iconbtn .slash{display:none} .iconbtn[data-on="false"] .slash{display:block}
   header{flex-wrap:wrap}
+
+  .diffs{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; max-width:380px; margin:8px auto 0}
+  .diffs button{display:flex; flex-direction:column; align-items:center; gap:0; font-family:'Fredoka',sans-serif; font-weight:700; font-size:.95rem; padding:7px 4px; background:#fff; border:3px solid var(--ink); border-radius:16px; box-shadow:0 4px 0 var(--ink); transition:transform .08s, box-shadow .08s}
+  .diffs button i{font-style:normal; color:var(--sun-d); font-size:.85rem; letter-spacing:.06em}
+  .diffs button[aria-pressed="true"]{background:var(--sun); transform:translateY(2px); box-shadow:0 2px 0 var(--ink)}
+  .mini{margin:14px 0 0; font-family:'Fredoka',sans-serif; font-weight:600; font-size:1.05rem}
+  .target-card{position:relative; padding-top:42px}
+  .diffbadge{position:absolute; top:10px; left:12px; font-family:'Fredoka',sans-serif; font-weight:600; font-size:.8rem; background:var(--foam); border:2px solid var(--ink); border-radius:999px; padding:1px 10px}
+  .target.mid{font-size:clamp(2.4rem,12vw,4rem)}
+  .target.small{font-size:clamp(1.7rem,8.5vw,2.8rem)}
+  .speed{display:flex; justify-content:center; gap:8px; margin-top:10px}
+  .speed button{font-family:'Fredoka',sans-serif; font-weight:600; font-size:.88rem; padding:4px 14px; background:#fff; border:2px solid var(--ink); border-radius:999px}
+  .speed button[aria-pressed="true"]{background:var(--sun)}
+  .suggest{margin-top:16px; padding-top:14px; border-top:2px dashed var(--line); text-align:center}
+  .suggest p{margin:0 0 10px; font-weight:800}
+
+  .srcs{display:grid; grid-template-columns:1fr 1fr; gap:8px; max-width:380px; margin:8px auto 0}
+  .srcs button{font-family:'Fredoka',sans-serif; font-weight:700; font-size:1.05rem; padding:8px 4px; background:#fff; border:3px solid var(--ink); border-radius:16px; box-shadow:0 4px 0 var(--ink); transition:transform .08s, box-shadow .08s}
+  .srcs button[aria-pressed="true"]{background:var(--sun); transform:translateY(2px); box-shadow:0 2px 0 var(--ink)}
+  .diffs.dim{opacity:.45}
+  .dlg textarea{font:inherit; padding:10px 12px; border:3px solid var(--ink); border-radius:14px; width:100%; background:#fff; resize:vertical}
+  .dlg label > span{font-family:'Fredoka',sans-serif; font-weight:600; font-size:1.05rem}
+  .dlg .langs{max-width:none}
+  .dlg{max-height:88vh; overflow:auto}
 
   @media (prefers-reduced-motion:reduce){ *,*::before,*::after{animation:none !important; transition:none !important} .micarea[data-state="listening"] .ring{opacity:.5; transform:scale(1.15)} }
 </style>
@@ -233,9 +266,6 @@
     <button class="iconbtn" id="voiceBtn" type="button" data-on="true" aria-pressed="true" aria-label="Boses ni Basa Buddy">
       <svg viewBox="0 0 24 24" fill="none" stroke="#1F2A44" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z" fill="#FFD23F"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/><path class="slash" d="M3 3l18 18" stroke="#E5484D" stroke-width="3"/></svg>
     </button>
-    <button class="iconbtn" id="openSettings" type="button" aria-label="Settings">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#1F2A44" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
-    </button>
   </div>
 </header>
 
@@ -252,11 +282,25 @@
         <button type="button" id="langFil" aria-pressed="true">Filipino</button>
         <button type="button" id="langEn" aria-pressed="false">English</button>
       </div>
+      <p class="mini" id="srcLabel">Babasahin</p>
+      <div class="srcs" role="group" aria-label="Pinagmulan ng babasahin">
+        <button type="button" id="srcApp" aria-pressed="true">App</button>
+        <button type="button" id="srcTeacher" aria-pressed="false">Guro</button>
+      </div>
+      <button class="btn small" id="openTeacher" type="button" style="margin-top:10px">Para sa guro</button>
+      <p class="note" id="srcHint"></p>
+      <p class="mini" id="diffLabel">Hirap</p>
+      <div class="diffs" id="diffGroup" role="group" aria-label="Hirap">
+        <button type="button" id="dEasy" aria-pressed="true"><i>★</i><span>Madali</span></button>
+        <button type="button" id="dMedium" aria-pressed="false"><i>★★</i><span>Katamtaman</span></button>
+        <button type="button" id="dHard" aria-pressed="false"><i>★★★</i><span>Mahirap</span></button>
+      </div>
       <label class="field">Code mo
         <input id="learner" type="text" maxlength="20" placeholder="G2-A-014" autocomplete="off">
         <small>Code o initials lang, hindi buong pangalan.</small>
       </label>
       <div class="warn" id="supportWarn" hidden>Hindi gumagana ang mikropono sa browser na ito. Gumamit ng Chrome o Edge.</div>
+      <label class="consent" id="consentRow" hidden><input type="checkbox" id="consent"><span id="consentTxt"></span></label>
       <div class="row" style="margin-top:14px"><button class="btn sun" id="begin" type="button">Simulan</button></div>
       <p class="note" id="logNote"></p>
     </div>
@@ -270,6 +314,7 @@
     <div class="progress"><div class="bar" aria-hidden="true"><i id="barFill"></i></div><div class="count" id="count"></div></div>
 
     <div class="card target-card">
+      <span class="diffbadge" id="diffBadge"></span>
       <div class="target" id="target" aria-label="Babasahin"></div>
       <div class="result" id="result" hidden>
         <p class="verdict" id="verdict"></p>
@@ -280,6 +325,10 @@
         <button class="btn small" id="listen" type="button">
           <svg viewBox="0 0 24 24" fill="none" stroke="#1F2A44" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z" fill="#FFD23F"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg><span id="listenTxt">Pakinggan muna</span>
         </button>
+      </div>
+      <div class="speed" role="group" aria-label="Bilis ng pagbasa">
+        <button type="button" id="spSlow" aria-pressed="true">Mabagal</button>
+        <button type="button" id="spVerySlow" aria-pressed="false">Napakabagal</button>
       </div>
     </div>
 
@@ -292,8 +341,9 @@
       <div class="micwrap">
         <button class="mic" id="mic" type="button" data-state="idle" aria-label="Mikropono">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <rect x="9" y="2" width="6" height="12" rx="3" fill="currentColor" stroke="none"></rect>
-            <path d="M5 11a7 7 0 0 0 14 0"></path><path d="M12 18v4"></path><path d="M8 22h8"></path>
+            <g class="micg"><rect x="9" y="2" width="6" height="12" rx="3" fill="currentColor" stroke="none"></rect>
+            <path d="M5 11a7 7 0 0 0 14 0"></path><path d="M12 18v4"></path><path d="M8 22h8"></path></g>
+            <rect class="stopshape" x="6" y="6" width="12" height="12" rx="2.5" fill="currentColor" stroke="none"></rect>
           </svg>
         </button>
         <span class="ring"></span><span class="ring r2"></span>
@@ -318,6 +368,7 @@
     <div class="card">
       <div class="sum" id="sum"></div>
       <p class="practice" id="practice" style="margin-top:16px"></p>
+      <div class="suggest" id="suggest" hidden><p id="suggestTxt"></p><button class="btn sea" id="suggestBtn" type="button"></button></div>
     </div>
     <div class="row">
       <button class="btn sun" id="again" type="button">Ulit na session</button>
@@ -325,96 +376,64 @@
     </div>
   </section>
 
-  <footer>Hindi sine-save ang boses. Ang transcript, resulta, at code lang ang nasa talaan ng guro (kung naka-konekta). Pang-praktis ito, hindi pamalit sa pormal na pagtatasa.</footer>
+  <footer>Hindi sine-save ng app ang boses. Para maintindihan ang binabasa, ipinapadala ng browser (Chrome o Edge) ang audio sa sarili nitong serbisyo sa speech recognition, kaya magpaalam sa magulang o guro bago gamitin.<span id="footLog" hidden> Kung pumayag ang magulang o guro, itinatala ang code, resulta, at ang binasa ng bata (walang boses at walang buong pangalan).</span> Pang-praktis ito, hindi pamalit sa pormal na pagtatasa.</footer>
 </main>
 
 <div class="banner" id="banner" hidden><div id="bannerText"></div></div>
 <div id="confetti" aria-hidden="true"></div>
-
-<dialog id="settings">
-  <form method="dialog" class="dlg" id="settingsForm">
-    <h2>Settings</h2>
-    <label>Mikropono / speech engine
-      <select id="fEngine">
-        <option value="web">Web Speech (libre, walang account)</option>
-        <option value="azure">Azure (may pronunciation score; kailangan ng backend)</option>
-      </select>
-      <small>Kapag pumalya ang Azure, awtomatikong babalik sa Web Speech.</small>
-    </label>
-    <label>Boses ni Basa Buddy (papuri at paghikayat)
-      <select id="fVoice">
-        <option value="on">Naka-on</option>
-        <option value="off">Naka-off</option>
-      </select>
-      <small id="voiceInfo"></small>
-    </label>
-    <div><button class="btn small" type="button" id="testVoice">Subukan ang boses</button></div>
-    <label>Apps Script URL (opsyonal)
-      <input id="fUrl" type="url" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off">
-      <small>Para sa talaan ng guro at mensahe ni Claude. Walang laman = gagana pa rin ang app.</small>
-    </label>
-    <label>Access code (opsyonal)
-      <input id="fCode" type="text" autocomplete="off">
-    </label>
+<dialog id="teacherDlg">
+  <form method="dialog" class="dlg" id="teacherForm">
+    <h2 id="tTitle">Para sa guro</h2>
+    <p class="note" id="tIntro" style="margin:0"></p>
+    <div class="langs" role="group" aria-label="Wika"><button type="button" id="tFil" aria-pressed="true">Filipino</button><button type="button" id="tEn" aria-pressed="false">English</button></div>
+    <label><span id="tWordsL">Mga salita</span><small id="tWordsH"></small><textarea id="tWords" rows="3"></textarea><small id="tWordsN"></small></label>
+    <label><span id="tSentL">Mga pangungusap</span><small id="tSentH"></small><textarea id="tSent" rows="4"></textarea><small id="tSentN"></small></label>
+    <label><span id="tParaL">Mga talata</span><small id="tParaH"></small><textarea id="tPara" rows="6"></textarea><small id="tParaN"></small></label>
     <div class="actions">
-      <button class="btn small" type="button" id="cancelSettings">Kanselahin</button>
-      <button class="btn small sea" value="save" id="saveSettings">I-save</button>
+      <button class="btn small" type="button" id="tSample">Halimbawa</button>
+      <button class="btn small" type="button" id="tClear">Burahin</button>
+      <button class="btn small" type="button" id="tCancel">Kanselahin</button>
+      <button class="btn small sea" id="tSave">I-save</button>
     </div>
   </form>
 </dialog>
 
-<script src="https://aka.ms/csspeech/jsbrowserpackageraw"></script>
+
+
 <script>
 (() => {
   'use strict';
 
   /* ================= PAGSASAAYOS ================= */
   const CONFIG = {
-    appsScriptUrl: '',                         // opsyonal: Web App URL para sa talaan ng guro
+    // I-paste dito ang Web App URL ng Code_public.gs para maitala ang mga gumagamit. Walang laman = walang pagtatala.
+    logUrl: '',
+    consentDefault: false,                     // true lang kung may blanket consent na ang paaralan
     locale:      { fil: 'fil-PH', en: 'en-US' }, // Web Speech. Subukan din ang 'en-PH' para sa English
-    azureLocale: { fil: 'fil-PH', en: 'en-US' },
-    pronunciationScore: { fil: false, en: true },  // Azure lamang. I-on sa Filipino matapos subukan
+    // Paano humihinto ang pakikinig bawat antas. 'auto': kusang hihinto kapag natahimik ang bata. 'manual': pipindutin ng bata ang mikropono kapag tapos na (hindi apektado ng pag-pause).
+    stopMode: { words: 'auto', sentences: 'manual', paragraphs: 'manual' },
+    accentTolerance: true,                     // English: ituturing na pareho ang th/t,d  v/b  f/p  z/s (accent ng mga batang Pilipino)
+    numberWordsPerSet: 2,                      // ilan sa 8 salita bawat set ang pangalan ng bilang
+    silenceMs: { once: 2000, long: 3500 },     // para sa 'auto' lamang
+    maxListenMs: { once: 45000, long: 180000 },// pananggalang: kusang titigil kung nakalimutang pindutin ang mikropono
     passScore: 55,
     gate: 0.8,                                 // 80% para umakyat ng antas
-    session: { words: 8, sentences: 4, paragraphs: 1 },
+    session: { words: 8, sentences: 4, paragraphs: 3 },
+    listenRate: { slow: 0.65, veryslow: 0.45 },   // bilis ng "Pakinggan muna" (1 = karaniwan)
+    voiceFallback: { fil: [] },                   // hal. ['id', 'ms'] kung walang Filipino na boses ang device (subukan muna)
+    teacher: { maxWords: 100, maxSentences: 60, maxParagraphs: 20, maxWordsPerSentence: 25, maxWordsPerParagraph: 120 },   // hangganan ng ilalagay ng guro
     useAlternativesForWords: true              // tinatanggap ang alternatibong narinig ng engine sa iisang salita
   };
 
   /* ================= BANGKO NG BABASAHIN ================= */
   const BANK = {
     fil: {
-      words: ['aso','pusa','bola','mesa','bahay','mata','araw','buwan','bata','tubig','lapis','libro','isda','puno','lola','lolo','baso','upuan','silid','kama','damo','bato','ulan','hangin','ilaw','pinto','saging','mangga','kanin','gatas','itlog','tinapay','bangka','dagat','ibon','manok','baka','kabayo','bayan','guro'],
-      sentences: [
-        'Si Ana ay may bola.','Masaya ang bata.','Maganda ang bukid sa umaga.','Kumain si Lolo ng saging.',
-        'Ang aso ay tumatakbo.','May libro ako sa bag.','Mainit ang araw ngayon.','Umiinom ng gatas ang sanggol.',
-        'Naglalaro ang mga bata sa bakuran.','Malaki ang puno sa tabi ng bahay.','Si Nanay ay nagluluto ng kanin.','Ang pusa ay natutulog sa upuan.',
-        'Maaga akong pumasok sa paaralan.','Mabait ang aming guro.','Sumakay kami sa bangka papunta sa isla.','Umulan kahapon kaya basa ang daan.'
-      ],
-      paragraphs: [
-        'Si Ben ay may alagang aso. Malaki at kayumanggi ang aso. Tuwing hapon, tumatakbo sila sa parke. Naglalaro sila ng pulang bola. Pagkatapos, umuuwi sila para magpahinga.',
-        'Maaraw ngayon. Pumunta sa palengke si Mia at ang kanyang nanay. Bumili sila ng bigas, isda, at prutas. Dala ni Mia ang maliit na bag. Masaya siyang tumulong sa kanyang nanay.',
-        'May maliit na hardin si Tito Sam. Nagtanim siya ng sitaw at mais. Tuwing umaga, dinidiligan niya ang mga halaman. Pagkalipas ng ilang linggo, tumaas ang sitaw. Pinitas niya ito para sa hapunan.',
-        'Umuulan sa bubong ng bahay. Nakaupo si Ana sa tabi ng bintana. Nagbabasa siya ng aklat tungkol sa palaka at pato. Tumalon ang palaka sa lawa. Ngumiti si Ana at binuksan ang susunod na pahina.',
-        'May aklatan ang aming paaralan. Maraming aklat sa mga istante. Gusto ni Tim ang mga aklat tungkol sa hayop. Nagbabasa siya ng isa bawat linggo. Binigyan siya ng bituin ng kanyang guro.',
-        'Maliit na bangka ang naglalayag sa dagat. Malamig at banayad ang hangin. Kumakaway ang dalawang bata mula sa baybayin. Kumaway pabalik ang mangingisda. Iuuwi niya ang sariwang isda.'
-      ]
+      words: {"easy": ["aso", "ate", "ama", "ina", "bata", "baso", "bato", "bola", "baka", "buko", "damo", "isda", "ibon", "ilaw", "kama", "kuya", "lola", "lolo", "mama", "papa", "mata", "mesa", "pusa", "puno", "ulan", "upo", "tao", "araw", "kamay", "ilong", "bibig", "tala"], "medium": ["bahay", "buwan", "tubig", "lapis", "libro", "upuan", "silid", "pinto", "saging", "mangga", "kanin", "gatas", "itlog", "bangka", "dagat", "manok", "kabayo", "guro", "bayan", "hangin", "tinapay", "kamatis", "sitaw", "kalabaw", "bintana", "kapatid", "halaman", "pagkain", "salamin", "bukid", "bundok", "hardin", "sapatos"], "hard": ["paaralan", "kaibigan", "magulang", "bulaklak", "kuwaderno", "tindahan", "palengke", "mangingisda", "dalampasigan", "kalendaryo", "hapunan", "almusal", "meryenda", "eroplano", "sasakyan", "kuwento", "pamilya", "estudyante", "kapitbahay", "kaklase", "bahaghari", "pagbabasa", "mananahi", "magsasaka", "ospital", "simbahan", "gulayan", "matematika", "pagbilang"]},
+      extras: ["Maaga pang gumising si Ben. Nagtanim siya ng limang buto ng mais sa hardin. Dinilig niya ito tuwing umaga sa loob ng pitong araw. Pagkatapos ng dalawang linggo, tumubo ang apat na halaman.", "May sampung bangka sa dalampasigan. Pumalaot ang anim at naiwan ang apat. Bago dumilim, bumalik ang tatlo. Ilan ang nasa dagat pa rin? Tatlo pa ang nasa dagat.", "May dalawampu't limang bata sa klase ni Gng. Cruz. Labindalawa ang lalaki at labintatlo ang babae. Ang labindalawa at labintatlo ay dalawampu't lima. Masayang nagbasa ang buong klase.", "Pumunta sa tindahan si Mia kasama si Lola. Bumili sila ng tatlong itlog at dalawang kamatis. Ang lahat ay labinlimang piso. Nagbayad si Lola ng dalawampung piso. May sukli silang limang piso.", "May maliit na hardin si Tito Sam. Nagtanim siya ng sitaw at mais. Tuwing umaga, dinidiligan niya ang mga halaman. Pagkalipas ng tatlong linggo, tumaas ang sitaw. Pinitas niya ang sampung pirasong sitaw para sa hapunan."]
     },
     en: {
-      words: ['cat','sun','pen','hop','bus','dog','sit','red','map','bed','cup','pig','hat','net','top','run','big','fox','jam','leg','mop','pin','box','sad','hen','bug','zip','wet','nut','fan','lip','rug','yes','van','web','log','kid','mud','bat','gum'],
-      sentences: [
-        'Tom has a red hat.','The dog can run fast.','I see a big bus.','A cat sat on the mat.',
-        'We read a story today.','The sun is hot.','My pen is in the bag.','The pig is in the mud.',
-        'Dad has a red cup.','The hen sits on the nest.','I can hop on one leg.','A fox ran to the box.',
-        'Sam and Ben play in the van.','The bug is on the log.','She has a pink hat and a black bag.','We eat rice and fish for lunch.'
-      ],
-      paragraphs: [
-        'Ben has a pet dog. The dog is big and brown. Every day, Ben and his dog run in the park. They play with a red ball. Then they go home to rest.',
-        'It is a sunny day. Mia and her mom go to the market. They buy rice, fish, and fruit. Mia carries a small bag. She is happy to help her mom.',
-        'Sam has a little garden. He plants beans and corn. Every morning, he waters the plants. After a few weeks, the beans grow tall. Sam picks them for dinner.',
-        'The rain falls on the roof. Ana sits by the window with a book. She reads about a frog and a duck. The frog jumps into the pond. Ana smiles and turns the page.',
-        'Our school has a library. It has many books on the shelves. Tim likes books about animals. He reads one every week. His teacher gives him a star.',
-        'A small boat sails on the sea. The wind is soft and cool. Two children wave from the shore. The fisherman waves back. He will bring home fresh fish.'
-      ]
+      words: {"easy": ["cat", "sun", "pen", "hop", "bus", "dog", "sit", "red", "map", "bed", "cup", "pig", "hat", "net", "top", "run", "big", "fox", "jam", "leg", "mop", "pin", "box", "sad", "hen", "bug", "zip", "wet", "nut", "fan", "lip", "rug", "yes", "van", "web", "log", "kid", "mud", "bat", "gum"], "medium": ["frog", "drum", "flag", "stop", "jump", "hand", "lamp", "nest", "milk", "tent", "ship", "chin", "shop", "fish", "duck", "king", "ring", "sing", "gift", "desk", "bank", "belt", "camp", "dust", "pond", "sand", "wind", "soft", "plum", "crab", "swim", "clap", "step", "snow", "grass", "clock"], "hard": ["basket", "rabbit", "garden", "window", "yellow", "pencil", "school", "friend", "family", "flower", "kitchen", "chicken", "monkey", "sunset", "picture", "farmer", "sister", "brother", "teacher", "pumpkin", "thunder", "planet", "bridge", "forest", "island", "rainbow", "market", "orange", "purple", "jungle", "bottle", "button", "castle", "butter", "winter", "summer"]},
+      extras: ["Ben woke up early. He planted five corn seeds in the garden. He watered them every morning for seven days. After two weeks, four plants grew.", "At the beach, there are ten boats. Six went out to sea and four stayed. Before dark, three came back. How many are still at sea? Three are still at sea.", "There are twenty-five children in Mrs. Cruz's class. Twelve are boys and thirteen are girls. Twelve and thirteen make twenty-five. The whole class read happily.", "Mia went to the store with Grandma. They bought three eggs and two tomatoes. Altogether it cost fifteen pesos. Grandma paid twenty pesos. They got five pesos in change.", "Sam has a little garden. He plants beans and corn. Every morning, he waters the plants. After three weeks, the beans grow tall. Sam picks ten beans for dinner."]
     }
   };
 
@@ -426,13 +445,24 @@
 
   const TR = {
     fil: {
-      press: 'Pindutin ang mikropono at basahin nang malakas!',
-      pressLong: 'Pindutin ang mikropono at basahin ang buong talata.',
+      press: 'Pindutin ang mikropono, basahin nang malakas, at pindutin ulit kapag tapos na!',
+      pressWord: 'Pindutin ang mikropono at basahin ang salita!',
+      pressLong: 'Pindutin ang mikropono, basahin ang buong talata, at pindutin ulit kapag tapos na.',
       micIdle: 'Pindutin para magsimula', micStop: 'Pindutin kapag tapos ka na',
-      listening: 'Nakikinig ako… basahin mo na!', listeningLong: 'Nakikinig ako… pindutin ulit kapag tapos ka na.',
+      listeningWord: 'Nakikinig ako… basahin mo na!',
+      listening: 'Nakikinig ako… basahin mo na! Pindutin ulit kapag tapos ka na.', listeningLong: 'Nakikinig ako… basahin ang buong talata. Pindutin ulit kapag tapos ka na.',
       thinking: 'Sandali lang…',
       getReady: 'Sandali… hintayin munang pumula ang mikropono.',
       levelHint: 'Gusto mong lumipat? Pindutin ang bilang ng antas.',
+      srcLabel: 'Babasahin', srcApp: 'App', srcTeacher: 'Guro', openTeacher: 'Para sa guro', teacherBadge: 'Guro',
+      srcNone: 'Wala pang inilagay ang guro sa wikang ito. Pindutin ang "Para sa guro".',
+      srcSummary: (w, s, p) => `Aralin ng guro: ${w} salita, ${s} pangungusap, ${p} talata. Ang app na ang bahala sa antas na walang laman.`,
+      tTitle: 'Para sa guro', tIntro: 'I-paste dito ang sarili mong babasahin. Nai-save ito sa device na ito lamang, at ginagamit kapag piniling "Guro". Para ito sa lahat ng hirap.',
+      tWords: 'Mga salita', tWordsHint: 'isa kada linya, o paghiwalayin ng kuwit', tSent: 'Mga pangungusap', tSentHint: 'isa kada linya (mahahati rin ang mahabang linya)', tPara: 'Mga talata', tParaHint: 'lagyan ng blangkong linya sa pagitan ng bawat talata',
+      tSample: 'Halimbawa', tClear: 'Burahin', tCancel: 'Kanselahin', tSave: 'I-save',
+      tCount: (n, k) => `${n} ang isasama${k ? `, ${k} ang hindi isinama (masyadong mahaba o marami)` : ''}`,
+      diffLabel: 'Hirap', speedSlow: 'Mabagal', speedVerySlow: 'Napakabagal', tryBtn: 'Subukan ang ',
+      suggestUp: 'Ang galing mo! Handa ka na ba sa mas mahirap?', suggestDown: 'Okay lang! Magpraktis muna tayo sa mas madali para mas gumaling.',
       praise: ['Magaling!', 'Ang galing mo!', 'Mahusay!', 'Napakahusay!', 'Very good!', 'Wow, ang galing!', 'Bravo!', 'Ang linaw ng basa mo!', 'Husay naman!', 'Sobrang galing!', 'Excellent!', 'Ayos! Tama ka!', 'Ang galing-galing mo!', 'Ikaw na!', 'Good job!', 'Napakagaling mo!', 'Tama! Ang husay!', 'Well done!'],
       near: ['Halos tama! Isa pa!', 'Malapit na!', 'Konti na lang!', 'Ang lapit na! Subukan ulit!', 'Halos nakuha mo na!'],
       retry: ['Subukan mo ulit!', 'Kaya mo yan!', 'Ulitin natin!', 'Dahan-dahan lang, kaya mo!', 'Isa pa, kaya mo yan!', 'Huwag sumuko, subukan ulit!'],
@@ -444,7 +474,6 @@
       next: 'Susunod', skip: 'Laktawan', listenBtn: 'Pakinggan muna',
       unsupported: 'Hindi gumagana ang mikropono sa browser na ito. Gumamit ng Chrome o Edge.',
       micDenied: 'Hindi pinayagan ang mikropono. Payagan ito sa settings ng browser.',
-      azureOut: 'Gagamit muna tayo ng libreng mikropono. Pindutin ulit ang mikropono.',
       errorPrefix: 'May problema:',
       another: 'Isa pang set para sa antas na ito!', levelUp: 'Magaling! Susunod na antas.',
       endTitle: 'Tapos na! Magaling ka!', sumPara: 'Talata', accuracy: 'Tama',
@@ -455,13 +484,24 @@
       local: { good: 'Napakahusay ng basa mo ngayon!', mid: 'Mahusay! Konting praktis pa at mas gagaling ka.', low: 'Magaling na simula! Basahin ulit nang dahan-dahan bukas.' }
     },
     en: {
-      press: 'Press the mic and read out loud!',
-      pressLong: 'Press the mic and read the whole paragraph.',
+      press: 'Press the mic, read out loud, then press again when you are done!',
+      pressWord: 'Press the mic and read the word!',
+      pressLong: 'Press the mic, read the whole paragraph, then press again when you are done.',
       micIdle: 'Press to start', micStop: 'Press when you are done',
-      listening: 'I am listening… read it out loud!', listeningLong: 'I am listening… press again when you are done.',
+      listeningWord: 'I am listening… read it out loud!',
+      listening: 'I am listening… read it out loud! Press again when you are done.', listeningLong: 'I am listening… read the whole paragraph. Press again when you are done.',
       thinking: 'One moment…',
       getReady: 'One moment… wait for the mic to turn red.',
       levelHint: 'Want to switch? Tap a level number.',
+      srcLabel: 'Reading material', srcApp: 'App', srcTeacher: 'Teacher', openTeacher: 'For teachers', teacherBadge: 'Teacher',
+      srcNone: 'The teacher has not added anything in this language yet. Tap "For teachers".',
+      srcSummary: (w, s, p) => `Teacher lesson: ${w} words, ${s} sentences, ${p} paragraphs. The app fills any empty level.`,
+      tTitle: 'For teachers', tIntro: 'Paste your own reading material here. It is saved on this device only, and used when "Teacher" is chosen. It applies to every level of difficulty.',
+      tWords: 'Words', tWordsHint: 'one per line, or separated by commas', tSent: 'Sentences', tSentHint: 'one per line (long lines are split too)', tPara: 'Paragraphs', tParaHint: 'leave a blank line between paragraphs',
+      tSample: 'Example', tClear: 'Clear', tCancel: 'Cancel', tSave: 'Save',
+      tCount: (n, k) => `${n} will be used${k ? `, ${k} left out (too long or too many)` : ''}`,
+      diffLabel: 'Level', speedSlow: 'Slow', speedVerySlow: 'Very slow', tryBtn: 'Try ',
+      suggestUp: 'You did great! Ready for something harder?', suggestDown: 'That is okay! Let us practice something easier first.',
       praise: ['Very good!', 'Excellent!', 'Great job!', 'Awesome!', 'Well done!', 'Fantastic!', 'Perfect!', 'Amazing!', 'Wonderful!', 'You did it!', 'Super reading!', 'Brilliant!', 'Nice work!', 'That is correct!', 'Outstanding!', 'Way to go!', 'Magnificent!', 'Terrific!', 'You are a star!', 'Great reading!'],
       near: ['Almost there!', 'So close! One more time!', 'Nearly right! Try again!', 'You are close!', 'Almost! Try once more!'],
       retry: ['Try again!', 'You can do it!', 'Let us try once more!', 'Take your time. You can do it!', 'One more time!', 'Do not give up, try again!'],
@@ -473,7 +513,6 @@
       next: 'Next', skip: 'Skip', listenBtn: 'Listen first',
       unsupported: 'The microphone does not work in this browser. Use Chrome or Edge.',
       micDenied: 'Microphone was blocked. Allow it in your browser settings.',
-      azureOut: 'We will use the free microphone for now. Press the mic again.',
       errorPrefix: 'Problem:',
       another: 'One more set for this level!', levelUp: 'Great! Next level.',
       endTitle: 'All done! Well done!', sumPara: 'Paragraph', accuracy: 'Correct',
@@ -492,15 +531,20 @@
   const jset = (k, v) => store(k, JSON.stringify(v));
   const sleep = ms => new Promise(r => setTimeout(r, ms));
   const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
-  const cfg = () => ({
-    url: (store('bt_url') || CONFIG.appsScriptUrl || '').trim(),
-    code: (store('bt_code') || '').trim(),
-    engine: store('bt_engine') === 'azure' ? 'azure' : 'web'
-  });
 
-  const S = { lang: store('bt_lang') === 'en' ? 'en' : 'fil', learner: '', stars: 0, results: [], stop: null, wantMore: false, azureFailed: false, last: {}, jump: null, curLevel: 0, doneLevels: new Set() };
+  const S = { lang: store('bt_lang') === 'en' ? 'en' : 'fil', learner: '', stars: 0, results: [], stop: null, wantMore: false, last: {}, diff: (['easy', 'medium', 'hard'].includes(store('bt_diff')) ? store('bt_diff') : 'easy'), speed: store('bt_speed') === 'veryslow' ? 'veryslow' : 'slow', source: store('bt_source') === 'teacher' ? 'teacher' : 'app', usedTeacher: false, jump: null, curLevel: 0, doneLevels: new Set() };
   const tr = k => TR[S.lang][k];
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  // Pinagsasama ang mga bahagi ng narinig. Kung ang susunod na bahagi ay pagpapatuloy lang ng nauna (nangyayari sa ilang Android Chrome), isa lang ang bibilangin.
+  function joinParts(parts) {
+    const out = [];
+    parts.forEach(p => {
+      const t = String(p || '').trim(); if (!t) return;
+      const last = out[out.length - 1];
+      if (last && t.toLowerCase().startsWith(last.toLowerCase())) out[out.length - 1] = t; else out.push(t);
+    });
+    return out.join(' ');
+  }
   function pickPhrase(kind) {
     const list = TR[S.lang][kind], key = S.lang + kind; let i;
     do { i = Math.floor(Math.random() * list.length); } while (list.length > 1 && i === S.last[key]);
@@ -589,27 +633,122 @@
   }
   const sim = (a, b) => (!a && !b) ? 1 : 1 - lev(a, b) / Math.max(a.length, b.length);
 
-  // Pinakamainam na pagtutugma ng mga salita (LCS): eksakto = 2, malapit = 1
-  function align(target, heard) {
-    const Tn = tokens(target).map(norm);
-    const H = tokens(heard).map(norm).filter(Boolean);
-    const n = Tn.length, m = H.length;
-    const kind = (a, b) => (a === b) ? 2 : (a.length >= 4 && sim(a, b) >= 0.75) ? 1 : 0;
+  // ----- Mga bilang: "lima", "5", "limang", "dalawampu't lima", "25", "twenty-five" ay iisang bilang -----
+  const NUMW = (() => {
+    const fil = { isa: 1, dalawa: 2, tatlo: 3, apat: 4, lima: 5, anim: 6, pito: 7, walo: 8, siyam: 9, sampu: 10,
+      labingisa: 11, labindalawa: 12, labingdalawa: 12, labintatlo: 13, labingtatlo: 13, labingapat: 14, labinlima: 15, labinglima: 15,
+      labinganim: 16, labimpito: 17, labingpito: 17, labingwalo: 18, labinwalo: 18, labinsiyam: 19, labingsiyam: 19,
+      dalawampu: 20, tatlumpu: 30, apatnapu: 40, limampu: 50, animnapu: 60, pitumpu: 70, walumpu: 80, siyamnapu: 90, isandaan: 100, sandaan: 100 };
+    Object.keys(fil).forEach(k => {                       // ligature: tatlo -> tatlong, isandaan -> isandaang
+      if (/[aiou]$/.test(k)) fil[k + 'ng'] = fil[k];
+      else if (/n$/.test(k)) fil[k + 'g'] = fil[k];
+    });
+    const en = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10, eleven: 11, twelve: 12, thirteen: 13,
+      fourteen: 14, fifteen: 15, sixteen: 16, seventeen: 17, eighteen: 18, nineteen: 19, twenty: 20, thirty: 30, forty: 40, fifty: 50,
+      sixty: 60, seventy: 70, eighty: 80, ninety: 90 };
+    return { fil, en };
+  })();
+  function numUnits(rawTokens, lang) {
+    const en = lang === 'en', M = en ? NUMW.en : NUMW.fil;
+    const pieces = [];
+    rawTokens.forEach((t, i) => {
+      let s = t.replace(/['\u2019]t\b/gi, ' at ');
+      s = en ? s.replace(/-/g, ' ') : s.replace(/-/g, '');
+      s.split(/\s+/).forEach(p => { const w = norm(p); if (w) pieces.push({ w, o: i }); });
+    });
+    const owners = (a, b) => { const o = []; for (let k = a; k <= b; k++) if (!o.includes(pieces[k].o)) o.push(pieces[k].o); return o; };
+    const ones = k => { const v = pieces[k] ? M[pieces[k].w] : undefined; return (v >= 1 && v <= 9) ? v : 0; };
+    const units = []; let k = 0;
+    while (k < pieces.length) {
+      const w = pieces[k].w;
+      if (/^\d+$/.test(w)) { units.push({ key: '#' + parseInt(w, 10), num: true, o: [pieces[k].o], e: k }); k++; continue; }
+      if (!en && (w === 'labing' || w === 'labin' || w === 'labim') && ones(k + 1)) {      // "labing isa" = 11
+        units.push({ key: '#' + (10 + ones(k + 1)), num: true, o: owners(k, k + 1), e: k + 1 }); k += 2; continue;
+      }
+      let v = M[w];
+      if (v !== undefined) {
+        let end = k;
+        if (v >= 20 && v < 100 && v % 10 === 0) {                                          // dalawampu't lima / twenty five
+          let j = k + 1; if (!en && pieces[j] && pieces[j].w === 'at') j++;
+          if (ones(j)) { v += ones(j); end = j; }
+        } else if (!en && v === 1 && pieces[k + 1] && pieces[k + 1].w === 'daan') { v = 100; end = k + 1; }   // isang daan
+        units.push({ key: '#' + v, num: true, o: owners(k, end), e: end }); k = end + 1; continue;
+      }
+      if (en && w === 'hundred') {                                                          // one hundred
+        const last = units[units.length - 1];
+        if (last && last.num && last.e === k - 1) {
+          const n = parseInt(last.key.slice(1), 10);
+          if (n >= 1 && n <= 9) { last.key = '#' + (n * 100); last.o = [...new Set([...last.o, pieces[k].o])]; last.e = k; k++; continue; }
+        }
+      }
+      units.push({ key: w, num: false, o: [pieces[k].o], e: k }); k++;
+    }
+    return units;
+  }
+
+  // Pinakamainam na pagtutugma ng mga salita (LCS): eksakto = 2, malapit = 1. Ang bilang ay tinutumbasan ayon sa halaga.
+  function align(target, heard, lang) {
+    lang = lang || S.lang;
+    const T = tokens(target), TU = numUnits(T, lang), HU = numUnits(tokens(heard), lang);
+    const n = TU.length, m = HU.length;
+    const kind = (a, b) => (a.num || b.num) ? ((a.num && b.num && a.key === b.key) ? 2 : 0)
+      : (a.key === b.key ? 2 : (a.key.length >= 4 && sim(a.key, b.key) >= 0.75) ? 1 : 0);
     const dp = Array.from({ length: n + 1 }, () => new Array(m + 1).fill(0));
     for (let i = 1; i <= n; i++) for (let j = 1; j <= m; j++) {
-      const k = Tn[i - 1] ? kind(Tn[i - 1], H[j - 1]) : 0;
+      const k = kind(TU[i - 1], HU[j - 1]);
       dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1], k ? dp[i - 1][j - 1] + k : 0);
     }
-    const st = new Array(n).fill('miss');
+    const us = new Array(n).fill('miss');
     let i = n, j = m;
     while (i > 0 && j > 0) {
-      const k = Tn[i - 1] ? kind(Tn[i - 1], H[j - 1]) : 0;
-      if (k && dp[i][j] === dp[i - 1][j - 1] + k) { st[i - 1] = k === 2 ? 'ok' : 'near'; i--; j--; }
+      const k = kind(TU[i - 1], HU[j - 1]);
+      if (k && dp[i][j] === dp[i - 1][j - 1] + k) { us[i - 1] = k === 2 ? 'ok' : 'near'; i--; j--; }
       else if (dp[i][j] === dp[i - 1][j]) i--;
       else j--;
     }
-    Tn.forEach((x, idx) => { if (!x) st[idx] = 'ok'; });
-    return st;
+    const rank = { ok: 0, near: 1, miss: 2 }, st = T.map(() => null);
+    TU.forEach((u, idx) => u.o.forEach(o => { if (st[o] === null || rank[us[idx]] > rank[st[o]]) st[o] = us[idx]; }));
+    return st.map(s => s === null ? 'ok' : s);
+  }
+
+  // Mga salitang magkatunog na hindi mapaghihiwalay ng mikropono kapag isang salita lang ang binigkas (Antas 1, English).
+  // Hal. kapag ang dapat basahin ay "two", tinatanggap ang "to" o "too". Hindi ito ginagamit sa mga pangungusap at talata.
+  const HOMOPHONES_EN = { one: ['won'], two: ['to', 'too'], four: ['for', 'fore'], eight: ['ate'] };
+  function acceptHomophones(target, heard) {
+    const map = {};
+    tokens(target).map(norm).forEach(t => (HOMOPHONES_EN[t] || []).forEach(h => { map[h] = t; }));
+    if (!Object.keys(map).length) return heard;
+    return tokens(heard).map(w => map[norm(w)] || w).join(' ');
+  }
+
+  // Accent ng mga batang Pilipino sa English: th -> t o d, v -> b, f -> p, z -> s.
+  // ISANG DIREKSYON lang: mula sa dapat basahin papunta sa maaaring marinig. Kaya tinatanggap ang "tree" para sa "three" at ang "pan" para sa "fan",
+  // pero hindi ang "fan" para sa "pan". Hindi kasama ang mga patinig (sit/seat, bed/bad ay mali pa rin).
+  function accentVariants(w) {
+    let set = new Set([w]);
+    const rule = (src, subs) => { const out = new Set(set); set.forEach(x => { if (x.includes(src)) subs.forEach(s => out.add(x.split(src).join(s))); }); set = out; };
+    rule('th', ['t', 'd']); rule('v', ['b']); rule('f', ['p']); rule('z', ['s']);
+    set.delete(w);
+    return [...set];
+  }
+  function acceptAccent(target, heard) {
+    if (!CONFIG.accentTolerance) return heard;
+    const tt = target.replace(/-/g, ' ').split(/\s+/).map(norm).filter(Boolean), tset = new Set(tt), rules = [];
+    tt.forEach(t => {
+      const vs = accentVariants(t);
+      // Ang mga salitang bilang at ang 3-letrang salita ay eksakto lang; ang iba ay may isang pagkakamaling-letra (hal. very -> bery -> berry)
+      if (vs.length) rules.push({ t, vs, strict: NUMW.en[t] !== undefined || t.length < 4 });
+    });
+    if (!rules.length) return heard;
+    return tokens(String(heard).replace(/-/g, ' ')).map(raw => {
+      const w = norm(raw);
+      if (!w || tset.has(w)) return raw;                               // kung nasa mismong dapat basahin, huwag galawin
+      const exact = rules.find(r => r.vs.includes(w));                 // UNAHIN ang eksaktong tugma sa lahat ng salita
+      if (exact) return exact.t;
+      let best = null;                                                 // saka ang pinakamalapit (hanggang isang letra ang layo)
+      rules.forEach(r => { if (r.strict) return; const d = Math.min(...r.vs.map(v => lev(v, w))); if (d <= 1 && (!best || d < best.d)) best = { t: r.t, d }; });
+      return best ? best.t : raw;
+    }).join(' ');
   }
 
   function evalItem(level, target, r) {
@@ -617,7 +756,9 @@
     const cands = useAlts ? r.alts : [r.text];
     let best = null;
     cands.forEach(c => {
-      const st = align(target, c);
+      let adj = c;
+      if (S.lang === 'en') { if (level.key === 'words') adj = acceptHomophones(target, adj); adj = acceptAccent(target, adj); }
+      const st = align(target, adj);   // 'heard' ay nananatiling orihinal
       const ok = st.filter(s => s === 'ok').length, near = st.filter(s => s === 'near').length;
       const sc = ok * 2 + near;
       if (!best || sc > best.sc) best = { st, heard: c, sc, ok, near };
@@ -634,42 +775,313 @@
   }
   const VALUE = { tama: 1, halos: 0.5, ulit: 0 };
 
+  /* ================= PAGBUO NG MGA BABASAHIN (laging bago) ================= */
+  const DIFFS = ['easy', 'medium', 'hard'];
+  const DIFF_NAME = { fil: { easy: 'Madali', medium: 'Katamtaman', hard: 'Mahirap' }, en: { easy: 'Easy', medium: 'Medium', hard: 'Hard' } };
+  const SENT_RANGE = { easy: [3, 5], medium: [5, 7], hard: [7, 10] };   // bilang ng salita sa isang pangungusap
+  const NUM_POOL = {                                                    // mga bilang sa Antas 1 (mga salita)
+    easy: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    medium: [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 30, 40, 50, 60, 70, 80, 90],
+    hard: Array.from({ length: 79 }, (_, i) => 21 + i).filter(n => n % 10 !== 0).concat([100])
+  };
+  const rn = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+  const ch = a => a[Math.floor(Math.random() * a.length)];
+  const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+
+  // Ang bilang bilang salita: 1 hanggang 100, sa Filipino at English
+  function numWords(n, lang) {
+    if (lang === 'en') {
+      const o = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
+      const t = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+      if (n < 20) return o[n];
+      if (n === 100) return 'one hundred';
+      return t[Math.floor(n / 10)] + (n % 10 ? '-' + o[n % 10] : '');
+    }
+    const o = ['', 'isa', 'dalawa', 'tatlo', 'apat', 'lima', 'anim', 'pito', 'walo', 'siyam'];
+    const teen = { 10: 'sampu', 11: 'labing-isa', 12: 'labindalawa', 13: 'labintatlo', 14: 'labing-apat', 15: 'labinlima', 16: 'labing-anim', 17: 'labimpito', 18: 'labingwalo', 19: 'labinsiyam' };
+    const tens = { 2: 'dalawampu', 3: 'tatlumpu', 4: 'apatnapu', 5: 'limampu', 6: 'animnapu', 7: 'pitumpu', 8: 'walumpu', 9: 'siyamnapu' };
+    if (n < 10) return o[n];
+    if (n < 20) return teen[n];
+    if (n === 100) return 'isandaan';
+    const T = tens[Math.floor(n / 10)];
+    return n % 10 ? T + "'t " + o[n % 10] : T;
+  }
+  // Filipino: tatlo + ng, isandaan + g, apat + " na"
+  const numLink = w => /[aeiou]$/.test(w) ? w + 'ng' : /n$/.test(w) ? w + 'g' : w + ' na';
+  const npf = (n, x, lang) => lang === 'en'
+    ? numWords(n, 'en') + ' ' + (n === 1 ? x.es : x.ep)
+    : numLink(numWords(n, 'fil')) + ' ' + x.fil;
+  const FIL = { w: n => numWords(n, 'fil'), np: (n, x) => npf(n, x, 'fil') };
+  const ENG = { w: n => numWords(n, 'en'), np: (n, x) => npf(n, x, 'en') };
+
+  const NOUNS = [
+    { fil: 'itlog', es: 'egg', ep: 'eggs', buy: 1, own: 1, pf: ['sa mesa', 'sa bilao'], pe: ['on the table', 'in the basket'] },
+    { fil: 'mangga', es: 'mango', ep: 'mangoes', buy: 1, own: 1, pf: ['sa mesa', 'sa basket'], pe: ['on the table', 'in the basket'] },
+    { fil: 'saging', es: 'banana', ep: 'bananas', buy: 1, own: 1, pf: ['sa mesa', 'sa basket'], pe: ['on the table', 'in the basket'] },
+    { fil: 'kamatis', es: 'tomato', ep: 'tomatoes', buy: 1, own: 1, pf: ['sa mesa', 'sa basket'], pe: ['on the table', 'in the basket'] },
+    { fil: 'lapis', es: 'pencil', ep: 'pencils', buy: 1, own: 1, pf: ['sa kahon', 'sa bag'], pe: ['in the box', 'in the bag'] },
+    { fil: 'aklat', es: 'book', ep: 'books', buy: 1, own: 1, pf: ['sa mesa', 'sa bag'], pe: ['on the table', 'in the bag'] },
+    { fil: 'bola', es: 'ball', ep: 'balls', buy: 1, own: 1, pf: ['sa kahon', 'sa bakuran'], pe: ['in the box', 'in the yard'] },
+    { fil: 'isda', es: 'fish', ep: 'fish', buy: 1, own: 1, pf: ['sa dagat', 'sa ilog'], pe: ['in the sea', 'in the river'] },
+    { fil: 'ibon', es: 'bird', ep: 'birds', pf: ['sa puno', 'sa bubong'], pe: ['in the tree', 'on the roof'] },
+    { fil: 'manok', es: 'chicken', ep: 'chickens', own: 1, pf: ['sa bakuran'], pe: ['in the yard'] },
+    { fil: 'aso', es: 'dog', ep: 'dogs', own: 1, pf: ['sa bakuran'], pe: ['in the yard'] },
+    { fil: 'pusa', es: 'cat', ep: 'cats', own: 1, pf: ['sa bahay'], pe: ['in the house'] },
+    { fil: 'baka', es: 'cow', ep: 'cows', own: 1, pf: ['sa bukid'], pe: ['in the field'] },
+    { fil: 'kabayo', es: 'horse', ep: 'horses', own: 1, pf: ['sa bukid'], pe: ['in the field'] },
+    { fil: 'bata', es: 'child', ep: 'children', pf: ['sa parke', 'sa bakuran'], pe: ['in the park', 'in the yard'] },
+    { fil: 'bangka', es: 'boat', ep: 'boats', pf: ['sa dagat', 'sa dalampasigan'], pe: ['in the sea', 'on the beach'] },
+    { fil: 'bulaklak', es: 'flower', ep: 'flowers', pf: ['sa hardin'], pe: ['in the garden'] },
+    { fil: 'upuan', es: 'chair', ep: 'chairs', pf: ['sa silid'], pe: ['in the room'] }
+  ];
+  const BUY = NOUNS.filter(x => x.buy), OWN = NOUNS.filter(x => x.own);
+  const PISO = { fil: 'piso', es: 'peso', ep: 'pesos' }, TAON = { fil: 'taong gulang' };
+  const NAMES = [{ n: 'Ana', g: 'f' }, { n: 'Mia', g: 'f' }, { n: 'Rosa', g: 'f' }, { n: 'Liza', g: 'f' }, { n: 'Nena', g: 'f' },
+                 { n: 'Ben', g: 'm' }, { n: 'Lito', g: 'm' }, { n: 'Tomas', g: 'm' }, { n: 'Carlo', g: 'm' }, { n: 'Dino', g: 'm' }];
+  const GIVERS = { fil: ['Nanay', 'Tatay', 'Lola', 'Lolo', 'Ate'], en: ['Mom', 'Dad', 'Grandma', 'Grandpa', 'Auntie'] };
+  const pron = g => g === 'f' ? { s: 'she', o: 'her', p: 'her' } : { s: 'he', o: 'him', p: 'his' };
+  const twoNames = () => { const a = ch(NAMES); let b; do { b = ch(NAMES); } while (b.n === a.n); return [a, b]; };
+  const twoBuy = () => { const a = ch(BUY); let b; do { b = ch(BUY); } while (b === a); return [a, b]; };
+  const twoNouns = () => {                                          // dalawang bagay na may iisang lugar
+    for (let k = 0; k < 300; k++) { const x1 = ch(NOUNS), x2 = ch(NOUNS); if (x1 === x2) continue; const i = x1.pf.findIndex(p => x2.pf.includes(p)); if (i >= 0) return [x1, x2, i]; }
+    return [NOUNS[0], NOUNS[1], 0];
+  };
+  const nr = d => d === 'easy' ? [2, 10] : d === 'medium' ? [2, 20] : [11, 99];
+  const cnt = d => rn(...nr(d));
+  const pairAdd = d => {                                            // a + b = c, nasa saklaw ng antas
+    if (d === 'easy') { const a = rn(1, 8), b = rn(1, 10 - a); return [a, b, a + b]; }
+    if (d === 'medium') { const a = rn(2, 18), b = rn(2, 20 - a); return [a, b, a + b]; }
+    const a = rn(11, 88), b = rn(11, 100 - a); return [a, b, a + b];
+  };
+  const pairSub = d => {                                            // a - b = c
+    if (d === 'easy') { const a = rn(3, 10), b = rn(1, a - 1); return [a, b, a - b]; }
+    if (d === 'medium') { const a = rn(5, 20), b = rn(2, a - 1); return [a, b, a - b]; }
+    const a = rn(30, 100), b = rn(11, a - 11); return [a, b, a - b];
+  };
+  const mkS = (text, nums, math) => ({ text, nums, math: math || null });
+  const mkP = (sents, nums, math) => ({ text: sents.join(' '), nums, math: math || null, count: sents.length });
+
+  const SENT = {
+    fil: {
+      easy: [
+        () => { const n = cnt('easy'), x = ch(NOUNS); return mkS(`May ${FIL.np(n, x)}.`, [n]); },
+        () => { const n = cnt('easy'), x = ch(OWN); return mkS(`Mayroon akong ${FIL.np(n, x)}.`, [n]); },
+        () => { const n = cnt('easy'), x = ch(OWN); return mkS(`May ${FIL.w(n)} akong ${x.fil}.`, [n]); },
+        () => { const n = cnt('easy'), x = ch(NOUNS); return mkS(`May ${FIL.np(n, x)} ${ch(x.pf)}.`, [n]); }
+      ],
+      medium: [
+        () => { const n = cnt('medium'), x = ch(OWN); return mkS(`Si ${ch(NAMES).n} ay may ${FIL.np(n, x)}.`, [n]); },
+        () => { const n = cnt('medium'), x = ch(NOUNS); return mkS(`May ${FIL.np(n, x)} ${ch(x.pf)}.`, [n]); },
+        () => { const n = cnt('medium'), x = ch(BUY); return mkS(`Bumili si ${ch(NAMES).n} ng ${FIL.np(n, x)}.`, [n]); },
+        () => { const [a, b, c] = pairAdd('medium'); return mkS(`Ang ${FIL.w(a)} at ${FIL.w(b)} ay ${FIL.w(c)}.`, [a, b, c], ['add', a, b, c]); },
+        () => { const [a, b, c] = pairSub('medium'); return mkS(`Ang ${FIL.w(a)} bawas ${FIL.w(b)} ay ${FIL.w(c)}.`, [a, b, c], ['sub', a, b, c]); },
+        () => { const n = rn(6, 12); return mkS(`Si ${ch(NAMES).n} ay ${FIL.np(n, TAON)}.`, [n]); }
+      ],
+      hard: [
+        () => { const n = cnt('hard'), x = ch(BUY); return mkS(`Bumili si ${ch(NAMES).n} ng ${FIL.np(n, x)} sa palengke.`, [n]); },
+        () => { const [a, b, c] = pairAdd('hard'); return mkS(`Ang ${FIL.w(a)} at ${FIL.w(b)} ay ${FIL.w(c)}.`, [a, b, c], ['add', a, b, c]); },
+        () => { const [a, b, c] = pairSub('hard'); return mkS(`Ang ${FIL.w(a)} bawas ${FIL.w(b)} ay ${FIL.w(c)}.`, [a, b, c], ['sub', a, b, c]); },
+        () => { const n = cnt('hard'), x = ch(NOUNS); return mkS(`Si ${ch(NAMES).n} ay nagbilang ng ${FIL.np(n, x)} kahapon.`, [n]); },
+        () => { const n = rn(11, 99); return mkS(`Nakaipon si ${ch(NAMES).n} ng ${FIL.np(n, PISO)} noong Linggo.`, [n]); },
+        () => { const [x1, x2, i] = twoNouns(), n1 = cnt('hard'), n2 = cnt('hard'); return mkS(`May ${FIL.np(n1, x1)} at ${FIL.np(n2, x2)} ${x1.pf[i]}.`, [n1, n2]); }
+      ]
+    },
+    en: {
+      easy: [
+        () => { const n = cnt('easy'), x = ch(NOUNS); return mkS(`There are ${ENG.np(n, x)}.`, [n]); },
+        () => { const n = cnt('easy'), x = ch(OWN); return mkS(`I have ${ENG.np(n, x)}.`, [n]); },
+        () => { const n = cnt('easy'), x = ch(NOUNS); return mkS(`I see ${ENG.np(n, x)}.`, [n]); },
+        () => { const n = cnt('easy'), x = ch(OWN); return mkS(`${ch(NAMES).n} has ${ENG.np(n, x)}.`, [n]); },
+        () => { const n = cnt('easy'), x = ch(NOUNS); return mkS(`${cap(ENG.np(n, x))} are here.`, [n]); }
+      ],
+      medium: [
+        () => { const n = cnt('medium'), x = ch(OWN); return mkS(`${ch(NAMES).n} has ${ENG.np(n, x)} at home.`, [n]); },
+        () => { const n = cnt('medium'), x = ch(NOUNS); return mkS(`There are ${ENG.np(n, x)} ${ch(x.pe)}.`, [n]); },
+        () => { const n = cnt('medium'), x = ch(BUY); return mkS(`${ch(NAMES).n} bought ${ENG.np(n, x)} today.`, [n]); },
+        () => { const [a, b, c] = pairAdd('medium'); return mkS(`${cap(ENG.w(a))} plus ${ENG.w(b)} is ${ENG.w(c)}.`, [a, b, c], ['add', a, b, c]); },
+        () => { const [a, b, c] = pairSub('medium'); return mkS(`${cap(ENG.w(a))} minus ${ENG.w(b)} is ${ENG.w(c)}.`, [a, b, c], ['sub', a, b, c]); },
+        () => { const n = rn(6, 12); return mkS(`${ch(NAMES).n} is ${ENG.w(n)} years old.`, [n]); }
+      ],
+      hard: [
+        () => { const n = cnt('hard'), x = ch(BUY); return mkS(`${ch(NAMES).n} bought ${ENG.np(n, x)} at the market.`, [n]); },
+        () => { const [a, b, c] = pairAdd('hard'); return mkS(`The sum of ${ENG.w(a)} and ${ENG.w(b)} is ${ENG.w(c)}.`, [a, b, c], ['add', a, b, c]); },
+        () => { const [a, b, c] = pairSub('hard'); return mkS(`If you take ${ENG.w(b)} from ${ENG.w(a)}, you have ${ENG.w(c)}.`, [b, a, c], ['sub', a, b, c]); },
+        () => { const n = cnt('hard'), x = ch(NOUNS); return mkS(`${ch(NAMES).n} counted ${ENG.np(n, x)} ${ch(x.pe)} yesterday.`, [n]); },
+        () => { const nm = ch(NAMES), n = rn(11, 99); return mkS(`${nm.n} saved ${ENG.np(n, PISO)} in ${pron(nm.g).p} piggy bank.`, [n]); },
+        () => { const [x1, x2, i] = twoNouns(), n1 = cnt('hard'), n2 = cnt('hard'); return mkS(`There are ${ENG.np(n1, x1)} and ${ENG.np(n2, x2)} ${x1.pe[i]}.`, [n1, n2]); }
+      ]
+    }
+  };
+
+  const PARA = {
+    fil: {
+      easy: [
+        () => { const [a, b, c] = pairAdd('easy'), x = ch(OWN), nm = ch(NAMES).n;
+          return mkP([`Si ${nm} ay may ${FIL.np(a, x)}.`, `Binigyan siya ng ${FIL.w(b)} pa.`, `Ang ${FIL.w(a)} at ${FIL.w(b)} ay ${FIL.w(c)}.`], [a, b, a, b, c], ['add', a, b, c]); },
+        () => { const [a, b, c] = pairSub('easy'), x = ch(BUY), nm = ch(NAMES).n;
+          return mkP([`May ${FIL.np(a, x)} ${ch(x.pf)}.`, `Kumuha si ${nm} ng ${FIL.w(b)}.`, `Ang ${FIL.w(a)} bawas ${FIL.w(b)} ay ${FIL.w(c)}.`], [a, b, a, b, c], ['sub', a, b, c]); },
+        () => { const [a, b, c] = pairAdd('easy'), x = ch(OWN), [n1, n2] = twoNames();
+          return mkP([`Si ${n1.n} ay may ${FIL.np(a, x)}.`, `Si ${n2.n} ay may ${FIL.np(b, x)}.`, `Ang lahat ay ${FIL.w(c)}.`], [a, b, c], ['add', a, b, c]); }
+      ],
+      medium: [
+        () => { const [a, b, c] = pairAdd('medium'), x = ch(OWN), nm = ch(NAMES).n, g = ch(GIVERS.fil);
+          return mkP([`Si ${nm} ay may ${FIL.np(a, x)}.`, `Binigyan siya ni ${g} ng ${FIL.w(b)} pa.`, `Ilan na ang ${x.fil} ni ${nm}?`, `Ang ${FIL.w(a)} at ${FIL.w(b)} ay ${FIL.w(c)}.`], [a, b, a, b, c], ['add', a, b, c]); },
+        () => { const [a, b, c] = pairSub('medium'), x = ch(BUY), nm = ch(NAMES).n;
+          return mkP([`May ${FIL.np(a, x)} ${ch(x.pf)}.`, `Kumuha si ${nm} ng ${FIL.w(b)}.`, `Ilan ang natira?`, `Ang ${FIL.w(a)} bawas ${FIL.w(b)} ay ${FIL.w(c)}.`], [a, b, a, b, c], ['sub', a, b, c]); },
+        () => { const [a, b, c] = pairAdd('medium'), x = ch(OWN), [n1, n2] = twoNames();
+          return mkP([`Si ${n1.n} ay may ${FIL.np(a, x)}.`, `Si ${n2.n} ay may ${FIL.np(b, x)}.`, `Ilan lahat ang ${x.fil}?`, `Ang ${FIL.w(a)} at ${FIL.w(b)} ay ${FIL.w(c)}.`], [a, b, a, b, c], ['add', a, b, c]); },
+        () => { const [a, b, c] = pairAdd('medium'), [x1, x2] = twoBuy();
+          return mkP([`Ang ${x1.fil} ay ${FIL.np(a, PISO)}.`, `Ang ${x2.fil} ay ${FIL.np(b, PISO)}.`, `Ilan ang bayad sa dalawa?`, `Ang ${FIL.w(a)} at ${FIL.w(b)} ay ${FIL.w(c)}.`], [a, b, 2, a, b, c], ['add', a, b, c]); }
+      ],
+      hard: [
+        () => { const [a, b, c] = pairAdd('hard'), x = ch(OWN), nm = ch(NAMES).n, g = ch(GIVERS.fil);
+          return mkP([`Si ${nm} ay may ${FIL.np(a, x)}.`, `Binigyan siya ni ${g} ng ${FIL.w(b)} pa.`, `Ilan na ang ${x.fil} ni ${nm}?`, `Ang ${FIL.w(a)} at ${FIL.w(b)} ay ${FIL.w(c)}.`, `May ${FIL.np(c, x)} na si ${nm}.`], [a, b, a, b, c, c], ['add', a, b, c]); },
+        () => { const [a, b, c] = pairSub('hard'), x = ch(BUY), nm = ch(NAMES).n, pl = ch(x.pf);
+          return mkP([`May ${FIL.np(a, x)} ${pl}.`, `Kumuha si ${nm} ng ${FIL.w(b)}.`, `Ilan ang natira?`, `Ang ${FIL.w(a)} bawas ${FIL.w(b)} ay ${FIL.w(c)}.`, `May ${FIL.np(c, x)} pa ${pl}.`], [a, b, a, b, c, c], ['sub', a, b, c]); },
+        () => { const [a, b, c] = pairAdd('hard'), x = ch(OWN), [n1, n2] = twoNames();
+          return mkP([`Si ${n1.n} ay nagbilang ng ${FIL.np(a, x)}.`, `Si ${n2.n} ay nagbilang ng ${FIL.np(b, x)}.`, `Ilan lahat ang nabilang nila?`, `Ang ${FIL.w(a)} at ${FIL.w(b)} ay ${FIL.w(c)}.`, `${cap(FIL.np(c, x))} ang nabilang nina ${n1.n} at ${n2.n}.`], [a, b, a, b, c, c], ['add', a, b, c]); },
+        () => { const [a, b, c] = pairAdd('hard'), [x1, x2] = twoBuy(), nm = ch(NAMES).n;
+          return mkP([`Ang ${x1.fil} ay ${FIL.np(a, PISO)}.`, `Ang ${x2.fil} ay ${FIL.np(b, PISO)}.`, `Ilan ang bayad sa dalawa?`, `Ang ${FIL.w(a)} at ${FIL.w(b)} ay ${FIL.w(c)}.`, `Nagbayad si ${nm} ng ${FIL.np(c, PISO)}.`], [a, b, 2, a, b, c, c], ['add', a, b, c]); }
+      ]
+    },
+    en: {
+      easy: [
+        () => { const [a, b, c] = pairAdd('easy'), x = ch(OWN), nm = ch(NAMES), p = pron(nm.g), g = ch(GIVERS.en);
+          return mkP([`${nm.n} has ${ENG.np(a, x)}.`, `${g} gave ${p.o} ${ENG.w(b)} more.`, `${cap(ENG.w(a))} and ${ENG.w(b)} make ${ENG.w(c)}.`], [a, b, a, b, c], ['add', a, b, c]); },
+        () => { const [a, b, c] = pairSub('easy'), x = ch(BUY), nm = ch(NAMES).n;
+          return mkP([`There are ${ENG.np(a, x)} ${ch(x.pe)}.`, `${nm} took ${ENG.w(b)}.`, `${cap(ENG.w(a))} take away ${ENG.w(b)} is ${ENG.w(c)}.`], [a, b, a, b, c], ['sub', a, b, c]); },
+        () => { const [a, b, c] = pairAdd('easy'), x = ch(OWN), [n1, n2] = twoNames();
+          return mkP([`${n1.n} has ${ENG.np(a, x)}.`, `${n2.n} has ${ENG.np(b, x)}.`, `Altogether they have ${ENG.w(c)}.`], [a, b, c], ['add', a, b, c]); }
+      ],
+      medium: [
+        () => { const [a, b, c] = pairAdd('medium'), x = ch(OWN), nm = ch(NAMES), p = pron(nm.g), g = ch(GIVERS.en);
+          return mkP([`${nm.n} has ${ENG.np(a, x)}.`, `${g} gave ${p.o} ${ENG.w(b)} more.`, `How many ${x.ep} does ${nm.n} have now?`, `${cap(ENG.w(a))} and ${ENG.w(b)} make ${ENG.w(c)}.`], [a, b, a, b, c], ['add', a, b, c]); },
+        () => { const [a, b, c] = pairSub('medium'), x = ch(BUY), nm = ch(NAMES).n;
+          return mkP([`There are ${ENG.np(a, x)} ${ch(x.pe)}.`, `${nm} took ${ENG.w(b)}.`, `How many are left?`, `${cap(ENG.w(a))} take away ${ENG.w(b)} is ${ENG.w(c)}.`], [a, b, a, b, c], ['sub', a, b, c]); },
+        () => { const [a, b, c] = pairAdd('medium'), x = ch(OWN), [n1, n2] = twoNames();
+          return mkP([`${n1.n} has ${ENG.np(a, x)}.`, `${n2.n} has ${ENG.np(b, x)}.`, `How many ${x.ep} do they have?`, `${cap(ENG.w(a))} and ${ENG.w(b)} make ${ENG.w(c)}.`], [a, b, a, b, c], ['add', a, b, c]); },
+        () => { const [a, b, c] = pairAdd('medium'), [x1, x2] = twoBuy();
+          return mkP([`The ${x1.es} costs ${ENG.np(a, PISO)}.`, `The ${x2.es} costs ${ENG.np(b, PISO)}.`, `How much do both cost?`, `${cap(ENG.w(a))} and ${ENG.w(b)} make ${ENG.w(c)}.`], [a, b, a, b, c], ['add', a, b, c]); }
+      ],
+      hard: [
+        () => { const [a, b, c] = pairAdd('hard'), x = ch(OWN), nm = ch(NAMES), p = pron(nm.g), g = ch(GIVERS.en);
+          return mkP([`${nm.n} has ${ENG.np(a, x)}.`, `${g} gave ${p.o} ${ENG.w(b)} more.`, `How many ${x.ep} does ${nm.n} have now?`, `${cap(ENG.w(a))} and ${ENG.w(b)} make ${ENG.w(c)}.`, `${nm.n} now has ${ENG.np(c, x)}.`], [a, b, a, b, c, c], ['add', a, b, c]); },
+        () => { const [a, b, c] = pairSub('hard'), x = ch(BUY), nm = ch(NAMES).n, pl = ch(x.pe);
+          return mkP([`There are ${ENG.np(a, x)} ${pl}.`, `${nm} took ${ENG.w(b)}.`, `How many are left?`, `${cap(ENG.w(a))} take away ${ENG.w(b)} is ${ENG.w(c)}.`, `There are ${ENG.np(c, x)} left ${pl}.`], [a, b, a, b, c, c], ['sub', a, b, c]); },
+        () => { const [a, b, c] = pairAdd('hard'), x = ch(OWN), [n1, n2] = twoNames();
+          return mkP([`${n1.n} counted ${ENG.np(a, x)}.`, `${n2.n} counted ${ENG.np(b, x)}.`, `How many did they count?`, `${cap(ENG.w(a))} and ${ENG.w(b)} make ${ENG.w(c)}.`, `They counted ${ENG.np(c, x)} in all.`], [a, b, a, b, c, c], ['add', a, b, c]); },
+        () => { const [a, b, c] = pairAdd('hard'), [x1, x2] = twoBuy(), nm = ch(NAMES).n;
+          return mkP([`The ${x1.es} costs ${ENG.np(a, PISO)}.`, `The ${x2.es} costs ${ENG.np(b, PISO)}.`, `How much do both cost?`, `${cap(ENG.w(a))} and ${ENG.w(b)} make ${ENG.w(c)}.`, `${nm} paid ${ENG.np(c, PISO)}.`], [a, b, a, b, c, c], ['add', a, b, c]); }
+      ]
+    }
+  };
+
+  function genSentence(lang, diff) {
+    const [lo, hi] = SENT_RANGE[diff], list = SENT[lang][diff];
+    for (let i = 0; i < 60; i++) { const t = ch(list)(), n = tokens(t.text).length; if (n >= lo && n <= hi) return t; }
+    return list[0]();                                                 // ang unang template ay palaging nasa saklaw
+  }
+  function genParagraph(lang, diff) {
+    if (diff === 'hard' && Math.random() < 0.3) { const e = ch(BANK[lang].extras); return { text: e, nums: null, math: null, count: e.split(/(?<=[.?!])\s+/).length, extra: true }; }
+    return ch(PARA[lang][diff])();
+  }
+  // Laging bago: hindi inuulit ang nabasa na ng batang iyon (naaalala ang huling 60)
+  function genItems(kind, n) {
+    const seenKey = `bt_seen_${S.learner}_${S.lang}_${S.diff}_${kind}`;
+    const seen = jget(seenKey, []), out = [];
+    while (out.length < n) {
+      let t = null;
+      for (let tries = 0; tries < 14; tries++) {
+        const c = kind === 'sentences' ? genSentence(S.lang, S.diff) : genParagraph(S.lang, S.diff);
+        t = c.text;
+        if (!seen.includes(t) && !out.includes(t)) break;
+      }
+      out.push(t);
+    }
+    jset(seenKey, seen.concat(out).slice(-60));
+    return out;
+  }
+
   /* ================= PAGPILI NG BABASAHIN ================= */
+  function pickTeacher(levelKey, n) {
+    const list = teacherLists(S.lang)[levelKey] || [];
+    if (!list.length) return [];
+    const mk = `bt_missed_${S.learner}_${S.lang}_teacher_${levelKey}`, uk = `bt_used_${S.learner}_${S.lang}_teacher_${levelKey}`;
+    const want = Math.min(n, list.length), out = [];
+    const missed = jget(mk, []).filter(x => list.includes(x));
+    const takeMissed = levelKey === 'paragraphs' ? 0 : Math.min(2, missed.length, want - 1);
+    for (let i = 0; i < takeMissed; i++) out.push(missed.shift());
+    jset(mk, missed);
+    let used = jget(uk, []).filter(x => list.includes(x));
+    const need = want - out.length;
+    const free = list.filter(x => !used.includes(x) && !out.includes(x));
+    let take = free.length >= need ? shuffle(free).slice(0, need) : free.slice();                  // ang mga hindi pa nababasa muna
+    if (take.length < need) {                                                                     // naubos na: simula ulit sa pagbilang
+      used = [];
+      take = take.concat(shuffle(list.filter(x => !out.includes(x) && !take.includes(x))).slice(0, need - take.length));
+    }
+    out.push(...take); used.push(...take);
+    jset(uk, used.slice(-300));
+    return shuffle(out);
+  }
   function pick(levelKey, n) {
-    const bank = BANK[S.lang][levelKey];
-    const uk = `bt_used_${S.learner}_${S.lang}_${levelKey}`, mk = `bt_missed_${S.learner}_${S.lang}_${levelKey}`;
-    let used = jget(uk, []), missed = jget(mk, []);
+    S.usedTeacher = false;
+    if (S.source === 'teacher') {                                      // babasahin ng guro; kung wala para sa antas na ito, ang app na ang bahala
+      const t = pickTeacher(levelKey, n);
+      if (t.length) { S.usedTeacher = true; return t; }
+    }
+    const diff = S.diff, B = BANK[S.lang];
+    const uk = k => `bt_used_${S.learner}_${S.lang}_${diff}_${k}`, mk = `bt_missed_${S.learner}_${S.lang}_${diff}_${levelKey}`;
+    const missed = jget(mk, []);
     const out = [];
     const takeMissed = levelKey === 'paragraphs' ? 0 : Math.min(2, missed.length, n - 1);
     for (let i = 0; i < takeMissed; i++) out.push(missed.shift());
     jset(mk, missed);
-    const free = () => bank.map((_, i) => i).filter(i => !out.includes(bank[i]));
-    let pool = free().filter(i => !used.includes(i));
-    if (pool.length < n - out.length) { used = []; pool = free(); }
-    shuffle(pool);
-    while (out.length < n && pool.length) { const i = pool.shift(); out.push(bank[i]); used.push(i); }
-    jset(uk, used);
-    return out;
+    if (levelKey !== 'words') return out.concat(genItems(levelKey, n - out.length));   // mga pangungusap at talata: laging bagong binubuo
+    // Mga salita: ilang pangalan ng bilang + mga karaniwang salita. Hindi inuulit hanggang maubos ang listahan.
+    const take = (pool, key, count, skip) => {
+      let used = jget(uk(key), []);
+      const all = () => pool.map((_, i) => i).filter(i => !skip(pool[i]));
+      let free = all().filter(i => !used.includes(i));
+      if (free.length < count) { used = []; free = all(); }
+      shuffle(free);
+      const got = [];
+      while (got.length < count && free.length) { const i = free.shift(); got.push(pool[i]); used.push(i); }
+      jset(uk(key), used); return got;
+    };
+    const isNum = t => { const u = numUnits(tokens(t), S.lang); return u.length > 0 && u.every(x => x.num); };
+    const need = Math.max(0, Math.min(CONFIG.numberWordsPerSet, n - out.length) - out.filter(isNum).length);
+    take(NUM_POOL[diff], 'numbers', need, v => out.includes(numWords(v, S.lang))).forEach(v => out.push(numWords(v, S.lang)));
+    take(B.words[diff], 'words', n - out.length, w => out.includes(w)).forEach(w => out.push(w));
+    return shuffle(out);
   }
   function rememberMissed(levelKey, texts) {
     if (!texts.length) return;
-    const mk = `bt_missed_${S.learner}_${S.lang}_${levelKey}`;
+    const mk = `bt_missed_${S.learner}_${S.lang}_${S.usedTeacher ? 'teacher' : S.diff}_${levelKey}`;
     const list = jget(mk, []);
     texts.forEach(t => { if (!list.includes(t)) list.push(t); });
     jset(mk, list.slice(-12));
   }
 
   /* ================= MIKROPONO ================= */
-  function webSpeech(locale, continuous, onReady) {
+  function webSpeech(locale, continuous, onReady, mode) {
     return new Promise((resolve, reject) => {
       if (!SR) { reject(new Error(tr('unsupported'))); return; }
       const rec = new SR();
-      rec.lang = locale; rec.interimResults = true; rec.maxAlternatives = 3; rec.continuous = !!continuous;
+      const manual = mode === 'manual';
+      const keepOpen = manual || !!continuous;   // tuloy-tuloy ang pakikinig para hindi maputol ng pag-pause
+      rec.lang = locale; rec.interimResults = true; rec.maxAlternatives = 3; rec.continuous = keepOpen;
       let text = '', prefix = '', alts = [], t0 = 0, t1 = 0, done = false;
-      let readyCalled = false;
+      let readyCalled = false, wd = null, cap = null;
+      // Kusang tapusin ang pakikinig kapag natahimik na ang bata (hindi na kailangang pindutin ulit ang mikropono).
+      const armWatchdog = () => {
+        clearTimeout(wd);
+        wd = setTimeout(() => { if (!done && text.trim()) { S.wantMore = false; try { rec.stop(); } catch (_) {} } },
+          continuous ? CONFIG.silenceMs.long : CONFIG.silenceMs.once);
+      };
       const ready = () => { if (!readyCalled && !done) { readyCalled = true; if (onReady) onReady(); } };
       const finish = () => {
-        if (done) return; done = true; S.stop = null; S.wantMore = false;
+        if (done) return; done = true; clearTimeout(wd); clearTimeout(cap); S.stop = null; S.wantMore = false;
         const secs = t0 ? Math.max(5, (t1 - t0) / 1000 + 1.5) : 0;
         resolve({ text: text.trim(), alts, seconds: secs });
       };
@@ -679,66 +1091,28 @@
         ready();
         const now = Date.now(); if (!t0) t0 = now; t1 = now;
         const parts = []; for (let i = 0; i < e.results.length; i++) parts.push(e.results[i][0].transcript);
-        text = (prefix + ' ' + parts.join(' ')).trim();
-        if (!continuous && e.results[0]) alts = Array.from(e.results[0]).map(a => a.transcript);
+        text = (prefix + ' ' + joinParts(parts)).trim();
+        if (e.results.length === 1 && e.results[0]) alts = Array.from(e.results[0]).map(a => a.transcript); else if (e.results.length > 1) alts = [];
+        if (!manual) armWatchdog();
       };
       rec.onerror = e => {
         if (e.error === 'no-speech' || e.error === 'aborted') return;
-        if (done) return; done = true; S.stop = null; S.wantMore = false;
+        if (done) return; done = true; clearTimeout(wd); clearTimeout(cap); S.stop = null; S.wantMore = false;
         reject(new Error(e.error === 'not-allowed' || e.error === 'service-not-allowed' ? tr('micDenied') : e.error));
       };
       rec.onend = () => {
-        if (continuous && S.wantMore && !done) { prefix = text; try { rec.start(); return; } catch (_) {} }
+        if (keepOpen && S.wantMore && !done) { prefix = text; try { rec.start(); return; } catch (_) {} }
         finish();
       };
-      S.wantMore = !!continuous;
+      S.wantMore = keepOpen;
+      cap = setTimeout(() => { if (!done) { S.wantMore = false; try { rec.stop(); } catch (_) {} } }, continuous ? CONFIG.maxListenMs.long : CONFIG.maxListenMs.once);
       S.stop = () => { S.wantMore = false; try { rec.stop(); } catch (_) {} };
       try { rec.start(); } catch (e) { done = true; S.stop = null; reject(e); }
     });
   }
 
-  let tokenCache = { token: null, region: null, exp: 0 };
-  async function getToken() {
-    if (tokenCache.token && Date.now() < tokenCache.exp) return tokenCache;
-    const c = cfg();
-    const r = await fetch(c.url + '?action=token&code=' + encodeURIComponent(c.code));
-    const j = await r.json();
-    if (!j.ok) throw new Error(j.error || 'token');
-    tokenCache = { token: j.token, region: j.region, exp: Date.now() + 8 * 60 * 1000 };
-    return tokenCache;
-  }
-  async function azureOnce(target, locale, usePA) {
-    if (!window.SpeechSDK) throw new Error('sdk');
-    const { token, region } = await getToken();
-    const sc = SpeechSDK.SpeechConfig.fromAuthorizationToken(token, region);
-    sc.speechRecognitionLanguage = locale;
-    const rec = new SpeechSDK.SpeechRecognizer(sc, SpeechSDK.AudioConfig.fromDefaultMicrophoneInput());
-    if (usePA) {
-      new SpeechSDK.PronunciationAssessmentConfig(target, SpeechSDK.PronunciationAssessmentGradingSystem.HundredMark, SpeechSDK.PronunciationAssessmentGranularity.Word, true).applyTo(rec);
-    }
-    return new Promise((resolve, reject) => {
-      rec.recognizeOnceAsync(res => {
-        rec.close();
-        if (res.reason === SpeechSDK.ResultReason.RecognizedSpeech) {
-          let pa = null;
-          if (usePA) { try { const p = SpeechSDK.PronunciationAssessmentResult.fromResult(res); if (typeof p.accuracyScore === 'number') pa = Math.round(p.accuracyScore); } catch (e) {} }
-          resolve({ text: res.text || '', alts: [res.text || ''], seconds: 0, pa });
-        } else if (res.reason === SpeechSDK.ResultReason.NoMatch) resolve({ text: '', alts: [], seconds: 0, pa: null });
-        else reject(new Error('azure'));
-      }, err => { rec.close(); reject(new Error(String(err))); });
-    });
-  }
-
   async function listen(level, text, onReady) {
-    const c = cfg();
-    const useAzure = c.engine === 'azure' && level.mode === 'once' && !S.azureFailed && c.url && c.code;
-    if (useAzure) {
-      const usePA = !!CONFIG.pronunciationScore[S.lang];
-      if (onReady) onReady();
-      try { const r = await azureOnce(text, CONFIG.azureLocale[S.lang], usePA); r.engine = 'azure'; r.usePA = usePA; return r; }
-      catch (e) { S.azureFailed = true; const err = new Error('azure'); err.fallback = true; throw err; }
-    }
-    const r = await webSpeech(CONFIG.locale[S.lang], level.mode === 'long', onReady);
+    const r = await webSpeech(CONFIG.locale[S.lang], level.mode === 'long', onReady, CONFIG.stopMode[level.key]);
     r.engine = 'web'; r.usePA = false; r.pa = null;
     return r;
   }
@@ -751,9 +1125,9 @@
   function pickVoice() {
     if (!VOICES.length) loadVoices();
     const lg = v => (v.lang || '').toLowerCase().replace('_', '-');
-    if (S.lang === 'fil') return VOICES.find(v => /^(fil|tl)/.test(lg(v))) || null;
-    const want = CONFIG.locale.en.toLowerCase();
-    return VOICES.find(v => lg(v) === want) || VOICES.find(v => lg(v).startsWith('en')) || null;
+    const find = re => VOICES.find(v => re.test(lg(v)));
+    if (S.lang === 'fil') return find(/^(fil|tl)/) || CONFIG.voiceFallback.fil.map(pre => find(new RegExp('^' + pre))).find(Boolean) || null;
+    return find(/^en-ph/) || find(/^en-us/) || find(/^en/) || null;       // English ng Pilipinas muna kung mayroon
   }
   function utter(text, o) {
     o = o || {};
@@ -770,14 +1144,9 @@
       setTimeout(fin, 9000);
     });
   }
-  const speak = t => utter(t, { rate: 0.8 });                                  // pagbasa ng tamang salita
+  const speak = t => utter(t, { rate: CONFIG.listenRate[S.speed] });            // "Pakinggan muna" at pagbasa ng tamang salita (mabagal)
   const say = t => voiceOn() ? utter(t, { rate: 1, pitch: 1.2 }) : Promise.resolve(); // papuri ni Basa Buddy
   function syncVoiceBtn() { const b = $('voiceBtn'); b.dataset.on = String(voiceOn()); b.setAttribute('aria-pressed', String(voiceOn())); }
-  function updateVoiceInfo() {
-    const v = pickVoice();
-    $('voiceInfo').textContent = v ? `Boses: ${v.name} (${v.lang})` : 'Walang nakitang boses para sa wikang ito; gagamitin ang default na boses ng device.';
-  }
-
   /* ================= UI ================= */
   const show = id => { ['screenStart', 'screenPlay', 'screenEnd'].forEach(s => { $(s).hidden = (s !== id); }); $('hdrLang').hidden = (id === 'screenStart'); };
   const setStatus = s => { $('status').textContent = s; };
@@ -800,7 +1169,9 @@
 
   function renderTarget(level, text, pos, total) {
     const el = $('target');
-    el.className = 'target' + (level.mode === 'long' ? ' para' : level.key === 'sentences' ? ' sent' : '');
+    const len = text.length;
+    el.className = 'target' + (level.mode === 'long' ? ' para' : level.key === 'sentences' ? ' sent' : len > 10 ? ' small' : len > 7 ? ' mid' : '');
+    $('diffBadge').textContent = S.usedTeacher ? '✎ ' + tr('teacherBadge') : '★'.repeat(DIFFS.indexOf(S.diff) + 1) + ' ' + diffName(S.diff);
     el.innerHTML = '';
     tokens(text).forEach(w => { const s = document.createElement('span'); s.className = 'w'; s.textContent = w; el.appendChild(s); });
     $('levelName').textContent = level.name[S.lang];
@@ -856,11 +1227,13 @@
   async function playItem(level, text, pos, total, id) {
     renderTarget(level, text, pos, total);
     const maxAttempts = level.mode === 'long' ? 1 : 2;
+    const autoStop = CONFIG.stopMode[level.key] === 'auto';
+    $('micArea').dataset.auto = autoStop ? '1' : '0';
     let attempts = 0, errors = 0, empties = 0, best = null, skipped = false;
 
     while (attempts < maxAttempts && errors < 3 && empties < 3) {
       setMic('idle', tr('micIdle'));
-      setStatus(level.mode === 'long' ? tr('pressLong') : tr('press'));
+      setStatus(level.mode === 'long' ? tr('pressLong') : autoStop ? tr('pressWord') : tr('press'));
       const act = await waitMic(); chk(id);
       if (act === 'skip') { skipped = true; break; }
 
@@ -868,15 +1241,14 @@
       setMic('starting', ''); setStatus(tr('getReady'));
       const onReady = () => {
         if (id !== runId || S.jump !== null) return;
-        setMic('listening', level.mode === 'long' ? tr('micStop') : '');
-        setStatus(level.mode === 'long' ? tr('listeningLong') : tr('listening'));
+        setMic('listening', autoStop ? '' : tr('micStop'));
+        setStatus(level.mode === 'long' ? tr('listeningLong') : autoStop ? tr('listeningWord') : tr('listening'));
       };
       let r;
       try { r = await listen(level, text, onReady); }
       catch (e) {
         chk(id);
         setMic('idle', ''); mood('idle');
-        if (e.fallback) { setStatus(tr('azureOut')); await sleep(1200); chk(id); continue; }
         errors++; setStatus(tr('errorPrefix') + ' ' + e.message); await sleep(1800); chk(id); continue;
       }
       chk(id);
@@ -912,20 +1284,24 @@
       levelKey: level.key, text, verdict, score: VALUE[verdict], attempts: Math.max(attempts, skipped ? 0 : 1),
       heard: best ? (level.mode === 'long' ? best.r.text : best.ev.heard) : '', pa: best ? (best.r.pa ?? '') : '',
       wcpm: best && best.wcpm ? best.wcpm : '', engine: best ? best.r.engine : '', acc: best ? best.ev.acc : 0,
-      missWords: best ? tokens(text).filter((w, i) => best.ev.st[i] === 'miss').map(w => norm(w)).filter(w => w.length >= 3) : []
+      missWords: best ? tokens(text).filter((w, i) => best.ev.st[i] === 'miss').filter(w => !/['\u2019]/.test(w)).map(w => norm(w)).filter(w => w.length >= 3) : []
     };
     logResult(res);
     return res;
   }
 
+  /* ================= PAGTATALA (kailangan ng pahintulot) ================= */
+  const logOn = () => !!CONFIG.logUrl;
+  const consentGiven = () => logOn() && $('consent').checked;
   function logResult(res) {
-    const c = cfg(); if (!c.url || !c.code) return;
+    if (!consentGiven()) return;
     try {
-      fetch(c.url, {
+      fetch(CONFIG.logUrl, {
         method: 'POST', mode: 'no-cors', keepalive: true,
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'result', code: c.code, learner: S.learner, lang: S.lang, level: res.levelKey, target: res.text, heard: res.heard,
-          verdict: res.verdict, tama: res.verdict === 'tama' ? 1 : 0, attempts: res.attempts, score: res.pa, wcpm: res.wcpm, engine: res.engine })
+        body: JSON.stringify({ k: 'basa-tayo', action: 'result', hp: '', learner: S.learner, lang: S.lang, diff: S.usedTeacher ? 'teacher' : S.diff, level: res.levelKey,
+          target: String(res.text).slice(0, 400), heard: String(res.heard || '').slice(0, 200), verdict: res.verdict,
+          tama: res.verdict === 'tama' ? 1 : 0, attempts: res.attempts, wcpm: res.wcpm, engine: 'web' })
       });
     } catch (e) {}
   }
@@ -957,7 +1333,7 @@
   async function runSession(startIdx) {
     const id = ++runId;
     try {
-      S.results = []; S.stars = 0; S.azureFailed = false; S.jump = null; S.doneLevels = new Set(); $('stars').textContent = '0';
+      S.results = []; S.stars = 0; S.jump = null; store('bt_diff_' + S.learner, S.diff); S.doneLevels = new Set(); $('stars').textContent = '0';
       show('screenPlay'); $('screenPlay').style.display = 'flex';
       let li = startIdx || 0;
       while (li < LEVELS.length) {
@@ -984,11 +1360,11 @@
     $('endTitle').textContent = tr('endTitle');
     say(tr('endTitle') + ' ' + pickPhrase('praise'));
     const st = statsByLevel(); const sum = $('sum'); sum.innerHTML = '';
-    const line = (k, v) => { const d = document.createElement('div'); const a = document.createElement('span'); a.textContent = k; const b = document.createElement('b'); b.textContent = v; d.append(a, b); sum.appendChild(d); };
+    const line = (k, v, sub) => { const d = document.createElement('div'); const a = document.createElement('span'); a.textContent = k; const b = document.createElement('b'); b.textContent = v; d.append(a, b); if (sub) { const m = document.createElement('small'); m.textContent = sub; d.appendChild(m); } sum.appendChild(d); };
     LEVELS.forEach(l => {
       const s = st[l.key];
       if (!s.n) { line(l.short[S.lang], '—'); return; }
-      if (l.mode === 'long') line(l.short[S.lang], `${Math.round(s.acc * 100)}%` + (s.wcpm ? ` (${s.wcpm} ${tr('wpm')})` : ''));
+      if (l.mode === 'long') line(l.short[S.lang], `${Math.round(s.acc * 100)}%`, s.wcpm ? `${s.wcpm} ${tr('wpm')}` : '');
       else line(l.short[S.lang], `${s.got % 1 ? s.got.toFixed(1) : s.got} / ${s.n}`);
     });
     line('★', String(S.stars));
@@ -1002,18 +1378,13 @@
     const visited = LEVELS.filter(l => st[l.key].n > 0);
     const overall = visited.length ? visited.reduce((a, l) => a + st[l.key].acc, 0) / visited.length : 0;
     const localMsg = overall >= 0.8 ? tr('local').good : overall >= 0.5 ? tr('local').mid : tr('local').low;
-    const c = cfg();
-    if (c.url && c.code) {
-      buddy.textContent = tr('buddyWait');
-      const ctrl = new AbortController(); const t = setTimeout(() => ctrl.abort(), 10000);
-      try {
-        const r = await fetch(c.url, { method: 'POST', signal: ctrl.signal, headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({ action: 'summary', code: c.code, learner: S.learner, lang: S.lang, stats: st, missed: missed.slice(0, 8) }) });
-        const j = await r.json();
-        buddy.className = 'buddy'; buddy.textContent = (j.ok && j.feedback) ? j.feedback : localMsg;
-      } catch (e) { buddy.className = 'buddy'; buddy.textContent = localMsg; }
-      finally { clearTimeout(t); }
-    } else { buddy.className = 'buddy'; buddy.textContent = localMsg; }
+    // Mungkahi: umakyat kung magaling, o magpraktis sa mas madali kung nahirapan (ang bata pa rin ang magpapasya)
+    const sg = $('suggest'); sg.hidden = true;
+    if (S.source !== 'teacher') { const di = DIFFS.indexOf(S.diff); let to = null;
+      if (overall >= 0.8 && di < DIFFS.length - 1) { to = DIFFS[di + 1]; $('suggestTxt').textContent = tr('suggestUp'); }
+      else if (overall < 0.5 && di > 0) { to = DIFFS[di - 1]; $('suggestTxt').textContent = tr('suggestDown'); }
+      if (to) { $('suggestBtn').textContent = tr('tryBtn') + diffName(to); $('suggestBtn').dataset.diff = to; sg.hidden = false; } }
+    buddy.className = 'buddy'; buddy.textContent = localMsg;
   }
 
   /* ================= KONTROL ================= */
@@ -1027,14 +1398,14 @@
     if (micWaiter) { const w = micWaiter; micWaiter = null; w('skip'); }
   });
   $('nextBtn').addEventListener('click', () => { if (nextWaiter) { const w = nextWaiter; nextWaiter = null; w(); } });
-  $('listen').addEventListener('click', () => { if (S.curText) speak(S.curText); });
+  $('listen').addEventListener('click', () => { if (S.curText && !S.stop) speak(S.curText); });   // hindi magsasalita habang nakikinig ang mikropono
 
   function setLang(l) {
     S.lang = l; store('bt_lang', l);
     ['langFil', 'hLangFil'].forEach(i => $(i).setAttribute('aria-pressed', String(l === 'fil')));
     ['langEn', 'hLangEn'].forEach(i => $(i).setAttribute('aria-pressed', String(l === 'en')));
     document.documentElement.lang = l === 'fil' ? 'fil' : 'en';
-    buildTracker();
+    buildTracker(); refreshStart(); syncDiff(); syncSpeed(); syncSource();
   }
   // Kapag nagpalit ng wika habang nagbabasa, magsisimula ng bagong session sa bagong wika.
   function switchLang(l) {
@@ -1050,32 +1421,118 @@
     if (!voiceOn()) { try { speechSynthesis.cancel(); } catch (e) {} }
   });
 
-  function refreshStart() {
-    const c = cfg();
-    $('supportWarn').hidden = !!SR || c.engine === 'azure';
-    $('logNote').textContent = (c.url && c.code) ? TR.fil.logOn : TR.fil.noLog;
+  /* ================= HIRAP (difficulty) AT BILIS NG "PAKINGGAN MUNA" ================= */
+  const DIFF_ID = { easy: 'dEasy', medium: 'dMedium', hard: 'dHard' };
+  const diffName = d => DIFF_NAME[S.lang][d];
+  function syncDiff() {
+    DIFFS.forEach(d => { const b = $(DIFF_ID[d]); b.setAttribute('aria-pressed', String(d === S.diff)); b.querySelector('span').textContent = diffName(d); });
+    $('diffLabel').textContent = tr('diffLabel');
   }
+  function setDiff(d) { if (!DIFFS.includes(d)) return; S.diff = d; store('bt_diff', d); syncDiff(); }
+  DIFFS.forEach(d => $(DIFF_ID[d]).addEventListener('click', () => setDiff(d)));
+  const cleanCode = v => v.trim().toUpperCase().replace(/\s+/g, '-').replace(/[^A-Z0-9._-]/g, '').replace(/^[^A-Z0-9]+/, '').slice(0, 20);
+  $('learner').addEventListener('input', () => { const c = cleanCode($('learner').value), d = c && store('bt_diff_' + c); if (DIFFS.includes(d)) setDiff(d); });
+
+  function syncSpeed() {
+    $('spSlow').setAttribute('aria-pressed', String(S.speed === 'slow')); $('spVerySlow').setAttribute('aria-pressed', String(S.speed === 'veryslow'));
+    $('spSlow').textContent = tr('speedSlow'); $('spVerySlow').textContent = tr('speedVerySlow');
+  }
+  [['spSlow', 'slow'], ['spVerySlow', 'veryslow']].forEach(([id, v]) => $(id).addEventListener('click', () => {
+    S.speed = v; store('bt_speed', v); syncSpeed();
+    if (!S.stop && S.curText) speak(S.curText);                      // pinapakinggan agad sa napiling bilis
+  }));
+  $('suggestBtn').addEventListener('click', () => { setDiff($('suggestBtn').dataset.diff); $('screenEnd').hidden = true; runSession(); });
+
+  /* ================= BABASAHIN NG GURO (kopya-paste; naka-save sa device na ito) ================= */
+  const ABBR = ['gng', 'bb', 'g', 'mr', 'mrs', 'ms', 'dr', 'sr', 'jr', 'gat', 'engr', 'atty'];
+  const cleanLine = x => x.replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/^\s*(?:[-•*·]|\d+[.)])\s+/, '').replace(/\s+/g, ' ').trim();
+  function splitSentences(line) {                                       // hindi puputulin pagkatapos ng Gng., Mr., Dr. atbp.
+    const t = line.replace(/\b([A-Za-z]{1,4})\./g, (m, w) => ABBR.includes(w.toLowerCase()) ? w + '\u0001' : m);
+    return t.split(/(?<=[.?!])\s+(?=[A-Z0-9"'\u201c\u2018])/).map(x => x.replace(/\u0001/g, '.'));
+  }
+  function parseTeacher(kind, text) {
+    const L = CONFIG.teacher, raw = String(text || '');
+    let parts;
+    if (kind === 'words') parts = raw.split(/[\n,;\t]+/);                                           // isa kada linya o paghiwalayin ng kuwit
+    else if (kind === 'sentences') parts = raw.split(/\n/).flatMap(splitSentences);                 // isa kada linya; hinahati rin ang mahabang linya
+    else parts = /\n\s*\n/.test(raw) ? raw.split(/\n\s*\n/) : raw.split(/\n/);                      // blangkong linya = bagong talata
+    const seen = new Set(), items = []; let skipped = 0;
+    parts.map(cleanLine).filter(x => /[\p{L}\p{N}]/u.test(x)).forEach(x => {
+      if (seen.has(x)) return; seen.add(x);
+      const n = x.split(/\s+/).length;
+      const fits = kind === 'words' ? (n <= 3 && x.length <= 30) : kind === 'sentences' ? (n <= L.maxWordsPerSentence && x.length <= 220) : (n <= L.maxWordsPerParagraph && x.length <= 1000);
+      const cap = kind === 'words' ? L.maxWords : kind === 'sentences' ? L.maxSentences : L.maxParagraphs;
+      if (!fits || items.length >= cap) skipped++; else items.push(x);
+    });
+    return { items, skipped };
+  }
+  const teacherLists = lang => { const o = jget('bt_teacher_' + lang, {}); return { words: o.words || [], sentences: o.sentences || [], paragraphs: o.paragraphs || [] }; };
+  const hasTeacher = lang => { const L = teacherLists(lang); return L.words.length + L.sentences.length + L.paragraphs.length > 0; };
+
+  function syncSource() {
+    $('srcApp').setAttribute('aria-pressed', String(S.source === 'app')); $('srcTeacher').setAttribute('aria-pressed', String(S.source === 'teacher'));
+    $('srcLabel').textContent = tr('srcLabel'); $('srcApp').textContent = tr('srcApp'); $('srcTeacher').textContent = tr('srcTeacher'); $('openTeacher').textContent = tr('openTeacher');
+    const L = teacherLists(S.lang), has = hasTeacher(S.lang);
+    $('srcHint').textContent = S.source === 'teacher' ? (has ? tr('srcSummary')(L.words.length, L.sentences.length, L.paragraphs.length) : tr('srcNone')) : '';
+    $('diffGroup').classList.toggle('dim', S.source === 'teacher' && has);        // ang hirap ay para sa binuo ng app lang
+  }
+  function setSource(v) { S.source = v; store('bt_source', v); syncSource(); }
+  $('srcApp').addEventListener('click', () => setSource('app'));
+  $('srcTeacher').addEventListener('click', () => { if (!hasTeacher(S.lang)) { openTeacher(); return; } setSource('teacher'); });
+
+  const tDlg = $('teacherDlg'); let tLang = 'fil'; const tDraft = {};
+  const TSAMPLE = {
+    fil: { words: 'bahay, kaibigan, pamilya, paaralan', sentences: 'Pumasok si Ana sa paaralan.\nMasaya ang aming pamilya.', paragraphs: 'Maaga akong gumising. Naligo ako at kumain ng almusal. Pagkatapos, pumasok ako sa paaralan.' },
+    en:  { words: 'house, friend, family, school', sentences: 'Ana goes to school.\nOur family is happy.', paragraphs: 'I woke up early. I took a bath and ate breakfast. Then I went to school.' }
+  };
+  function readDraft() { tDraft[tLang] = { words: $('tWords').value, sentences: $('tSent').value, paragraphs: $('tPara').value }; }
+  function showDraft() {
+    const d = tDraft[tLang]; $('tWords').value = d.words; $('tSent').value = d.sentences; $('tPara').value = d.paragraphs;
+    $('tFil').setAttribute('aria-pressed', String(tLang === 'fil')); $('tEn').setAttribute('aria-pressed', String(tLang === 'en')); countDraft();
+  }
+  function countDraft() {
+    [['tWords', 'tWordsN', 'words'], ['tSent', 'tSentN', 'sentences'], ['tPara', 'tParaN', 'paragraphs']].forEach(([f, c, k]) => {
+      const r = parseTeacher(k, $(f).value); $(c).textContent = tr('tCount')(r.items.length, r.skipped);
+    });
+  }
+  function openTeacher() {
+    ['fil', 'en'].forEach(l => { const L = teacherLists(l); tDraft[l] = { words: L.words.join('\n'), sentences: L.sentences.join('\n'), paragraphs: L.paragraphs.join('\n\n') }; });
+    tLang = S.lang;
+    [['tTitle', 'tTitle'], ['tIntro', 'tIntro'], ['tWordsL', 'tWords'], ['tWordsH', 'tWordsHint'], ['tSentL', 'tSent'], ['tSentH', 'tSentHint'], ['tParaL', 'tPara'], ['tParaH', 'tParaHint'], ['tSample', 'tSample'], ['tClear', 'tClear'], ['tCancel', 'tCancel'], ['tSave', 'tSave']].forEach(([id, k]) => { $(id).textContent = tr(k); });
+    showDraft();
+    if (typeof tDlg.showModal === 'function') tDlg.showModal(); else tDlg.setAttribute('open', '');
+  }
+  $('openTeacher').addEventListener('click', openTeacher);
+  ['tWords', 'tSent', 'tPara'].forEach(id => $(id).addEventListener('input', countDraft));
+  [['tFil', 'fil'], ['tEn', 'en']].forEach(([id, l]) => $(id).addEventListener('click', () => { readDraft(); tLang = l; showDraft(); }));
+  $('tSample').addEventListener('click', () => { tDraft[tLang] = Object.assign({}, TSAMPLE[tLang]); showDraft(); });
+  $('tClear').addEventListener('click', () => { tDraft[tLang] = { words: '', sentences: '', paragraphs: '' }; showDraft(); });
+  $('tCancel').addEventListener('click', () => tDlg.close());
+  $('teacherForm').addEventListener('submit', e => {
+    e.preventDefault(); readDraft();
+    ['fil', 'en'].forEach(l => { const d = tDraft[l]; jset('bt_teacher_' + l, { words: parseTeacher('words', d.words).items, sentences: parseTeacher('sentences', d.sentences).items, paragraphs: parseTeacher('paragraphs', d.paragraphs).items }); });
+    if (S.source === 'app' && hasTeacher(S.lang)) S.source = 'teacher', store('bt_source', 'teacher');   // pagkatapos mag-save, sa Guro na agad
+    if (!hasTeacher(S.lang) && S.source === 'teacher') setSource('app');
+    syncSource(); tDlg.close();
+  });
+
+  function refreshStart() {
+    $('supportWarn').hidden = !!SR;
+    const en = S.lang === 'en';
+    $('consentRow').hidden = !logOn(); $('footLog').hidden = !logOn();
+    $('consentTxt').textContent = en
+      ? 'A parent or teacher agrees to record the code and reading results (no voice, no full name).'
+      : 'Pumapayag ang magulang o guro na itala ang code at resulta ng pagbasa (walang boses, walang buong pangalan).';
+    $('logNote').textContent = en ? 'No voice is saved. Ask a parent or teacher before you start.' : 'Walang sine-save na boses. Magpaalam sa magulang o guro bago magsimula.';
+  }
+  $('consent').addEventListener('change', () => store('bt_consent', $('consent').checked ? '1' : '0'));
   $('begin').addEventListener('click', () => {
-    const code = $('learner').value.trim().toUpperCase().replace(/\s+/g, '-') || 'BISITA';
+    const code = $('learner').value.trim().toUpperCase().replace(/\s+/g, '-').replace(/[^A-Z0-9._-]/g, '').replace(/^[^A-Z0-9]+/, '').slice(0, 20) || 'BISITA';
     S.learner = code; store('bt_learner', code);
     runSession();
   });
   $('again').addEventListener('click', () => { $('screenEnd').hidden = true; runSession(); });
   $('newUser').addEventListener('click', () => { $('learner').value = ''; mood('idle'); show('screenStart'); $('screenPlay').style.display = 'none'; refreshStart(); });
-
-  /* ================= SETTINGS ================= */
-  const dlg = $('settings');
-  $('openSettings').addEventListener('click', () => {
-    const c = cfg(); $('fEngine').value = c.engine; $('fUrl').value = c.url; $('fCode').value = c.code;
-    $('fVoice').value = voiceOn() ? 'on' : 'off'; updateVoiceInfo();
-    if (typeof dlg.showModal === 'function') dlg.showModal(); else dlg.setAttribute('open', '');
-  });
-  $('cancelSettings').addEventListener('click', () => dlg.close());
-  $('testVoice').addEventListener('click', () => { utter(pickPhrase('praise'), { rate: 1, pitch: 1.2 }); updateVoiceInfo(); });
-  $('settingsForm').addEventListener('submit', () => {
-    store('bt_engine', $('fEngine').value); store('bt_voice', $('fVoice').value); syncVoiceBtn(); store('bt_url', $('fUrl').value.trim()); store('bt_code', $('fCode').value.trim());
-    tokenCache = { token: null, region: null, exp: 0 }; refreshStart();
-  });
 
   /* ================= SIMULA ================= */
   initMascots();
@@ -1083,6 +1540,7 @@
   $('screenPlay').style.display = 'none';
   setLang(S.lang);
   $('learner').value = store('bt_learner') || '';
+  { const c = store('bt_consent'); $('consent').checked = c === null ? !!CONFIG.consentDefault : c === '1'; }
   refreshStart();
 })();
 </script>
